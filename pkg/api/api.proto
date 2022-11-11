@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = "urlshortener/pkg/api";
+
+package api;
+
+message NoContent {};
+
+message PingRequest {};
+
+message PingResponse {};

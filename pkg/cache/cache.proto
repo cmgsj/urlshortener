@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option go_package = "urlshortener/pkg/cache";
+
+package cache;
+
+import "pkg/api/api.proto";
+
+message GetUrlRequest {
+	string urlId = 1;
+}
+
+message GetUrlResponse {
+	string redirectUrl = 1;
+}
+
+message SetUrlRequest {
+	string urlId = 1;
+	string redirectUrl = 2;
+}
+
+service Cache {
+	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse);
+	rpc SetUrl(SetUrlRequest) returns (api.NoContent);
+	rpc Ping(api.PingRequest) returns (api.PingResponse);
+}

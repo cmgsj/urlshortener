@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+option go_package = "urlshortener/pkg/urls";
+
+package urlss;
+
+import "pkg/api/api.proto";
+
+message GetUrlRequest {
+	string urlId = 1;
+}
+
+message CreateUrlRequest {
+	string redirectUrl = 1;
+}
+
+message UpdateUrlRequest {
+	string urlId = 1;
+	string redirectUrl = 2;
+}
+
+message DeleteUrlRequest {
+	string urlId = 1;
+}
+
+message GetUrlResponse {
+	string urlId = 1;
+	string redirectUrl = 2;
+}
+
+message CreateUrlResponse {
+	string urlId = 1;
+}
+
+service Urls {
+	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse);
+  	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse);
+  	rpc UpdateUrl(UpdateUrlRequest) returns (api.NoContent);
+  	rpc DeleteUrl(DeleteUrlRequest) returns (api.NoContent);
+  	rpc Ping(api.PingRequest) returns (api.PingResponse);
+}
