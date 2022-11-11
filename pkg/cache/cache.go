@@ -75,7 +75,7 @@ func (server *cacheServer) SetUrl(ctx context.Context, req *SetUrlRequest) (*api
 }
 
 func (server *cacheServer) Ping(ctx context.Context, req *api.PingRequest) (*api.PingResponse, error) {
-	return &api.PingResponse{}, nil
+	return &api.PingResponse{Message: "pong"}, nil
 }
 
 func initRedisDB(redisAddr string, redisPassword string, redisDb int) *redis.Client {

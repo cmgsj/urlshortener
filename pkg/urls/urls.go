@@ -92,7 +92,7 @@ func (server *urlServer) DeleteUrl(ctx context.Context, req *DeleteUrlRequest) (
 }
 
 func (server *urlServer) Ping(ctx context.Context, req *api.PingRequest) (*api.PingResponse, error) {
-	return &api.PingResponse{}, nil
+	return &api.PingResponse{Message: "pong"}, nil
 }
 
 func generateID() (string, error) {

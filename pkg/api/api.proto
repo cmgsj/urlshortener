@@ -8,4 +8,6 @@ message NoContent {};
 
 message PingRequest {};
 
-message PingResponse {};
+message PingResponse {
+	string message = 1;
+};
