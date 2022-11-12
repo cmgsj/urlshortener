@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	port    = flag.Int("port", 8081, "the port to serve on")
-	urls_db = flag.String("urls_db", "urls.db", "the urls db")
+	port   = flag.Int("port", 8081, "the port to serve on")
+	urlsDB = flag.String("urls_db", "urls.db", "the urls db")
 )
 
 func RunService() {
@@ -33,7 +33,7 @@ func RunService() {
 		grpc.StreamInterceptor(grpcInterceptor.StreamLogger))
 
 	server := &urlServer{
-		db: initSqliteDB(*urls_db),
+		db: initSqliteDB(*urlsDB),
 	}
 
 	urlspb.RegisterUrlsServer(grpcServer, server)

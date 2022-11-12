@@ -178,7 +178,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
-	Title:            "URL Shortener",
+	Title:            "URL Shortener API",
 	Description:      "This is a URL shortener service.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

@@ -14,11 +14,11 @@ import (
 )
 
 var (
-	port           = flag.Int("port", 8082, "the port to serve on")
-	redis_addr     = flag.String("redis_addr", "redis_cache:6379", "the redis address")
-	redis_password = flag.String("redis_password", "", "the redis password")
-	redis_db       = flag.Int("redis_db", 0, "the redis db")
-	cache_exp_time = flag.Duration("cache_exp_time", time.Hour, "the cache expiry time")
+	port          = flag.Int("port", 8082, "the port to serve on")
+	redisAddr     = flag.String("redis_addr", "redis_cache:6379", "the redis address")
+	redisPassword = flag.String("redis_password", "", "the redis password")
+	redisDb       = flag.Int("redis_db", 0, "the redis db")
+	cacheExpTime  = flag.Duration("cache_exp_time", time.Hour, "the cache expiry time")
 )
 
 func RunService() {
@@ -37,8 +37,8 @@ func RunService() {
 		grpc.StreamInterceptor(grpcInterceptor.StreamLogger))
 
 	server := &cacheServer{
-		rdb:             initRedisDB(*redis_addr, *redis_password, *redis_db),
-		cacheExpiryTime: *cache_exp_time,
+		rdb:             initRedisDB(*redisAddr, *redisPassword, *redisDb),
+		cacheExpiryTime: *cacheExpTime,
 	}
 
 	cachepb.RegisterCacheServer(grpcServer, server)

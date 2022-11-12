@@ -19,9 +19,9 @@ import (
 )
 
 var (
-	port       = flag.Int("port", 8080, "The server port")
-	urls_addr  = flag.String("urls_addr", "urls_service:8081", "url service address")
-	cache_addr = flag.String("cache_addr", "cache_service:8082", "cache service address")
+	port      = flag.Int("port", 8080, "The server port")
+	urlsAddr  = flag.String("urls_addr", "urls_service:8081", "url service address")
+	cacheAddr = flag.String("cache_addr", "cache_service:8082", "cache service address")
 )
 
 // @title                   URL Shortener API
@@ -42,13 +42,13 @@ func RunService() {
 	flag.Parse()
 
 	var err error
-	urlConn, err := grpc.Dial(*urls_addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	urlConn, err := grpc.Dial(*urlsAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
 	defer urlConn.Close()
 
-	cacheConn, err := grpc.Dial(*cache_addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	cacheConn, err := grpc.Dial(*cacheAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
