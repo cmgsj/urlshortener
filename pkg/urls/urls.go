@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"urlshortener/pkg/grpc/interceptor"
-	"urlshortener/pkg/protobuf/urlspb"
+
+	"github.com/mike9107/urlshortener/pkg/grpc/interceptor"
+	"github.com/mike9107/urlshortener/pkg/protobuf/urlspb"
 
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc"
@@ -17,9 +18,16 @@ var (
 	urlsDB = flag.String("urls_db", "urls.db", "the urls db")
 )
 
-func RunService() {
-
+func NewService() *urlServer {
 	flag.Parse()
+
+	server := &urlServer{
+		db: initSqliteDB(*urlsDB),
+	}
+	return server
+}
+
+func (server *urlServer) Run() {
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
@@ -31,10 +39,6 @@ func RunService() {
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(grpcInterceptor.UnaryLogger),
 		grpc.StreamInterceptor(grpcInterceptor.StreamLogger))
-
-	server := &urlServer{
-		db: initSqliteDB(*urlsDB),
-	}
 
 	urlspb.RegisterUrlsServer(grpcServer, server)
 

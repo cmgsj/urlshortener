@@ -6,16 +6,13 @@ import (
 	"log"
 	"time"
 
-	_ "urlshortener/docs"
-	"urlshortener/pkg/protobuf/cachepb"
-	"urlshortener/pkg/protobuf/urlspb"
+	_ "github.com/mike9107/urlshortener/docs"
+	"github.com/mike9107/urlshortener/pkg/protobuf/cachepb"
+	"github.com/mike9107/urlshortener/pkg/protobuf/urlspb"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var (
@@ -37,34 +34,33 @@ var (
 // @license.name            MIT
 // @license.url             https://opensource.org/licenses/MIT
 
-func RunService() {
-
+func NewService() *apiServer {
 	flag.Parse()
 
-	var err error
 	urlConn, err := grpc.Dial(*urlsAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
-	defer urlConn.Close()
 
 	cacheConn, err := grpc.Dial(*cacheAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
-	defer cacheConn.Close()
 
-	server := &httpServer{
-		urlClient:      urlspb.NewUrlsClient(urlConn),
+	server := &apiServer{
+		urlsClient:     urlspb.NewUrlsClient(urlConn),
 		cacheClient:    cachepb.NewCacheClient(cacheConn),
 		router:         gin.Default(),
 		trustedProxies: []string{"127.0.0.1"},
 	}
 	server.registerEndpoints()
 	server.registerTrustedProxies()
+	return server
+}
+
+func (server *apiServer) Run() {
 	go server.pingServices()
-	stop := server.schedulePeriodicTask(server.pingServices, time.Minute)
-	defer stop()
+	schedulePeriodicTask(server.pingServices, time.Minute)
 
 	log.Println("Starting server on port", *port)
 	log.Printf("Swagger docs available at http://localhost:%d/docs/index.html\n", *port)
@@ -72,12 +68,4 @@ func RunService() {
 	if err := server.router.Run(fmt.Sprintf(":%d", *port)); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-}
-
-func (server *httpServer) registerEndpoints() {
-	server.router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	server.router.GET("/ping", server.Ping)
-	server.router.Any("/:urlId", server.RedirectToUrl)
-	server.router.GET("/url/:urlId", server.GetUrl)
-	server.router.POST("/url", server.PostUrl)
 }

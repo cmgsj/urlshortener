@@ -7,8 +7,8 @@ import (
 	"net"
 	"time"
 
-	"urlshortener/pkg/grpc/interceptor"
-	"urlshortener/pkg/protobuf/cachepb"
+	"github.com/mike9107/urlshortener/pkg/grpc/interceptor"
+	"github.com/mike9107/urlshortener/pkg/protobuf/cachepb"
 
 	"google.golang.org/grpc"
 )
@@ -21,9 +21,17 @@ var (
 	cacheExpTime  = flag.Duration("cache_exp_time", time.Hour, "the cache expiry time")
 )
 
-func RunService() {
-
+func NewService() *cacheServer {
 	flag.Parse()
+
+	server := &cacheServer{
+		rdb:             initRedisDB(*redisAddr, *redisPassword, *redisDb),
+		cacheExpiryTime: *cacheExpTime,
+	}
+	return server
+}
+
+func (server *cacheServer) Run() {
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
@@ -35,11 +43,6 @@ func RunService() {
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(grpcInterceptor.UnaryLogger),
 		grpc.StreamInterceptor(grpcInterceptor.StreamLogger))
-
-	server := &cacheServer{
-		rdb:             initRedisDB(*redisAddr, *redisPassword, *redisDb),
-		cacheExpiryTime: *cacheExpTime,
-	}
 
 	cachepb.RegisterCacheServer(grpcServer, server)
 

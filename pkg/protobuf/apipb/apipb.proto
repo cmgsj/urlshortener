@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "urlshortener/pkg/protobuf/apipb";
+option go_package = "github.com/mike9107/urlshortener/pkg/protobuf/apipb";
 
 package apipb;
 

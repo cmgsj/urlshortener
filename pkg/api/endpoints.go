@@ -5,8 +5,9 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"urlshortener/pkg/protobuf/cachepb"
-	"urlshortener/pkg/protobuf/urlspb"
+
+	"github.com/mike9107/urlshortener/pkg/protobuf/cachepb"
+	"github.com/mike9107/urlshortener/pkg/protobuf/urlspb"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +25,7 @@ var (
 // @Success     200 {string} string "pong"
 // @Failure     500 {object} ErrorResponse
 // @Router      /ping [get]
-func (server *httpServer) Ping(ctx *gin.Context) {
+func (server *apiServer) Pong(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "pong")
 }
 
@@ -39,7 +40,7 @@ func (server *httpServer) Ping(ctx *gin.Context) {
 // @Failure     404   {object} ErrorResponse
 // @Failure     500   {object} ErrorResponse
 // @Router      /url/{urlId} [get]
-func (server *httpServer) GetUrl(ctx *gin.Context) {
+func (server *apiServer) GetUrl(ctx *gin.Context) {
 	urlId := ctx.Param(UrlIdParam)
 	if server.cacheServiceActive {
 		c, cancel := makeCtx()
@@ -50,10 +51,10 @@ func (server *httpServer) GetUrl(ctx *gin.Context) {
 			return
 		}
 	}
-	if server.urlServiceActive {
+	if server.urlsServiceActive {
 		c, cancel := makeCtx()
 		defer cancel()
-		urlRes, err := server.urlClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
+		urlRes, err := server.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err == nil {
 			ctx.JSON(http.StatusOK, UrlDTO{UrlId: urlId, RedirectUrl: urlRes.RedirectUrl})
 		} else {
@@ -75,16 +76,16 @@ func (server *httpServer) GetUrl(ctx *gin.Context) {
 // @Failure     400 {object} ErrorResponse
 // @Failure     500 {object} ErrorResponse
 // @Router      /url [post]
-func (server *httpServer) PostUrl(ctx *gin.Context) {
+func (server *apiServer) PostUrl(ctx *gin.Context) {
 	var body CreateUrlRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	if server.urlServiceActive {
+	if server.urlsServiceActive {
 		c, cancel := makeCtx()
 		defer cancel()
-		urlRes, err := server.urlClient.CreateUrl(c, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
+		urlRes, err := server.urlsClient.CreateUrl(c, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 			return
@@ -103,7 +104,7 @@ func (server *httpServer) PostUrl(ctx *gin.Context) {
 	ctx.JSON(http.StatusInternalServerError, ServicesUnavailableError)
 }
 
-func (server *httpServer) RedirectToUrl(ctx *gin.Context) {
+func (server *apiServer) RedirectToUrl(ctx *gin.Context) {
 	urlId := ctx.Param(UrlIdParam)
 	if server.cacheServiceActive {
 		c, cancel := makeCtx()
@@ -114,10 +115,10 @@ func (server *httpServer) RedirectToUrl(ctx *gin.Context) {
 			return
 		}
 	}
-	if server.urlServiceActive {
+	if server.urlsServiceActive {
 		c, cancel := makeCtx()
 		defer cancel()
-		urlRes, err := server.urlClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
+		urlRes, err := server.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err == nil {
 			ctx.Redirect(http.StatusTemporaryRedirect, urlRes.RedirectUrl)
 		} else {

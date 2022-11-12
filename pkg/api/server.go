@@ -2,66 +2,45 @@ package api
 
 import (
 	"log"
-	"time"
-	"urlshortener/pkg/protobuf/apipb"
-	"urlshortener/pkg/protobuf/cachepb"
-	"urlshortener/pkg/protobuf/urlspb"
+
+	"github.com/mike9107/urlshortener/pkg/protobuf/cachepb"
+	"github.com/mike9107/urlshortener/pkg/protobuf/urlspb"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-type httpServer struct {
-	urlClient          urlspb.UrlsClient
-	urlServiceActive   bool
+type apiServer struct {
+	urlsClient         urlspb.UrlsClient
+	urlsServiceActive  bool
 	cacheClient        cachepb.CacheClient
 	cacheServiceActive bool
 	router             *gin.Engine
 	trustedProxies     []string
 }
 
-func (server *httpServer) registerTrustedProxies() {
+func (server *apiServer) registerTrustedProxies() {
 	err := server.router.SetTrustedProxies(server.trustedProxies)
 	if err != nil {
 		log.Fatalf("failed to set trusted proxies: %v", err)
 	}
 }
 
-func (server *httpServer) pingServices() {
-	c, cancel := makeCtx()
-	defer cancel()
-	_, err := server.urlClient.Ping(c, &apipb.PingRequest{})
-	if err != nil {
-		server.urlServiceActive = false
-		log.Println("failed to ping url service: ", err)
-	} else {
-		server.urlServiceActive = true
-		log.Println("url service is active")
-	}
-	c, cancel = makeCtx()
-	defer cancel()
-	_, err = server.cacheClient.Ping(c, &apipb.PingRequest{})
-	if err != nil {
-		server.cacheServiceActive = false
-		log.Println("failed to ping cache service: ", err)
-	} else {
-		server.cacheServiceActive = true
-		log.Println("cache service is active")
-	}
+func (server *apiServer) registerEndpoints() {
+	server.router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	server.router.GET("/ping", server.Pong)
+	server.router.Any("/:urlId", server.RedirectToUrl)
+	server.router.GET("/url/:urlId", server.GetUrl)
+	server.router.POST("/url", server.PostUrl)
 }
 
-func (server *httpServer) schedulePeriodicTask(task func(), d time.Duration) func() {
-	ticker := time.NewTicker(d)
-	done := make(chan struct{}, 1)
-	go func(ticker *time.Ticker, task func(), done <-chan struct{}) {
-		for {
-			select {
-			case <-ticker.C:
-				task()
-			case <-done:
-				ticker.Stop()
-				return
-			}
-		}
-	}(ticker, task, done)
-	return func() { done <- struct{}{} }
+func (server *apiServer) pingServices() {
+	clients := []client{
+		{name: "urls service", service: server.urlsClient, active: &server.urlsServiceActive},
+		{name: "cache service", service: server.cacheClient, active: &server.cacheServiceActive},
+	}
+	for _, client := range clients {
+		go makePingCall(client.service, client.name, client.active)
+	}
 }

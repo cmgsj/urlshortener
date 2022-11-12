@@ -8,10 +8,10 @@ package urlspb
 
 import (
 	context "context"
+	apipb "github.com/mike9107/urlshortener/pkg/protobuf/apipb"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	apipb "urlshortener/pkg/protobuf/apipb"
 )
 
 // This is a compile-time assertion to ensure that this generated file

@@ -3,8 +3,9 @@ package cache
 import (
 	"context"
 	"time"
-	"urlshortener/pkg/protobuf/apipb"
-	"urlshortener/pkg/protobuf/cachepb"
+
+	"github.com/mike9107/urlshortener/pkg/protobuf/apipb"
+	"github.com/mike9107/urlshortener/pkg/protobuf/cachepb"
 
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc/codes"

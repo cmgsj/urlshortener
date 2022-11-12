@@ -1,4 +1,9 @@
-default: format proto_gen swagger_gen
+default: build
+
+build: format proto_gen swagger_gen
+	go build -o bin/api_service cmd/api/main.go
+	go build -o bin/urls_service cmd/urls/main.go
+	go build -o bin/cache_service cmd/cache/main.go
 	
 format:
 	gofmt -w .
@@ -15,6 +20,21 @@ swagger_gen:
 
 docker_swagger_update: swagger_gen
 	docker compose run --rm api_service sh -c "swag fmt; swag init -g pkg/api/api.go"
+
+run_redis:
+	docker run -d -p 6379:6379 --name redis_cache redis
+
+run_cache:
+	./bin/cache_service -redis_addr=localhost:6379
+
+run_urls:
+	./bin/urls_service
+
+run_api:
+	./bin/api_service -urls_addr=localhost:8081 -cache_addr=localhost:8082
+
+clean:
+	rm -f bin/*
 
 # docker exec -it [container] bash
 # docker compose run --rm [container] sh -c "[command]"

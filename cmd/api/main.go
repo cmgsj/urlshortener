@@ -1,7 +1,7 @@
 package main
 
-import "urlshortener/pkg/api"
+import "github.com/mike9107/urlshortener/pkg/api"
 
 func main() {
-	api.RunService()
+	api.NewService().Run()
 }

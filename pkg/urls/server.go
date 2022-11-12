@@ -5,9 +5,9 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"encoding/base64"
+	"github.com/mike9107/urlshortener/pkg/protobuf/apipb"
+	"github.com/mike9107/urlshortener/pkg/protobuf/urlspb"
 	"net/url"
-	"urlshortener/pkg/protobuf/apipb"
-	"urlshortener/pkg/protobuf/urlspb"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
