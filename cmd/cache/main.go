@@ -1,6 +1,6 @@
 package main
 
-import "urlshortener/pkg/cache"
+import "urlshortener/pkg/services/cache"
 
 func main() {
 	cache.NewService().Run()

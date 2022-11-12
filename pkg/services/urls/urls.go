@@ -6,7 +6,7 @@ import (
 	"log"
 	"net"
 
-	"urlshortener/pkg/grpc/interceptor"
+	"urlshortener/pkg/interceptors/logger"
 	"urlshortener/pkg/protobuf/urlspb"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -34,11 +34,11 @@ func (server *urlServer) Run() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcInterceptor := interceptor.NewGrpcInterceptor()
+	loggerInterceptor := logger.NewLoggerInterceptor()
 
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(grpcInterceptor.UnaryLogger),
-		grpc.StreamInterceptor(grpcInterceptor.StreamLogger))
+		grpc.UnaryInterceptor(loggerInterceptor.UnaryLogger),
+		grpc.StreamInterceptor(loggerInterceptor.StreamLogger))
 
 	urlspb.RegisterUrlsServer(grpcServer, server)
 

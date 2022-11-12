@@ -9,8 +9,10 @@ import (
 	_ "urlshortener/docs"
 	"urlshortener/pkg/protobuf/cachepb"
 	"urlshortener/pkg/protobuf/urlspb"
+	"urlshortener/pkg/scheduler"
 
 	"github.com/gin-gonic/gin"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -60,7 +62,7 @@ func NewService() *apiServer {
 
 func (server *apiServer) Run() {
 	go server.pingServices()
-	schedulePeriodicTask(server.pingServices, time.Minute)
+	scheduler.SchedulePeriodicTask(server.pingServices, time.Minute)
 
 	log.Println("Starting server on port", *port)
 	log.Printf("Swagger docs available at http://localhost:%d/docs/index.html\n", *port)

@@ -3,6 +3,7 @@ package api
 import (
 	"log"
 
+	"urlshortener/pkg/protobuf/apipb"
 	"urlshortener/pkg/protobuf/cachepb"
 	"urlshortener/pkg/protobuf/urlspb"
 
@@ -42,5 +43,18 @@ func (server *apiServer) pingServices() {
 	}
 	for _, client := range clients {
 		go makePingCall(client.service, client.name, client.active)
+	}
+}
+
+func makePingCall(client pingCallable, name string, active *bool) {
+	c, cancel := makeCtx()
+	defer cancel()
+	_, err := client.Ping(c, &apipb.PingRequest{})
+	if err != nil {
+		*active = false
+		log.Printf("failed to ping %s: %v", name, err)
+	} else {
+		*active = true
+		log.Printf("%s is active", name)
 	}
 }

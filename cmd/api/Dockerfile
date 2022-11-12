@@ -11,7 +11,7 @@ RUN go mod download
 
 RUN go install github.com/swaggo/swag/cmd/swag@latest
 RUN swag fmt 
-RUN swag init -g pkg/api/api.go
+RUN swag init -g pkg/services/api/api.go
 
 RUN go install github.com/githubnemo/CompileDaemon@latest
 

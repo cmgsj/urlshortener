@@ -7,7 +7,7 @@ import (
 	"net"
 	"time"
 
-	"urlshortener/pkg/grpc/interceptor"
+	"urlshortener/pkg/interceptors/logger"
 	"urlshortener/pkg/protobuf/cachepb"
 
 	"google.golang.org/grpc"
@@ -38,11 +38,11 @@ func (server *cacheServer) Run() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcInterceptor := interceptor.NewGrpcInterceptor()
+	loggerInterceptor := logger.NewLoggerInterceptor()
 
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(grpcInterceptor.UnaryLogger),
-		grpc.StreamInterceptor(grpcInterceptor.StreamLogger))
+		grpc.UnaryInterceptor(loggerInterceptor.UnaryLogger),
+		grpc.StreamInterceptor(loggerInterceptor.StreamLogger))
 
 	cachepb.RegisterCacheServer(grpcServer, server)
 
