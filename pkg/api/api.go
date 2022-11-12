@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	_ "urlshortener/pkg/docs"
+	_ "urlshortener/docs"
 	"urlshortener/pkg/protobuf/cachepb"
 	"urlshortener/pkg/protobuf/urlspb"
 
