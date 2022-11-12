@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-option go_package = "urlshortener/pkg/proto/urlspb";
+option go_package = "urlshortener/pkg/protobuf/urlspb";
 
 package urlspb;
 
-import "pkg/proto/apipb/apipb.proto";
+import "pkg/protobuf/apipb/apipb.proto";
 
 message GetUrlRequest {
 	string urlId = 1;

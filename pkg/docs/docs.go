@@ -45,7 +45,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/server.ErrorResponse"
                         }
                     }
                 }
@@ -69,7 +69,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.CreateUrlRequest"
+                            "$ref": "#/definitions/server.CreateUrlRequest"
                         }
                     }
                 ],
@@ -77,19 +77,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDTO"
+                            "$ref": "#/definitions/server.UrlDTO"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/server.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/server.ErrorResponse"
                         }
                     }
                 }
@@ -119,19 +119,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDTO"
+                            "$ref": "#/definitions/server.UrlDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/server.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/server.ErrorResponse"
                         }
                     }
                 }
@@ -139,7 +139,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.CreateUrlRequest": {
+        "server.CreateUrlRequest": {
             "type": "object",
             "required": [
                 "redirectUrl"
@@ -150,7 +150,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.ErrorResponse": {
+        "server.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -158,7 +158,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.UrlDTO": {
+        "server.UrlDTO": {
             "type": "object",
             "properties": {
                 "redirectUrl": {
@@ -168,6 +168,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "JWT_AUTH": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

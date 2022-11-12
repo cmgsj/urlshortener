@@ -14,17 +14,21 @@ type UrlEntity struct {
 func initSqliteDB(sqliteDbName string) *sql.DB {
 	db, err := sql.Open("sqlite3", sqliteDbName)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to open sqlite db: %v", err)
 	}
-	err = createTable(db, context.Background())
+	err = createUrlsTable(db, context.Background())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to create table: %v", err)
 	}
 	return db
 }
 
-func createTable(db *sql.DB, ctx context.Context) error {
+func createUrlsTable(db *sql.DB, ctx context.Context) error {
 	_, err := db.ExecContext(ctx, "CREATE TABLE IF NOT EXISTS urls (url_id TEXT PRIMARY KEY, redirect_url TEXT UNIQUE)")
+	if err != nil {
+		return err
+	}
+	_, err = db.ExecContext(ctx, "CREATE INDEX IF NOT EXISTS redirect_url_index ON urls (redirect_url)")
 	return err
 }
 

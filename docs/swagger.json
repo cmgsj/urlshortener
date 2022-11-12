@@ -41,7 +41,7 @@
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/server.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -65,7 +65,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/server.CreateUrlDTO"
+                            "$ref": "#/definitions/api.CreateUrlRequest"
                         }
                     }
                 ],
@@ -73,19 +73,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/server.UrlDTO"
+                            "$ref": "#/definitions/api.UrlDTO"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/server.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/server.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -115,19 +115,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/server.UrlDTO"
+                            "$ref": "#/definitions/api.UrlDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/server.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/server.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -135,7 +135,7 @@
         }
     },
     "definitions": {
-        "server.CreateUrlDTO": {
+        "api.CreateUrlRequest": {
             "type": "object",
             "required": [
                 "redirectUrl"
@@ -146,7 +146,7 @@
                 }
             }
         },
-        "server.ErrorResponse": {
+        "api.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -154,7 +154,7 @@
                 }
             }
         },
-        "server.UrlDTO": {
+        "api.UrlDTO": {
             "type": "object",
             "properties": {
                 "redirectUrl": {
@@ -164,13 +164,6 @@
                     "type": "string"
                 }
             }
-        }
-    },
-    "securityDefinitions": {
-        "JWT_AUTH": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
         }
     }
 }

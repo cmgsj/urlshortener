@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -9,18 +8,10 @@ import (
 	"time"
 
 	"urlshortener/pkg/grpc/interceptor"
-	"urlshortener/pkg/proto/apipb"
-	"urlshortener/pkg/proto/cachepb"
+	"urlshortener/pkg/protobuf/cachepb"
 
-	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc"
 )
-
-type cacheServer struct {
-	cachepb.UnimplementedCacheServer
-	rdb             *redis.Client
-	cacheExpiryTime time.Duration
-}
 
 var (
 	port           = flag.Int("port", 8082, "the port to serve on")
@@ -58,37 +49,4 @@ func RunService() {
 		log.Fatalf("failed to serve: %v", err)
 	}
 
-}
-
-func (server *cacheServer) GetUrl(ctx context.Context, req *cachepb.GetUrlRequest) (*cachepb.GetUrlResponse, error) {
-	redirectUrl, err := server.rdb.Get(ctx, req.GetUrlId()).Result()
-	if err != nil {
-		return nil, err
-	}
-	return &cachepb.GetUrlResponse{RedirectUrl: redirectUrl}, nil
-}
-
-func (server *cacheServer) SetUrl(ctx context.Context, req *cachepb.SetUrlRequest) (*apipb.NoContent, error) {
-	err := server.rdb.Set(ctx, req.GetUrlId(), req.GetRedirectUrl(), server.cacheExpiryTime).Err()
-	if err != nil {
-		return nil, err
-	}
-	return &apipb.NoContent{}, nil
-}
-
-func (server *cacheServer) Ping(ctx context.Context, req *apipb.PingRequest) (*apipb.PingResponse, error) {
-	return &apipb.PingResponse{Message: "pong"}, nil
-}
-
-func initRedisDB(redisAddr string, redisPassword string, redisDb int) *redis.Client {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     redisAddr,
-		Password: redisPassword,
-		DB:       redisDb,
-	})
-	_, err := rdb.Ping(context.Background()).Result()
-	if err != nil {
-		log.Fatalf("failed to connect to redis: %v", err)
-	}
-	return rdb
 }

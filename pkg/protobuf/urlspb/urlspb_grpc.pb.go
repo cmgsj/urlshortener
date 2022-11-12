@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.9
-// source: pkg/proto/urlspb/urlspb.proto
+// source: pkg/protobuf/urlspb/urlspb.proto
 
 package urlspb
 
@@ -11,7 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	apipb "urlshortener/pkg/proto/apipb"
+	apipb "urlshortener/pkg/protobuf/apipb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -246,5 +246,5 @@ var Urls_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/proto/urlspb/urlspb.proto",
+	Metadata: "pkg/protobuf/urlspb/urlspb.proto",
 }

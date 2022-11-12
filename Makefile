@@ -1,4 +1,4 @@
-default: format
+default: format proto_gen swagger_gen
 	
 format:
 	gofmt -w .
@@ -11,15 +11,7 @@ proto_gen:
 
 swagger_gen:
 	swag fmt 
-	swag init -g pkg/server/server.go
-
-build: format proto_gen swagger_gen
-	go build -o bin/server ./cmd/server/main.go
-	go build -o bin/cache ./cmd/cache/main.go
-	go build -o bin/urls ./cmd/urls/main.go
-
-clean:
-	rm -rf bin/*
+	swag init -g pkg/api/api.go
 
 # docker exec -it urls_service bash
 # docker compose run --rm urls_service sh -c "ls -lh"

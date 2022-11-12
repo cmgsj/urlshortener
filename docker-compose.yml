@@ -2,18 +2,18 @@ version: "3.9"
 
 services:
   
-  server:
-    container_name: server
+  api_service:
+    container_name: api_service
     build:
       context: .
-      dockerfile: cmd/server/Dockerfile
+      dockerfile: cmd/api/Dockerfile
     depends_on:
       - urls_service
       - cache_service
     env_file:
       - .env
     ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+      - "${API_PORT}:${API_PORT}"
     volumes:
       - ./pkg:/usr/src/app/pkg
 

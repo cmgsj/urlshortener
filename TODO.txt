@@ -1,1 +1,1 @@
-TODO: use command line flags in services and in docker-compose.yml
+TODO: use command line flags in services and in docker compose

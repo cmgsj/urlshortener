@@ -1,18 +1,18 @@
 basePath: /
 definitions:
-  api.CreateUrlRequest:
+  server.CreateUrlRequest:
     properties:
       redirectUrl:
         type: string
     required:
-    - redirectUrl
+      - redirectUrl
     type: object
-  api.ErrorResponse:
+  server.ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  api.UrlDTO:
+  server.UrlDTO:
     properties:
       redirectUrl:
         type: string
@@ -37,7 +37,7 @@ paths:
       description: Ping the server
       operationId: ping
       produces:
-      - text/plain
+        - text/plain
       responses:
         "200":
           description: pong
@@ -46,67 +46,72 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: "#/definitions/server.ErrorResponse"
       summary: Ping the server
       tags:
-      - ping
+        - ping
   /url:
     post:
       description: Create a new url
       operationId: create-url
       parameters:
-      - description: url
-        in: body
-        name: url
-        required: true
-        schema:
-          $ref: '#/definitions/api.CreateUrlRequest'
+        - description: url
+          in: body
+          name: url
+          required: true
+          schema:
+            $ref: "#/definitions/server.CreateUrlRequest"
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.UrlDTO'
+            $ref: "#/definitions/server.UrlDTO"
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: "#/definitions/server.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: "#/definitions/server.ErrorResponse"
       summary: Create a new url
       tags:
-      - url
+        - url
   /url/{urlId}:
     get:
       description: Get the redirect url
       operationId: get-url
       parameters:
-      - description: url id
-        in: path
-        name: urlId
-        required: true
-        type: string
+        - description: url id
+          in: path
+          name: urlId
+          required: true
+          type: string
       produces:
-      - application/json
+        - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.UrlDTO'
+            $ref: "#/definitions/server.UrlDTO"
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: "#/definitions/server.ErrorResponse"
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: "#/definitions/server.ErrorResponse"
       summary: Get the redirect url
       tags:
-      - url
+        - url
 schemes:
-- http
+  - http
+securityDefinitions:
+  JWT_AUTH:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

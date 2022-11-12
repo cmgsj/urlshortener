@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "urlshortener/pkg/proto/apipb";
+option go_package = "urlshortener/pkg/protobuf/apipb";
 
 package apipb;
 

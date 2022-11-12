@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.9
-// source: pkg/proto/cachepb/cachepb.proto
+// source: pkg/protobuf/cachepb/cachepb.proto
 
 package cachepb
 
@@ -11,7 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	apipb "urlshortener/pkg/proto/apipb"
+	apipb "urlshortener/pkg/protobuf/apipb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -174,5 +174,5 @@ var Cache_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/proto/cachepb/cachepb.proto",
+	Metadata: "pkg/protobuf/cachepb/cachepb.proto",
 }
