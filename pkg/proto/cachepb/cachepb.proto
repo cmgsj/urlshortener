@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-option go_package = "urlshortener/pkg/cache";
+option go_package = "urlshortener/pkg/proto/cachepb";
 
-package cache;
+package cachepb;
 
-import "pkg/api/api.proto";
+import "pkg/proto/apipb/apipb.proto";
 
 message GetUrlRequest {
 	string urlId = 1;
@@ -21,6 +21,6 @@ message SetUrlRequest {
 
 service Cache {
 	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse);
-	rpc SetUrl(SetUrlRequest) returns (api.NoContent);
-	rpc Ping(api.PingRequest) returns (api.PingResponse);
+	rpc SetUrl(SetUrlRequest) returns (apipb.NoContent);
+	rpc Ping(apipb.PingRequest) returns (apipb.PingResponse);
 }

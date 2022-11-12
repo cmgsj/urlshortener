@@ -1,0 +1,70 @@
+version: "3.9"
+
+services:
+  
+  server:
+    container_name: server
+    build:
+      context: .
+      dockerfile: cmd/server/Dockerfile
+    depends_on:
+      - urls_service
+      - cache_service
+    env_file:
+      - .env
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    volumes:
+      - ./pkg:/usr/src/app/pkg
+
+  urls_service:
+    container_name: urls_service
+    build:
+      context: .
+      dockerfile: cmd/urls/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${CACHE_PORT}:${CACHE_PORT}"
+    volumes:
+      - ./pkg:/usr/src/app/pkg
+  
+  cache_service:
+    container_name: cache_service
+    build:
+      context: .
+      dockerfile: cmd/cache/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - redis_cache
+    ports:
+      - "${URLS_PORT}:${URLS_PORT}"
+    volumes:
+      - ./pkg:/usr/src/app/pkg
+
+  redis_cache:
+    container_name: redis_cache
+    image: redis
+    env_file:
+      - .env
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    volumes:
+      - redis_data:/data
+
+  # postgres_db:
+  #   container_name: postgres_db
+  #   image: "postgres"
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "${DB_PORT}:${DB_PORT}"
+
+volumes:
+  redis_data:
+    driver: local
+  
+
+
+  

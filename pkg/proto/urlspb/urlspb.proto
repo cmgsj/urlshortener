@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-option go_package = "urlshortener/pkg/urls";
+option go_package = "urlshortener/pkg/proto/urlspb";
 
-package urlss;
+package urlspb;
 
-import "pkg/api/api.proto";
+import "pkg/proto/apipb/apipb.proto";
 
 message GetUrlRequest {
 	string urlId = 1;
@@ -35,7 +35,7 @@ message CreateUrlResponse {
 service Urls {
 	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse);
   	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse);
-  	rpc UpdateUrl(UpdateUrlRequest) returns (api.NoContent);
-  	rpc DeleteUrl(DeleteUrlRequest) returns (api.NoContent);
-  	rpc Ping(api.PingRequest) returns (api.PingResponse);
+  	rpc UpdateUrl(UpdateUrlRequest) returns (apipb.NoContent);
+  	rpc DeleteUrl(DeleteUrlRequest) returns (apipb.NoContent);
+  	rpc Ping(apipb.PingRequest) returns (apipb.PingResponse);
 }

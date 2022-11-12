@@ -3,8 +3,9 @@ package server
 import (
 	"log"
 	"net/http"
-	"urlshortener/pkg/cache"
-	"urlshortener/pkg/urls"
+	"net/url"
+	"urlshortener/pkg/proto/cachepb"
+	"urlshortener/pkg/proto/urlspb"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,14 +50,14 @@ func (server *Server) GetUrl(ctx *gin.Context) {
 	urlId := ctx.Param("urlId")
 	c, cancel := makeCtx()
 	defer cancel()
-	cacheRes, err := server.cacheClient.GetUrl(c, &cache.GetUrlRequest{UrlId: urlId})
+	cacheRes, err := server.cacheClient.GetUrl(c, &cachepb.GetUrlRequest{UrlId: urlId})
 	if err == nil {
 		ctx.JSON(http.StatusOK, UrlDTO{UrlId: urlId, RedirectUrl: cacheRes.RedirectUrl})
 		return
 	}
 	c, cancel = makeCtx()
 	defer cancel()
-	urlRes, err := server.urlClient.GetUrl(c, &urls.GetUrlRequest{UrlId: urlId})
+	urlRes, err := server.urlClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -81,16 +82,20 @@ func (server *Server) PostUrl(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
+	if !validateUrl(body.RedirectUrl) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid url"})
+		return
+	}
 	c, cancel := makeCtx()
 	defer cancel()
-	urlRes, err := server.urlClient.CreateUrl(c, &urls.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
+	urlRes, err := server.urlClient.CreateUrl(c, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c, cancel = makeCtx()
 	defer cancel()
-	_, err = server.cacheClient.SetUrl(c, &cache.SetUrlRequest{UrlId: urlRes.UrlId, RedirectUrl: body.RedirectUrl})
+	_, err = server.cacheClient.SetUrl(c, &cachepb.SetUrlRequest{UrlId: urlRes.UrlId, RedirectUrl: body.RedirectUrl})
 	if err != nil {
 		log.Println(err)
 	}
@@ -101,17 +106,22 @@ func (server *Server) RedirectToUrl(ctx *gin.Context) {
 	urlId := ctx.Param("urlId")
 	c, cancel := makeCtx()
 	defer cancel()
-	cacheRes, err := server.cacheClient.GetUrl(c, &cache.GetUrlRequest{UrlId: urlId})
+	cacheRes, err := server.cacheClient.GetUrl(c, &cachepb.GetUrlRequest{UrlId: urlId})
 	if err == nil {
 		ctx.Redirect(http.StatusTemporaryRedirect, cacheRes.RedirectUrl)
 		return
 	}
 	c, cancel = makeCtx()
 	defer cancel()
-	urlRes, err := server.urlClient.GetUrl(c, &urls.GetUrlRequest{UrlId: urlId})
+	urlRes, err := server.urlClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
 	ctx.Redirect(http.StatusTemporaryRedirect, urlRes.RedirectUrl)
+}
+
+func validateUrl(urlStr string) bool {
+	_, err := url.ParseRequestURI(urlStr)
+	return err == nil
 }

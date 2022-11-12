@@ -13,22 +13,17 @@ swagger_gen:
 	swag fmt 
 	swag init -g pkg/server/server.go
 
-run_redis: 
-	docker run --name redis_cache -p 6379:6379 -d redis
-
-run_cache:
-	go run cmd/cache/main.go
-
-run_urls:
-	go run cmd/urls/main.go
-
-run_server:
-	go run cmd/server/main.go
-
 build: format proto_gen swagger_gen
 	go build -o bin/server ./cmd/server/main.go
 	go build -o bin/cache ./cmd/cache/main.go
-	go build -o bin/url ./cmd/url/main.go
+	go build -o bin/urls ./cmd/urls/main.go
 
 clean:
 	rm -rf bin/*
+
+# docker exec -it urls_service bash
+# docker compose run --rm urls_service sh -c "ls -lh"
+# docker compose up
+# docker compose up --build -V
+# docker-compose down
+# docker-compose down --remove-orphans

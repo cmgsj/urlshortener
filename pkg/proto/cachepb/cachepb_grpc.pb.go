@@ -2,16 +2,16 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.9
-// source: pkg/cache/cache.proto
+// source: pkg/proto/cachepb/cachepb.proto
 
-package cache
+package cachepb
 
 import (
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	api "urlshortener/pkg/api"
+	apipb "urlshortener/pkg/proto/apipb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -24,8 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CacheClient interface {
 	GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error)
-	SetUrl(ctx context.Context, in *SetUrlRequest, opts ...grpc.CallOption) (*api.NoContent, error)
-	Ping(ctx context.Context, in *api.PingRequest, opts ...grpc.CallOption) (*api.PingResponse, error)
+	SetUrl(ctx context.Context, in *SetUrlRequest, opts ...grpc.CallOption) (*apipb.NoContent, error)
+	Ping(ctx context.Context, in *apipb.PingRequest, opts ...grpc.CallOption) (*apipb.PingResponse, error)
 }
 
 type cacheClient struct {
@@ -38,25 +38,25 @@ func NewCacheClient(cc grpc.ClientConnInterface) CacheClient {
 
 func (c *cacheClient) GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error) {
 	out := new(GetUrlResponse)
-	err := c.cc.Invoke(ctx, "/cache.Cache/GetUrl", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/cachepb.Cache/GetUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *cacheClient) SetUrl(ctx context.Context, in *SetUrlRequest, opts ...grpc.CallOption) (*api.NoContent, error) {
-	out := new(api.NoContent)
-	err := c.cc.Invoke(ctx, "/cache.Cache/SetUrl", in, out, opts...)
+func (c *cacheClient) SetUrl(ctx context.Context, in *SetUrlRequest, opts ...grpc.CallOption) (*apipb.NoContent, error) {
+	out := new(apipb.NoContent)
+	err := c.cc.Invoke(ctx, "/cachepb.Cache/SetUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *cacheClient) Ping(ctx context.Context, in *api.PingRequest, opts ...grpc.CallOption) (*api.PingResponse, error) {
-	out := new(api.PingResponse)
-	err := c.cc.Invoke(ctx, "/cache.Cache/Ping", in, out, opts...)
+func (c *cacheClient) Ping(ctx context.Context, in *apipb.PingRequest, opts ...grpc.CallOption) (*apipb.PingResponse, error) {
+	out := new(apipb.PingResponse)
+	err := c.cc.Invoke(ctx, "/cachepb.Cache/Ping", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,8 +68,8 @@ func (c *cacheClient) Ping(ctx context.Context, in *api.PingRequest, opts ...grp
 // for forward compatibility
 type CacheServer interface {
 	GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error)
-	SetUrl(context.Context, *SetUrlRequest) (*api.NoContent, error)
-	Ping(context.Context, *api.PingRequest) (*api.PingResponse, error)
+	SetUrl(context.Context, *SetUrlRequest) (*apipb.NoContent, error)
+	Ping(context.Context, *apipb.PingRequest) (*apipb.PingResponse, error)
 	mustEmbedUnimplementedCacheServer()
 }
 
@@ -80,10 +80,10 @@ type UnimplementedCacheServer struct {
 func (UnimplementedCacheServer) GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUrl not implemented")
 }
-func (UnimplementedCacheServer) SetUrl(context.Context, *SetUrlRequest) (*api.NoContent, error) {
+func (UnimplementedCacheServer) SetUrl(context.Context, *SetUrlRequest) (*apipb.NoContent, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetUrl not implemented")
 }
-func (UnimplementedCacheServer) Ping(context.Context, *api.PingRequest) (*api.PingResponse, error) {
+func (UnimplementedCacheServer) Ping(context.Context, *apipb.PingRequest) (*apipb.PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
 func (UnimplementedCacheServer) mustEmbedUnimplementedCacheServer() {}
@@ -109,7 +109,7 @@ func _Cache_GetUrl_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cache.Cache/GetUrl",
+		FullMethod: "/cachepb.Cache/GetUrl",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CacheServer).GetUrl(ctx, req.(*GetUrlRequest))
@@ -127,7 +127,7 @@ func _Cache_SetUrl_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cache.Cache/SetUrl",
+		FullMethod: "/cachepb.Cache/SetUrl",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CacheServer).SetUrl(ctx, req.(*SetUrlRequest))
@@ -136,7 +136,7 @@ func _Cache_SetUrl_Handler(srv interface{}, ctx context.Context, dec func(interf
 }
 
 func _Cache_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(api.PingRequest)
+	in := new(apipb.PingRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -145,10 +145,10 @@ func _Cache_Ping_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cache.Cache/Ping",
+		FullMethod: "/cachepb.Cache/Ping",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServer).Ping(ctx, req.(*api.PingRequest))
+		return srv.(CacheServer).Ping(ctx, req.(*apipb.PingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -157,7 +157,7 @@ func _Cache_Ping_Handler(srv interface{}, ctx context.Context, dec func(interfac
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Cache_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "cache.Cache",
+	ServiceName: "cachepb.Cache",
 	HandlerType: (*CacheServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -174,5 +174,5 @@ var Cache_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/cache/cache.proto",
+	Metadata: "pkg/proto/cachepb/cachepb.proto",
 }

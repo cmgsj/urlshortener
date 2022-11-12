@@ -5,13 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os/exec"
 	"time"
 
 	_ "urlshortener/docs"
-	"urlshortener/pkg/api"
-	"urlshortener/pkg/cache"
-	"urlshortener/pkg/urls"
+	"urlshortener/pkg/proto/apipb"
+	"urlshortener/pkg/proto/cachepb"
+	"urlshortener/pkg/proto/urlspb"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -22,15 +21,15 @@ import (
 )
 
 type Server struct {
-	urlClient   urls.UrlsClient
-	cacheClient cache.CacheClient
+	urlClient   urlspb.UrlsClient
+	cacheClient cachepb.CacheClient
 	router      *gin.Engine
 }
 
 var (
 	port       = flag.Int("port", 8080, "The server port")
-	url_addr   = flag.String("url_addr", "localhost:50051", "url service address")
-	cache_addr = flag.String("cache_addr", "localhost:50052", "cache service address")
+	urls_addr  = flag.String("urls_addr", "urls_service:8081", "url service address")
+	cache_addr = flag.String("cache_addr", "cache_service:8082", "cache service address")
 )
 
 // @title       Go + Gin API
@@ -55,11 +54,10 @@ var (
 // @description:               'Authorization header: "Bearer [token]"'
 func RunService() {
 
-	fmt.Println("Starting http server")
 	flag.Parse()
 
 	var err error
-	urlConn, err := grpc.Dial(*url_addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	urlConn, err := grpc.Dial(*urls_addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -72,14 +70,15 @@ func RunService() {
 	defer cacheConn.Close()
 
 	server := &Server{
-		urlClient:   urls.NewUrlsClient(urlConn),
-		cacheClient: cache.NewCacheClient(cacheConn),
+		urlClient:   urlspb.NewUrlsClient(urlConn),
+		cacheClient: cachepb.NewCacheClient(cacheConn),
 		router:      gin.Default(),
 	}
 	server.pingServices()
 	server.registerEndpoints()
 
-	exec.Command("open", fmt.Sprintf("http://localhost:%d/docs/index.html", *port)).Start()
+	log.Println("Starting server on port", *port)
+	log.Printf("Swagger docs available at http://localhost:%d/docs/index.html\n", *port)
 
 	if err := server.router.Run(fmt.Sprintf(":%d", *port)); err != nil {
 		log.Fatalf("failed to run server: %v", err)
@@ -97,19 +96,18 @@ func (server *Server) registerEndpoints() {
 func (server *Server) pingServices() {
 	c, cancel := makeCtx()
 	defer cancel()
-	_, err := server.urlClient.Ping(c, &api.PingRequest{})
+	_, err := server.urlClient.Ping(c, &apipb.PingRequest{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to ping url service: ", err)
 	}
 	c, cancel = makeCtx()
 	defer cancel()
-	_, err = server.cacheClient.Ping(c, &api.PingRequest{})
+	_, err = server.cacheClient.Ping(c, &apipb.PingRequest{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("failed to ping cache service: ", err)
 	}
 }
 
 func makeCtx() (context.Context, context.CancelFunc) {
-	// ctx := metadata.AppendToOutgoingContext(context.Background(), "token", "xxxxx")
 	return context.WithTimeout(context.Background(), time.Second)
 }

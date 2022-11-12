@@ -9,22 +9,22 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"urlshortener/pkg/api"
-
-	"urlshortener/pkg/interceptor"
+	"urlshortener/pkg/grpc/interceptor"
+	"urlshortener/pkg/proto/apipb"
+	"urlshortener/pkg/proto/urlspb"
 
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc"
 )
 
 type urlServer struct {
-	UnimplementedUrlsServer
+	urlspb.UnimplementedUrlsServer
 	db *sql.DB
 }
 
 var (
-	port   = flag.Int("url_port", 50051, "the port to serve on")
-	url_db = flag.String("url_db", "url.db", "the url db")
+	port    = flag.Int("port", 8081, "the port to serve on")
+	urls_db = flag.String("urls_db", "urls.db", "the urls db")
 )
 
 func RunService() {
@@ -42,28 +42,29 @@ func RunService() {
 		grpc.UnaryInterceptor(grpcInterceptor.UnaryLogger),
 		grpc.StreamInterceptor(grpcInterceptor.StreamLogger))
 
-	server := &urlServer{
-		db: initSqliteDB(*url_db),
+	var server urlspb.UrlsServer = &urlServer{
+		db: initSqliteDB(*urls_db),
 	}
 
-	RegisterUrlsServer(grpcServer, server)
+	urlspb.RegisterUrlsServer(grpcServer, server)
 
-	log.Printf("server listening at %v", lis.Addr())
+	log.Printf("Starting urls_service at %v\n", lis.Addr())
+
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 
 }
 
-func (server *urlServer) GetUrl(ctx context.Context, req *GetUrlRequest) (*GetUrlResponse, error) {
+func (server *urlServer) GetUrl(ctx context.Context, req *urlspb.GetUrlRequest) (*urlspb.GetUrlResponse, error) {
 	urlEntity, err := getUrl(server.db, ctx, req.GetUrlId())
 	if err != nil {
 		return nil, err
 	}
-	return &GetUrlResponse{UrlId: urlEntity.UrlId, RedirectUrl: urlEntity.RedirectUrl}, nil
+	return &urlspb.GetUrlResponse{UrlId: urlEntity.UrlId, RedirectUrl: urlEntity.RedirectUrl}, nil
 }
 
-func (server *urlServer) CreateUrl(ctx context.Context, req *CreateUrlRequest) (*CreateUrlResponse, error) {
+func (server *urlServer) CreateUrl(ctx context.Context, req *urlspb.CreateUrlRequest) (*urlspb.CreateUrlResponse, error) {
 	urlId, err := generateID()
 	if err != nil {
 		return nil, err
@@ -72,27 +73,27 @@ func (server *urlServer) CreateUrl(ctx context.Context, req *CreateUrlRequest) (
 	if err != nil {
 		return nil, err
 	}
-	return &CreateUrlResponse{UrlId: urlId}, nil
+	return &urlspb.CreateUrlResponse{UrlId: urlId}, nil
 }
 
-func (server *urlServer) UpdateUrl(ctx context.Context, req *UpdateUrlRequest) (*api.NoContent, error) {
+func (server *urlServer) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlRequest) (*apipb.NoContent, error) {
 	err := updateUrl(server.db, ctx, req.GetUrlId(), req.GetRedirectUrl())
 	if err != nil {
 		return nil, err
 	}
-	return &api.NoContent{}, nil
+	return &apipb.NoContent{}, nil
 }
 
-func (server *urlServer) DeleteUrl(ctx context.Context, req *DeleteUrlRequest) (*api.NoContent, error) {
+func (server *urlServer) DeleteUrl(ctx context.Context, req *urlspb.DeleteUrlRequest) (*apipb.NoContent, error) {
 	err := deleteUrl(server.db, ctx, req.GetUrlId())
 	if err != nil {
 		return nil, err
 	}
-	return &api.NoContent{}, nil
+	return &apipb.NoContent{}, nil
 }
 
-func (server *urlServer) Ping(ctx context.Context, req *api.PingRequest) (*api.PingResponse, error) {
-	return &api.PingResponse{Message: "pong"}, nil
+func (server *urlServer) Ping(ctx context.Context, req *apipb.PingRequest) (*apipb.PingResponse, error) {
+	return &apipb.PingResponse{Message: "pong"}, nil
 }
 
 func generateID() (string, error) {
