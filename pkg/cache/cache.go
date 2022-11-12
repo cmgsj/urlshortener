@@ -7,8 +7,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/mike9107/urlshortener/pkg/grpc/interceptor"
-	"github.com/mike9107/urlshortener/pkg/protobuf/cachepb"
+	"urlshortener/pkg/grpc/interceptor"
+	"urlshortener/pkg/protobuf/cachepb"
 
 	"google.golang.org/grpc"
 )

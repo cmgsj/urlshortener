@@ -6,8 +6,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/mike9107/urlshortener/pkg/grpc/interceptor"
-	"github.com/mike9107/urlshortener/pkg/protobuf/urlspb"
+	"urlshortener/pkg/grpc/interceptor"
+	"urlshortener/pkg/protobuf/urlspb"
 
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc"

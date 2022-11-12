@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/mike9107/urlshortener/pkg/protobuf/apipb"
 	"log"
 	"time"
+	"urlshortener/pkg/protobuf/apipb"
 )
 
 func schedulePeriodicTask(task func(), d time.Duration) (stop func()) {

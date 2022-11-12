@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mike9107/urlshortener/pkg/protobuf/cachepb"
-	"github.com/mike9107/urlshortener/pkg/protobuf/urlspb"
+	"urlshortener/pkg/protobuf/cachepb"
+	"urlshortener/pkg/protobuf/urlspb"
 
 	"github.com/gin-gonic/gin"
 )

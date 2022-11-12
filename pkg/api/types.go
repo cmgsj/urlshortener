@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-	"github.com/mike9107/urlshortener/pkg/protobuf/apipb"
+	"urlshortener/pkg/protobuf/apipb"
 
 	"google.golang.org/grpc"
 )

@@ -6,9 +6,9 @@ import (
 	"log"
 	"time"
 
-	_ "github.com/mike9107/urlshortener/docs"
-	"github.com/mike9107/urlshortener/pkg/protobuf/cachepb"
-	"github.com/mike9107/urlshortener/pkg/protobuf/urlspb"
+	_ "urlshortener/docs"
+	"urlshortener/pkg/protobuf/cachepb"
+	"urlshortener/pkg/protobuf/urlspb"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"

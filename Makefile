@@ -40,4 +40,3 @@ clean:
 # docker compose run --rm [container] sh -c "[command]"
 # docker compose up --build -V
 # docker-compose down --remove-orphans
-# go get github.com/mike9107/urlshortener@v1.0.0
