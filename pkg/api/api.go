@@ -24,21 +24,18 @@ var (
 	cache_addr = flag.String("cache_addr", "cache_service:8082", "cache service address")
 )
 
-// @title       Go + Gin API
-// @version     1.0
-// @description This is a sample server.
-
-// @contact.name  API Support
-// @contact.url   http://www.swagger.io/support
-// @contact.email support@swagger.io
-
-// @license.name MIT
-// @license.url  https://opensource.org/licenses/MIT
-
+// @title                   URL Shortener API
+// @version                 1.0
+// @description             This is a URL shortener service.
 // @host                    localhost:8080
 // @BasePath                /
 // @query.collection.format multi
 // @schemes                 http
+// @contact.name            API Support
+// @contact.url             http://www.swagger.io/support
+// @contact.email           support@swagger.io
+// @license.name            MIT
+// @license.url             https://opensource.org/licenses/MIT
 
 func RunService() {
 

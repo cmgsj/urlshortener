@@ -4,8 +4,8 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server.",
-        "title": "Go + Gin API",
+        "description": "This is a URL shortener service.",
+        "title": "URL Shortener",
         "contact": {
             "name": "API Support",
             "url": "http://www.swagger.io/support",

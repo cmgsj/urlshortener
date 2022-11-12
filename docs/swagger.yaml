@@ -25,11 +25,11 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a sample server.
+  description: This is a URL shortener service.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  title: Go + Gin API
+  title: URL Shortener
   version: "1.0"
 paths:
   /ping:

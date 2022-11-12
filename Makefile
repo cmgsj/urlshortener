@@ -13,7 +13,10 @@ swagger_gen:
 	swag fmt 
 	swag init -g pkg/api/api.go
 
+docker_swagger_update: swagger_gen
+	docker compose run --rm api_service sh -c "swag fmt; swag init -g pkg/api/api.go"
+
 # docker exec -it [container] bash
-# docker compose run --rm [container] sh -c "ls -lh"
+# docker compose run --rm [container] sh -c "[command]"
 # docker compose up --build -V
 # docker-compose down --remove-orphans
