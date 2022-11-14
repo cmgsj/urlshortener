@@ -2,7 +2,7 @@ package cache
 
 import (
 	"context"
-	"log"
+	"urlshortener/pkg/logger"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -15,7 +15,7 @@ func initRedisDB(redisAddr string, redisPassword string, redisDb int) *redis.Cli
 	})
 	_, err := rdb.Ping(context.Background()).Result()
 	if err != nil {
-		log.Fatalf("failed to connect to redis: %v", err)
+		logger.Fatal("failed to connect to redis:", err)
 	}
 	return rdb
 }

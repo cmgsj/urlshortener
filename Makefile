@@ -22,16 +22,19 @@ docker_swagger_update: swagger_gen
 	docker compose run --rm api_service sh -c "swag fmt; swag init -g pkg/services/api/api.go"
 
 run_redis:
-	docker run -d -p 6379:6379 --name redis_cache redis
+	docker run -d -p 6379:6379 --name redi_cache_local redis
 
 run_cache:
-	./bin/cache_service -redis_addr=localhost:6379
+# ./bin/cache_service -redis_addr=localhost:6379
+	go run cmd/cache/main.go -redis_addr=localhost:6379
 
 run_urls:
-	./bin/urls_service
+# ./bin/urls_service
+	go run cmd/urls/main.go
 
 run_api:
-	./bin/api_service -urls_addr=localhost:8081 -cache_addr=localhost:8082
+# ./bin/api_service -urls_addr=localhost:8081 -cache_addr=localhost:8082
+	go run cmd/api/main.go -urls_addr=localhost:8081 -cache_addr=localhost:8082
 
 clean:
 	rm -f bin/*

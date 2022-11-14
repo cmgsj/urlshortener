@@ -14,6 +14,8 @@ definitions:
     type: object
   api.UrlDTO:
     properties:
+      newUrl:
+        type: string
       redirectUrl:
         type: string
       urlId:
@@ -32,6 +34,30 @@ info:
   title: URL Shortener API
   version: "1.0"
 paths:
+  /{urlId}:
+    get:
+      description: Redirect to url
+      operationId: redirect-url
+      parameters:
+      - description: url id
+        in: path
+        name: urlId
+        required: true
+        type: string
+      responses:
+        "302":
+          description: Found
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Redirect to url
+      tags:
+      - url
   /ping:
     get:
       description: Ping the server
@@ -52,7 +78,7 @@ paths:
       - ping
   /url:
     post:
-      description: Create a new url
+      description: Create a new url redirect
       operationId: create-url
       parameters:
       - description: url
@@ -76,12 +102,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-      summary: Create a new url
+      summary: Create a new url redirect
       tags:
       - url
   /url/{urlId}:
     get:
-      description: Get the redirect url
+      description: Get url
       operationId: get-url
       parameters:
       - description: url id
@@ -104,7 +130,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-      summary: Get the redirect url
+      summary: Get url
       tags:
       - url
 schemes:

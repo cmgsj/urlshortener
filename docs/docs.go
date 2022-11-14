@@ -53,14 +53,14 @@ const docTemplate = `{
         },
         "/url": {
             "post": {
-                "description": "Create a new url",
+                "description": "Create a new url redirect",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "url"
                 ],
-                "summary": "Create a new url",
+                "summary": "Create a new url redirect",
                 "operationId": "create-url",
                 "parameters": [
                     {
@@ -97,14 +97,14 @@ const docTemplate = `{
         },
         "/url/{urlId}": {
             "get": {
-                "description": "Get the redirect url",
+                "description": "Get url",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "url"
                 ],
-                "summary": "Get the redirect url",
+                "summary": "Get url",
                 "operationId": "get-url",
                 "parameters": [
                     {
@@ -121,6 +121,42 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/api.UrlDTO"
                         }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/{urlId}": {
+            "get": {
+                "description": "Redirect to url",
+                "tags": [
+                    "url"
+                ],
+                "summary": "Redirect to url",
+                "operationId": "redirect-url",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "url id",
+                        "name": "urlId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Found"
                     },
                     "404": {
                         "description": "Not Found",
@@ -161,6 +197,9 @@ const docTemplate = `{
         "api.UrlDTO": {
             "type": "object",
             "properties": {
+                "newUrl": {
+                    "type": "string"
+                },
                 "redirectUrl": {
                     "type": "string"
                 },

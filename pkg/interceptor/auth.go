@@ -1,8 +1,8 @@
-package logger
+package interceptor
 
 import (
 	"context"
-	"log"
+	"urlshortener/pkg/logger"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -24,23 +24,23 @@ func NewAuthInterceptor() *authInterceptor {
 func (i *authInterceptor) Unary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	data, ok := metadata.FromIncomingContext(ctx)
 	if !ok || len(data["auth"]) != 1 {
-		log.Println("No metadata found")
+		logger.Error("No metadata found")
 		return nil, InvalidAuthHeader
 	}
 	token := data["auth"][0]
-	log.Println("metadata:", data)
-	log.Println("auth:", token)
+	logger.Infof("metadata: %v", data)
+	logger.Infof("auth: %v", token)
 	return handler(ctx, req)
 }
 
 func (i *authInterceptor) Stream(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	data, ok := metadata.FromIncomingContext(stream.Context())
 	if !ok || len(data["auth"]) != 1 {
-		log.Println("No metadata found")
+		logger.Error("No metadata found")
 		return InvalidAuthHeader
 	}
 	token := data["auth"][0]
-	log.Println("metadata:", data)
-	log.Println("auth:", token)
+	logger.Infof("metadata: %v", data)
+	logger.Infof("auth: %v", token)
 	return handler(srv, stream)
 }

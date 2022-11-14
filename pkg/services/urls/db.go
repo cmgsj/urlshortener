@@ -3,7 +3,7 @@ package urls
 import (
 	"context"
 	"database/sql"
-	"log"
+	"urlshortener/pkg/logger"
 )
 
 type UrlEntity struct {
@@ -14,11 +14,11 @@ type UrlEntity struct {
 func initSqliteDB(sqliteDbName string) *sql.DB {
 	db, err := sql.Open("sqlite3", sqliteDbName)
 	if err != nil {
-		log.Fatalf("failed to open sqlite db: %v", err)
+		logger.Fatal("failed to open sqlite db:", err)
 	}
 	err = createUrlsTable(db, context.Background())
 	if err != nil {
-		log.Fatalf("failed to create table: %v", err)
+		logger.Fatal("failed to create table:", err)
 	}
 	return db
 }

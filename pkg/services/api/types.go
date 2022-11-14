@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-	"urlshortener/pkg/protobuf/apipb"
+	"urlshortener/pkg/proto/healthpb"
 
 	"google.golang.org/grpc"
 )
@@ -10,6 +10,7 @@ import (
 type UrlDTO struct {
 	UrlId       string `json:"urlId"`
 	RedirectUrl string `json:"redirectUrl"`
+	NewUrl      string `json:"newUrl"`
 }
 
 type CreateUrlRequest struct {
@@ -20,12 +21,6 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-type client struct {
-	name    string
-	service pingCallable
-	active  *bool
-}
-
-type pingCallable interface {
-	Ping(ctx context.Context, in *apipb.PingRequest, opts ...grpc.CallOption) (*apipb.PingResponse, error)
+type healthServer interface {
+	Check(ctx context.Context, in *healthpb.HealthCheckRequest, opts ...grpc.CallOption) (*healthpb.HealthCheckResponse, error)
 }

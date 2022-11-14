@@ -3,12 +3,12 @@ package api
 import (
 	"flag"
 	"fmt"
-	"log"
 	"time"
 
 	_ "urlshortener/docs"
-	"urlshortener/pkg/protobuf/cachepb"
-	"urlshortener/pkg/protobuf/urlspb"
+	"urlshortener/pkg/logger"
+	"urlshortener/pkg/proto/cachepb"
+	"urlshortener/pkg/proto/urlspb"
 	"urlshortener/pkg/scheduler"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +21,7 @@ var (
 	port      = flag.Int("port", 8080, "The server port")
 	urlsAddr  = flag.String("urls_addr", "urls_service:8081", "url service address")
 	cacheAddr = flag.String("cache_addr", "cache_service:8082", "cache service address")
+	logLevel  = flag.String("log_level", "info", "the log level")
 )
 
 // @title                   URL Shortener API
@@ -38,20 +39,9 @@ var (
 
 func NewService() *apiServer {
 	flag.Parse()
-
-	urlConn, err := grpc.Dial(*urlsAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("failed to connect: %v", err)
-	}
-
-	cacheConn, err := grpc.Dial(*cacheAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("failed to connect: %v", err)
-	}
-
 	server := &apiServer{
-		urlsClient:     urlspb.NewUrlsClient(urlConn),
-		cacheClient:    cachepb.NewCacheClient(cacheConn),
+		urlsClient:     urlspb.NewUrlsClient(dialGrpc(*urlsAddr)),
+		cacheClient:    cachepb.NewCacheClient(dialGrpc(*cacheAddr)),
 		router:         gin.Default(),
 		trustedProxies: []string{"127.0.0.1"},
 	}
@@ -61,13 +51,22 @@ func NewService() *apiServer {
 }
 
 func (server *apiServer) Run() {
-	go server.pingServices()
-	scheduler.SchedulePeriodicTask(server.pingServices, time.Minute)
+	logger.SetLogLevel(logger.LevelFromString(*logLevel))
 
-	log.Println("Starting server on port", *port)
-	log.Printf("Swagger docs available at http://localhost:%d/docs/index.html\n", *port)
+	go server.checkServices()
+	scheduler.SchedulePeriodicTask(server.checkServices, time.Minute)
 
+	logger.Info("Starting server on port:", *port)
+	logger.Infof("Swagger docs available at http://localhost:%d/docs/index.html", *port)
 	if err := server.router.Run(fmt.Sprintf(":%d", *port)); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		logger.Fatal("failed to serve:", err)
 	}
+}
+
+func dialGrpc(addr string) *grpc.ClientConn {
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Fatal("failed to connect:", err)
+	}
+	return conn
 }

@@ -3,12 +3,12 @@ package cache
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net"
 	"time"
 
-	"urlshortener/pkg/interceptors/logger"
-	"urlshortener/pkg/protobuf/cachepb"
+	"urlshortener/pkg/interceptor"
+	"urlshortener/pkg/logger"
+	"urlshortener/pkg/proto/cachepb"
 
 	"google.golang.org/grpc"
 )
@@ -32,24 +32,22 @@ func NewService() *cacheServer {
 }
 
 func (server *cacheServer) Run() {
-
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logger.Fatal("failed to listen:", err)
 	}
 
-	loggerInterceptor := logger.NewLoggerInterceptor()
+	loggerInterceptor := interceptor.NewLoggerInterceptor()
 
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(loggerInterceptor.UnaryLogger),
-		grpc.StreamInterceptor(loggerInterceptor.StreamLogger))
+		grpc.UnaryInterceptor(loggerInterceptor.Unary),
+		grpc.StreamInterceptor(loggerInterceptor.Stream))
 
 	cachepb.RegisterCacheServer(grpcServer, server)
 
-	log.Printf("Starting cache_service at %v\n", lis.Addr())
+	logger.Info("Starting cache_service at:", lis.Addr())
 
 	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		logger.Fatal("failed to serve:", err)
 	}
-
 }

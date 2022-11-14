@@ -1,18 +1,18 @@
 package api
 
 import (
-	"context"
-	"log"
+	"fmt"
 	"net/http"
-	"time"
 
-	"urlshortener/pkg/protobuf/cachepb"
-	"urlshortener/pkg/protobuf/urlspb"
+	"urlshortener/pkg/logger"
+	"urlshortener/pkg/proto/cachepb"
+	"urlshortener/pkg/proto/urlspb"
 
 	"github.com/gin-gonic/gin"
 )
 
 var (
+	BaseUrl                  = "http://localhost:8080"
 	UrlIdParam               = "urlId"
 	ServicesUnavailableError = ErrorResponse{Error: "services unavailable"}
 )
@@ -29,10 +29,10 @@ func (server *apiServer) Pong(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "pong")
 }
 
-// @Summary     Get the redirect url
+// @Summary     Get url
 // @ID          get-url
 // @Tags        url
-// @Description Get the redirect url
+// @Description Get url
 // @Consume     application/json
 // @Produce     application/json
 // @Param       urlId path     string true "url id"
@@ -47,7 +47,12 @@ func (server *apiServer) GetUrl(ctx *gin.Context) {
 		defer cancel()
 		cacheRes, err := server.cacheClient.GetUrl(c, &cachepb.GetUrlRequest{UrlId: urlId})
 		if err == nil {
-			ctx.JSON(http.StatusOK, UrlDTO{UrlId: urlId, RedirectUrl: cacheRes.RedirectUrl})
+			urlDTO := UrlDTO{
+				UrlId:       urlId,
+				RedirectUrl: cacheRes.RedirectUrl,
+				NewUrl:      fmt.Sprintf("%s/%s", BaseUrl, urlId),
+			}
+			ctx.JSON(http.StatusOK, urlDTO)
 			return
 		}
 	}
@@ -56,7 +61,12 @@ func (server *apiServer) GetUrl(ctx *gin.Context) {
 		defer cancel()
 		urlRes, err := server.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err == nil {
-			ctx.JSON(http.StatusOK, UrlDTO{UrlId: urlId, RedirectUrl: urlRes.RedirectUrl})
+			urlDTO := UrlDTO{
+				UrlId:       urlId,
+				RedirectUrl: urlRes.RedirectUrl,
+				NewUrl:      fmt.Sprintf("%s/%s", BaseUrl, urlId),
+			}
+			ctx.JSON(http.StatusOK, urlDTO)
 		} else {
 			ctx.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
 		}
@@ -65,10 +75,10 @@ func (server *apiServer) GetUrl(ctx *gin.Context) {
 	ctx.JSON(http.StatusInternalServerError, ServicesUnavailableError)
 }
 
-// @Summary     Create a new url
+// @Summary     Create a new url redirect
 // @ID          create-url
 // @Tags        url
-// @Description Create a new url
+// @Description Create a new url redirect
 // @Consume     application/json
 // @Produce     application/json
 // @Param       url body     CreateUrlRequest true "url"
@@ -95,15 +105,29 @@ func (server *apiServer) PostUrl(ctx *gin.Context) {
 			defer cancel()
 			_, err = server.cacheClient.SetUrl(c, &cachepb.SetUrlRequest{UrlId: urlRes.UrlId, RedirectUrl: body.RedirectUrl})
 			if err != nil {
-				log.Println(err)
+				logger.Errorf(err.Error())
 			}
 		}
-		ctx.JSON(http.StatusOK, UrlDTO{UrlId: urlRes.UrlId, RedirectUrl: body.RedirectUrl})
+		urlDTO := UrlDTO{
+			UrlId:       urlRes.UrlId,
+			RedirectUrl: body.RedirectUrl,
+			NewUrl:      fmt.Sprintf("%s/%s", BaseUrl, urlRes.UrlId),
+		}
+		ctx.JSON(http.StatusOK, urlDTO)
 		return
 	}
 	ctx.JSON(http.StatusInternalServerError, ServicesUnavailableError)
 }
 
+// @Summary     Redirect to url
+// @ID          redirect-url
+// @Tags        url
+// @Description Redirect to url
+// @Param       urlId path string true "url id"
+// @Success     302
+// @Failure     404 {object} ErrorResponse
+// @Failure     500 {object} ErrorResponse
+// @Router      /{urlId} [get]
 func (server *apiServer) RedirectToUrl(ctx *gin.Context) {
 	urlId := ctx.Param(UrlIdParam)
 	if server.cacheServiceActive {
@@ -111,7 +135,7 @@ func (server *apiServer) RedirectToUrl(ctx *gin.Context) {
 		defer cancel()
 		cacheRes, err := server.cacheClient.GetUrl(c, &cachepb.GetUrlRequest{UrlId: urlId})
 		if err == nil {
-			ctx.Redirect(http.StatusTemporaryRedirect, cacheRes.RedirectUrl)
+			ctx.Redirect(http.StatusFound, cacheRes.RedirectUrl)
 			return
 		}
 	}
@@ -120,15 +144,11 @@ func (server *apiServer) RedirectToUrl(ctx *gin.Context) {
 		defer cancel()
 		urlRes, err := server.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err == nil {
-			ctx.Redirect(http.StatusTemporaryRedirect, urlRes.RedirectUrl)
+			ctx.Redirect(http.StatusFound, urlRes.RedirectUrl)
 		} else {
 			ctx.JSON(http.StatusNotFound, ErrorResponse{Error: err.Error()})
 		}
 		return
 	}
 	ctx.JSON(http.StatusInternalServerError, ServicesUnavailableError)
-}
-
-func makeCtx() (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), time.Second)
 }

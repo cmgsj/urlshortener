@@ -3,11 +3,11 @@ package urls
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net"
 
-	"urlshortener/pkg/interceptors/logger"
-	"urlshortener/pkg/protobuf/urlspb"
+	"urlshortener/pkg/interceptor"
+	"urlshortener/pkg/logger"
+	"urlshortener/pkg/proto/urlspb"
 
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc"
@@ -28,24 +28,22 @@ func NewService() *urlServer {
 }
 
 func (server *urlServer) Run() {
-
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logger.Fatal("failed to listen:", err)
 	}
 
-	loggerInterceptor := logger.NewLoggerInterceptor()
+	loggerInterceptor := interceptor.NewLoggerInterceptor()
 
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(loggerInterceptor.UnaryLogger),
-		grpc.StreamInterceptor(loggerInterceptor.StreamLogger))
+		grpc.UnaryInterceptor(loggerInterceptor.Unary),
+		grpc.StreamInterceptor(loggerInterceptor.Stream))
 
 	urlspb.RegisterUrlsServer(grpcServer, server)
 
-	log.Printf("Starting urls_service at %v\n", lis.Addr())
+	logger.Info("Starting urls_service at:", lis.Addr())
 
 	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		logger.Fatal("failed to serve:", err)
 	}
-
 }

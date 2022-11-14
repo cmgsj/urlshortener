@@ -6,8 +6,8 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"net/url"
-	"urlshortener/pkg/protobuf/apipb"
-	"urlshortener/pkg/protobuf/urlspb"
+	"urlshortener/pkg/proto/healthpb"
+	"urlshortener/pkg/proto/urlspb"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -48,7 +48,7 @@ func (server *urlServer) CreateUrl(ctx context.Context, req *urlspb.CreateUrlReq
 	return &urlspb.CreateUrlResponse{UrlId: urlId}, nil
 }
 
-func (server *urlServer) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlRequest) (*apipb.NoContent, error) {
+func (server *urlServer) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlRequest) (*urlspb.NoContent, error) {
 	if !validateUrl(req.GetRedirectUrl()) {
 		return nil, InvalidUrlArgumentError
 	}
@@ -56,19 +56,19 @@ func (server *urlServer) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlReq
 	if err != nil {
 		return nil, UrlAlreadyExistsError
 	}
-	return &apipb.NoContent{}, nil
+	return &urlspb.NoContent{}, nil
 }
 
-func (server *urlServer) DeleteUrl(ctx context.Context, req *urlspb.DeleteUrlRequest) (*apipb.NoContent, error) {
+func (server *urlServer) DeleteUrl(ctx context.Context, req *urlspb.DeleteUrlRequest) (*urlspb.NoContent, error) {
 	err := deleteUrl(server.db, ctx, req.GetUrlId())
 	if err != nil {
 		return nil, UrlNotFoundError
 	}
-	return &apipb.NoContent{}, nil
+	return &urlspb.NoContent{}, nil
 }
 
-func (server *urlServer) Ping(ctx context.Context, req *apipb.PingRequest) (*apipb.PingResponse, error) {
-	return &apipb.PingResponse{Message: "pong"}, nil
+func (server *urlServer) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
+	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
 }
 
 func generateID() (string, error) {

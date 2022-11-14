@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.9
-// source: pkg/protobuf/urlspb/urlspb.proto
+// source: pkg/proto/urlspb/urlspb.proto
 
 package urlspb
 
@@ -11,7 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	apipb "urlshortener/pkg/protobuf/apipb"
+	healthpb "urlshortener/pkg/proto/healthpb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -25,9 +25,9 @@ const _ = grpc.SupportPackageIsVersion7
 type UrlsClient interface {
 	GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error)
 	CreateUrl(ctx context.Context, in *CreateUrlRequest, opts ...grpc.CallOption) (*CreateUrlResponse, error)
-	UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*apipb.NoContent, error)
-	DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*apipb.NoContent, error)
-	Ping(ctx context.Context, in *apipb.PingRequest, opts ...grpc.CallOption) (*apipb.PingResponse, error)
+	UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*NoContent, error)
+	DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*NoContent, error)
+	Check(ctx context.Context, in *healthpb.HealthCheckRequest, opts ...grpc.CallOption) (*healthpb.HealthCheckResponse, error)
 }
 
 type urlsClient struct {
@@ -56,8 +56,8 @@ func (c *urlsClient) CreateUrl(ctx context.Context, in *CreateUrlRequest, opts .
 	return out, nil
 }
 
-func (c *urlsClient) UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*apipb.NoContent, error) {
-	out := new(apipb.NoContent)
+func (c *urlsClient) UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*NoContent, error) {
+	out := new(NoContent)
 	err := c.cc.Invoke(ctx, "/urlspb.Urls/UpdateUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -65,8 +65,8 @@ func (c *urlsClient) UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts .
 	return out, nil
 }
 
-func (c *urlsClient) DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*apipb.NoContent, error) {
-	out := new(apipb.NoContent)
+func (c *urlsClient) DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*NoContent, error) {
+	out := new(NoContent)
 	err := c.cc.Invoke(ctx, "/urlspb.Urls/DeleteUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -74,9 +74,9 @@ func (c *urlsClient) DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts .
 	return out, nil
 }
 
-func (c *urlsClient) Ping(ctx context.Context, in *apipb.PingRequest, opts ...grpc.CallOption) (*apipb.PingResponse, error) {
-	out := new(apipb.PingResponse)
-	err := c.cc.Invoke(ctx, "/urlspb.Urls/Ping", in, out, opts...)
+func (c *urlsClient) Check(ctx context.Context, in *healthpb.HealthCheckRequest, opts ...grpc.CallOption) (*healthpb.HealthCheckResponse, error) {
+	out := new(healthpb.HealthCheckResponse)
+	err := c.cc.Invoke(ctx, "/urlspb.Urls/Check", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,9 +89,9 @@ func (c *urlsClient) Ping(ctx context.Context, in *apipb.PingRequest, opts ...gr
 type UrlsServer interface {
 	GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error)
 	CreateUrl(context.Context, *CreateUrlRequest) (*CreateUrlResponse, error)
-	UpdateUrl(context.Context, *UpdateUrlRequest) (*apipb.NoContent, error)
-	DeleteUrl(context.Context, *DeleteUrlRequest) (*apipb.NoContent, error)
-	Ping(context.Context, *apipb.PingRequest) (*apipb.PingResponse, error)
+	UpdateUrl(context.Context, *UpdateUrlRequest) (*NoContent, error)
+	DeleteUrl(context.Context, *DeleteUrlRequest) (*NoContent, error)
+	Check(context.Context, *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error)
 	mustEmbedUnimplementedUrlsServer()
 }
 
@@ -105,14 +105,14 @@ func (UnimplementedUrlsServer) GetUrl(context.Context, *GetUrlRequest) (*GetUrlR
 func (UnimplementedUrlsServer) CreateUrl(context.Context, *CreateUrlRequest) (*CreateUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUrl not implemented")
 }
-func (UnimplementedUrlsServer) UpdateUrl(context.Context, *UpdateUrlRequest) (*apipb.NoContent, error) {
+func (UnimplementedUrlsServer) UpdateUrl(context.Context, *UpdateUrlRequest) (*NoContent, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUrl not implemented")
 }
-func (UnimplementedUrlsServer) DeleteUrl(context.Context, *DeleteUrlRequest) (*apipb.NoContent, error) {
+func (UnimplementedUrlsServer) DeleteUrl(context.Context, *DeleteUrlRequest) (*NoContent, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUrl not implemented")
 }
-func (UnimplementedUrlsServer) Ping(context.Context, *apipb.PingRequest) (*apipb.PingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+func (UnimplementedUrlsServer) Check(context.Context, *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
 }
 func (UnimplementedUrlsServer) mustEmbedUnimplementedUrlsServer() {}
 
@@ -199,20 +199,20 @@ func _Urls_DeleteUrl_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Urls_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(apipb.PingRequest)
+func _Urls_Check_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(healthpb.HealthCheckRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UrlsServer).Ping(ctx, in)
+		return srv.(UrlsServer).Check(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/urlspb.Urls/Ping",
+		FullMethod: "/urlspb.Urls/Check",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UrlsServer).Ping(ctx, req.(*apipb.PingRequest))
+		return srv.(UrlsServer).Check(ctx, req.(*healthpb.HealthCheckRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -241,10 +241,10 @@ var Urls_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Urls_DeleteUrl_Handler,
 		},
 		{
-			MethodName: "Ping",
-			Handler:    _Urls_Ping_Handler,
+			MethodName: "Check",
+			Handler:    _Urls_Check_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/protobuf/urlspb/urlspb.proto",
+	Metadata: "pkg/proto/urlspb/urlspb.proto",
 }

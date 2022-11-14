@@ -3,9 +3,8 @@ package cache
 import (
 	"context"
 	"time"
-
-	"urlshortener/pkg/protobuf/apipb"
-	"urlshortener/pkg/protobuf/cachepb"
+	"urlshortener/pkg/proto/cachepb"
+	"urlshortener/pkg/proto/healthpb"
 
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc/codes"
@@ -31,14 +30,14 @@ func (server *cacheServer) GetUrl(ctx context.Context, req *cachepb.GetUrlReques
 	return &cachepb.GetUrlResponse{RedirectUrl: redirectUrl}, nil
 }
 
-func (server *cacheServer) SetUrl(ctx context.Context, req *cachepb.SetUrlRequest) (*apipb.NoContent, error) {
+func (server *cacheServer) SetUrl(ctx context.Context, req *cachepb.SetUrlRequest) (*cachepb.NoContent, error) {
 	err := server.rdb.Set(ctx, req.GetUrlId(), req.GetRedirectUrl(), server.cacheExpiryTime).Err()
 	if err != nil {
 		return nil, InternalServerError
 	}
-	return &apipb.NoContent{}, nil
+	return &cachepb.NoContent{}, nil
 }
 
-func (server *cacheServer) Ping(ctx context.Context, req *apipb.PingRequest) (*apipb.PingResponse, error) {
-	return &apipb.PingResponse{Message: "pong"}, nil
+func (server *cacheServer) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
+	return &healthpb.HealthCheckResponse{Status: healthpb.HealthCheckResponse_SERVING}, nil
 }

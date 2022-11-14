@@ -1,11 +1,14 @@
 package api
 
 import (
-	"log"
+	"context"
+	"sync"
+	"time"
 
-	"urlshortener/pkg/protobuf/apipb"
-	"urlshortener/pkg/protobuf/cachepb"
-	"urlshortener/pkg/protobuf/urlspb"
+	"urlshortener/pkg/logger"
+	"urlshortener/pkg/proto/cachepb"
+	"urlshortener/pkg/proto/healthpb"
+	"urlshortener/pkg/proto/urlspb"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -19,13 +22,7 @@ type apiServer struct {
 	cacheServiceActive bool
 	router             *gin.Engine
 	trustedProxies     []string
-}
-
-func (server *apiServer) registerTrustedProxies() {
-	err := server.router.SetTrustedProxies(server.trustedProxies)
-	if err != nil {
-		log.Fatalf("failed to set trusted proxies: %v", err)
-	}
+	mu                 sync.Mutex
 }
 
 func (server *apiServer) registerEndpoints() {
@@ -36,25 +33,31 @@ func (server *apiServer) registerEndpoints() {
 	server.router.POST("/url", server.PostUrl)
 }
 
-func (server *apiServer) pingServices() {
-	clients := []client{
-		{name: "urls service", service: server.urlsClient, active: &server.urlsServiceActive},
-		{name: "cache service", service: server.cacheClient, active: &server.cacheServiceActive},
-	}
-	for _, client := range clients {
-		go makePingCall(client.service, client.name, client.active)
+func (server *apiServer) registerTrustedProxies() {
+	err := server.router.SetTrustedProxies(nil)
+	if err != nil {
+		logger.Fatal("failed to set trusted proxies:", err)
 	}
 }
 
-func makePingCall(client pingCallable, name string, active *bool) {
+func (server *apiServer) checkServices() {
+	go makeCheckCall(server.urlsClient, "urls_service", &server.urlsServiceActive, &server.mu)
+	go makeCheckCall(server.cacheClient, "cache_service", &server.cacheServiceActive, &server.mu)
+}
+
+func makeCheckCall(client healthServer, name string, active *bool, mu *sync.Mutex) {
 	c, cancel := makeCtx()
 	defer cancel()
-	_, err := client.Ping(c, &apipb.PingRequest{})
+	_, err := client.Check(c, &healthpb.HealthCheckRequest{Service: "api_service"})
 	if err != nil {
 		*active = false
-		log.Printf("failed to ping %s: %v", name, err)
+		logger.Errorf("failed to ping %s: %v", name, err)
 	} else {
 		*active = true
-		log.Printf("%s is active", name)
+		logger.Info(name, "is active")
 	}
+}
+
+func makeCtx() (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.Background(), time.Second)
 }

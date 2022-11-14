@@ -1,13 +1,18 @@
 package scheduler
 
-import "time"
+import (
+	"time"
+	"urlshortener/pkg/logger"
+)
 
 func ScheduleTask(task func(), d time.Duration) (stop func()) {
+	logger.Info("Scheduling periodic task in:", d)
 	timer := time.AfterFunc(d, task)
 	return func() { timer.Stop() }
 }
 
 func SchedulePeriodicTask(task func(), d time.Duration) (stop func()) {
+	logger.Info("Scheduling periodic task in:", d)
 	ticker := time.NewTicker(d)
 	done := make(chan struct{}, 1)
 	go func(ticker *time.Ticker, task func(), done <-chan struct{}) {
