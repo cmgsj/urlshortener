@@ -3,15 +3,17 @@ syntax = "proto3";
 option go_package = "urlshortener/pkg/proto/urlspb";
 
 package urlspb;
-
-import "pkg/proto/healthpb/healthpb.proto";
 	
-service Urls {
-	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse) {}
-	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse) {}
-	rpc UpdateUrl(UpdateUrlRequest) returns (NoContent) {}
-	rpc DeleteUrl(DeleteUrlRequest) returns (NoContent) {}
-	rpc Check(healthpb.HealthCheckRequest) returns (healthpb.HealthCheckResponse) {}
+service UrlsService {
+	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse);
+	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse);
+	rpc UpdateUrl(UpdateUrlRequest) returns (NoContent);
+	rpc DeleteUrl(DeleteUrlRequest) returns (NoContent);
+}
+
+message Url {
+	string urlId = 1;
+	string redirectUrl = 2;
 }
 
 message GetUrlRequest {
@@ -19,8 +21,7 @@ message GetUrlRequest {
 }
 
 message GetUrlResponse {
-	string urlId = 1;
-	string redirectUrl = 2;
+	Url url = 1;
 }
 
 message CreateUrlRequest {
@@ -32,8 +33,7 @@ message CreateUrlResponse {
 }
 
 message UpdateUrlRequest {
-	string urlId = 1;
-	string redirectUrl = 2;
+	Url url = 1;
 }
 
 message DeleteUrlRequest {

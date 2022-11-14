@@ -10,8 +10,8 @@ COPY cmd/api/main.go .
 RUN go mod download
 
 RUN go install github.com/swaggo/swag/cmd/swag@latest
-RUN swag fmt 
-RUN swag init -g pkg/services/api/api.go
+RUN swag fmt
+RUN swag init -o pkg/services/api/api_docs -g pkg/services/api/api.go
 
 RUN go install github.com/githubnemo/CompileDaemon@latest
 

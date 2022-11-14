@@ -38,6 +38,12 @@ func getUrl(db *sql.DB, ctx context.Context, urlId string) (*UrlEntity, error) {
 	return u, err
 }
 
+func getUrlByRedirectUrl(db *sql.DB, ctx context.Context, redirectUrl string) (*UrlEntity, error) {
+	u := &UrlEntity{}
+	err := db.QueryRowContext(ctx, "SELECT * FROM urls WHERE redirect_url = ?", redirectUrl).Scan(&u.UrlId, &u.RedirectUrl)
+	return u, err
+}
+
 func createUrl(db *sql.DB, ctx context.Context, urlId string, redirectUrl string) error {
 	_, err := db.ExecContext(ctx, "INSERT INTO urls VALUES (?, ?)", urlId, redirectUrl)
 	return err

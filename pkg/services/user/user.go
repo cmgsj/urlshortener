@@ -1,4 +1,4 @@
-package urls
+package auth
 
 import (
 	"flag"
@@ -7,7 +7,7 @@ import (
 
 	"urlshortener/pkg/interceptor"
 	"urlshortener/pkg/logger"
-	"urlshortener/pkg/proto/urlspb"
+	"urlshortener/pkg/proto/userpb"
 
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc"
@@ -23,7 +23,6 @@ func NewService() *Service {
 	service := &Service{
 		db: initSqliteDB(*urlsDB),
 	}
-	service.seedUrls()
 	return service
 }
 
@@ -37,7 +36,7 @@ func (service *Service) Run() {
 		grpc.UnaryInterceptor(loggerInterceptor.Unary),
 		grpc.StreamInterceptor(loggerInterceptor.Stream),
 	)
-	urlspb.RegisterUrlsServiceServer(grpcServer, service)
+	userpb.RegisterUserServiceServer(grpcServer, service)
 	logger.Info("Starting urls_service at:", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {
 		logger.Fatal("failed to serve:", err)

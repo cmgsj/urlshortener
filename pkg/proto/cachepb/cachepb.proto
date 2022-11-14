@@ -4,12 +4,11 @@ option go_package = "urlshortener/pkg/proto/cachepb";
 
 package cachepb;
 
-import "pkg/proto/healthpb/healthpb.proto";
+import "pkg/proto/urlspb/urlspb.proto";
 
-service Cache {
-	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse) {}
-	rpc SetUrl(SetUrlRequest) returns (NoContent) {}
-	rpc Check(healthpb.HealthCheckRequest) returns (healthpb.HealthCheckResponse) {}
+service CacheService {
+	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse);
+	rpc SetUrl(SetUrlRequest) returns (NoContent);
 }
 
 message GetUrlRequest {
@@ -21,8 +20,7 @@ message GetUrlResponse {
 }
 
 message SetUrlRequest {
-	string urlId = 1;
-	string redirectUrl = 2;
+	urlspb.Url url = 1;
 }
 
 message NoContent {}

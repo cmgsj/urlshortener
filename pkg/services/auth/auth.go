@@ -1,4 +1,4 @@
-package urls
+package auth
 
 import (
 	"flag"
@@ -7,23 +7,22 @@ import (
 
 	"urlshortener/pkg/interceptor"
 	"urlshortener/pkg/logger"
-	"urlshortener/pkg/proto/urlspb"
+	"urlshortener/pkg/proto/authpb"
 
 	_ "github.com/mattn/go-sqlite3"
 	"google.golang.org/grpc"
 )
 
 var (
-	port   = flag.Int("port", 8081, "the port to serve on")
-	urlsDB = flag.String("urls_db", "urls.sqlite", "the urls db")
+	port   = flag.Int("port", 8083, "the port to serve on")
+	dbAddr = flag.String("db_addr", "postgres_db:8085", "the db address")
 )
 
 func NewService() *Service {
 	flag.Parse()
 	service := &Service{
-		db: initSqliteDB(*urlsDB),
+		db: initSqliteDB(*dbAddr),
 	}
-	service.seedUrls()
 	return service
 }
 
@@ -37,8 +36,8 @@ func (service *Service) Run() {
 		grpc.UnaryInterceptor(loggerInterceptor.Unary),
 		grpc.StreamInterceptor(loggerInterceptor.Stream),
 	)
-	urlspb.RegisterUrlsServiceServer(grpcServer, service)
-	logger.Info("Starting urls_service at:", lis.Addr())
+	authpb.RegisterAuthServiceServer(grpcServer, service)
+	logger.Info("Starting auth_service at:", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {
 		logger.Fatal("failed to serve:", err)
 	}

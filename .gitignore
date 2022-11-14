@@ -16,6 +16,7 @@
 
 # sqlite3 database
 *.db
+*.sqlite
 
 # env file
 .env
@@ -23,3 +24,4 @@
 # IDE folders
 .idea
 .vscode
+test.go

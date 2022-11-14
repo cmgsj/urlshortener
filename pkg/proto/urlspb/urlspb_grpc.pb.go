@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	healthpb "urlshortener/pkg/proto/healthpb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,230 +18,194 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// UrlsClient is the client API for Urls service.
+// UrlsServiceClient is the client API for UrlsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type UrlsClient interface {
+type UrlsServiceClient interface {
 	GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error)
 	CreateUrl(ctx context.Context, in *CreateUrlRequest, opts ...grpc.CallOption) (*CreateUrlResponse, error)
 	UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*NoContent, error)
 	DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*NoContent, error)
-	Check(ctx context.Context, in *healthpb.HealthCheckRequest, opts ...grpc.CallOption) (*healthpb.HealthCheckResponse, error)
 }
 
-type urlsClient struct {
+type urlsServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewUrlsClient(cc grpc.ClientConnInterface) UrlsClient {
-	return &urlsClient{cc}
+func NewUrlsServiceClient(cc grpc.ClientConnInterface) UrlsServiceClient {
+	return &urlsServiceClient{cc}
 }
 
-func (c *urlsClient) GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error) {
+func (c *urlsServiceClient) GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error) {
 	out := new(GetUrlResponse)
-	err := c.cc.Invoke(ctx, "/urlspb.Urls/GetUrl", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/urlspb.UrlsService/GetUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *urlsClient) CreateUrl(ctx context.Context, in *CreateUrlRequest, opts ...grpc.CallOption) (*CreateUrlResponse, error) {
+func (c *urlsServiceClient) CreateUrl(ctx context.Context, in *CreateUrlRequest, opts ...grpc.CallOption) (*CreateUrlResponse, error) {
 	out := new(CreateUrlResponse)
-	err := c.cc.Invoke(ctx, "/urlspb.Urls/CreateUrl", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/urlspb.UrlsService/CreateUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *urlsClient) UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*NoContent, error) {
+func (c *urlsServiceClient) UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*NoContent, error) {
 	out := new(NoContent)
-	err := c.cc.Invoke(ctx, "/urlspb.Urls/UpdateUrl", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/urlspb.UrlsService/UpdateUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *urlsClient) DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*NoContent, error) {
+func (c *urlsServiceClient) DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*NoContent, error) {
 	out := new(NoContent)
-	err := c.cc.Invoke(ctx, "/urlspb.Urls/DeleteUrl", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/urlspb.UrlsService/DeleteUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *urlsClient) Check(ctx context.Context, in *healthpb.HealthCheckRequest, opts ...grpc.CallOption) (*healthpb.HealthCheckResponse, error) {
-	out := new(healthpb.HealthCheckResponse)
-	err := c.cc.Invoke(ctx, "/urlspb.Urls/Check", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// UrlsServer is the server API for Urls service.
-// All implementations must embed UnimplementedUrlsServer
+// UrlsServiceServer is the server API for UrlsService service.
+// All implementations must embed UnimplementedUrlsServiceServer
 // for forward compatibility
-type UrlsServer interface {
+type UrlsServiceServer interface {
 	GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error)
 	CreateUrl(context.Context, *CreateUrlRequest) (*CreateUrlResponse, error)
 	UpdateUrl(context.Context, *UpdateUrlRequest) (*NoContent, error)
 	DeleteUrl(context.Context, *DeleteUrlRequest) (*NoContent, error)
-	Check(context.Context, *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error)
-	mustEmbedUnimplementedUrlsServer()
+	mustEmbedUnimplementedUrlsServiceServer()
 }
 
-// UnimplementedUrlsServer must be embedded to have forward compatible implementations.
-type UnimplementedUrlsServer struct {
+// UnimplementedUrlsServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedUrlsServiceServer struct {
 }
 
-func (UnimplementedUrlsServer) GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error) {
+func (UnimplementedUrlsServiceServer) GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUrl not implemented")
 }
-func (UnimplementedUrlsServer) CreateUrl(context.Context, *CreateUrlRequest) (*CreateUrlResponse, error) {
+func (UnimplementedUrlsServiceServer) CreateUrl(context.Context, *CreateUrlRequest) (*CreateUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUrl not implemented")
 }
-func (UnimplementedUrlsServer) UpdateUrl(context.Context, *UpdateUrlRequest) (*NoContent, error) {
+func (UnimplementedUrlsServiceServer) UpdateUrl(context.Context, *UpdateUrlRequest) (*NoContent, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUrl not implemented")
 }
-func (UnimplementedUrlsServer) DeleteUrl(context.Context, *DeleteUrlRequest) (*NoContent, error) {
+func (UnimplementedUrlsServiceServer) DeleteUrl(context.Context, *DeleteUrlRequest) (*NoContent, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUrl not implemented")
 }
-func (UnimplementedUrlsServer) Check(context.Context, *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
-}
-func (UnimplementedUrlsServer) mustEmbedUnimplementedUrlsServer() {}
+func (UnimplementedUrlsServiceServer) mustEmbedUnimplementedUrlsServiceServer() {}
 
-// UnsafeUrlsServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to UrlsServer will
+// UnsafeUrlsServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UrlsServiceServer will
 // result in compilation errors.
-type UnsafeUrlsServer interface {
-	mustEmbedUnimplementedUrlsServer()
+type UnsafeUrlsServiceServer interface {
+	mustEmbedUnimplementedUrlsServiceServer()
 }
 
-func RegisterUrlsServer(s grpc.ServiceRegistrar, srv UrlsServer) {
-	s.RegisterService(&Urls_ServiceDesc, srv)
+func RegisterUrlsServiceServer(s grpc.ServiceRegistrar, srv UrlsServiceServer) {
+	s.RegisterService(&UrlsService_ServiceDesc, srv)
 }
 
-func _Urls_GetUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UrlsService_GetUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUrlRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UrlsServer).GetUrl(ctx, in)
+		return srv.(UrlsServiceServer).GetUrl(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/urlspb.Urls/GetUrl",
+		FullMethod: "/urlspb.UrlsService/GetUrl",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UrlsServer).GetUrl(ctx, req.(*GetUrlRequest))
+		return srv.(UrlsServiceServer).GetUrl(ctx, req.(*GetUrlRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Urls_CreateUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UrlsService_CreateUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateUrlRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UrlsServer).CreateUrl(ctx, in)
+		return srv.(UrlsServiceServer).CreateUrl(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/urlspb.Urls/CreateUrl",
+		FullMethod: "/urlspb.UrlsService/CreateUrl",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UrlsServer).CreateUrl(ctx, req.(*CreateUrlRequest))
+		return srv.(UrlsServiceServer).CreateUrl(ctx, req.(*CreateUrlRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Urls_UpdateUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UrlsService_UpdateUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUrlRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UrlsServer).UpdateUrl(ctx, in)
+		return srv.(UrlsServiceServer).UpdateUrl(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/urlspb.Urls/UpdateUrl",
+		FullMethod: "/urlspb.UrlsService/UpdateUrl",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UrlsServer).UpdateUrl(ctx, req.(*UpdateUrlRequest))
+		return srv.(UrlsServiceServer).UpdateUrl(ctx, req.(*UpdateUrlRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Urls_DeleteUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UrlsService_DeleteUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteUrlRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UrlsServer).DeleteUrl(ctx, in)
+		return srv.(UrlsServiceServer).DeleteUrl(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/urlspb.Urls/DeleteUrl",
+		FullMethod: "/urlspb.UrlsService/DeleteUrl",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UrlsServer).DeleteUrl(ctx, req.(*DeleteUrlRequest))
+		return srv.(UrlsServiceServer).DeleteUrl(ctx, req.(*DeleteUrlRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Urls_Check_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(healthpb.HealthCheckRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UrlsServer).Check(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/urlspb.Urls/Check",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UrlsServer).Check(ctx, req.(*healthpb.HealthCheckRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// Urls_ServiceDesc is the grpc.ServiceDesc for Urls service.
+// UrlsService_ServiceDesc is the grpc.ServiceDesc for UrlsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Urls_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "urlspb.Urls",
-	HandlerType: (*UrlsServer)(nil),
+var UrlsService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "urlspb.UrlsService",
+	HandlerType: (*UrlsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetUrl",
-			Handler:    _Urls_GetUrl_Handler,
+			Handler:    _UrlsService_GetUrl_Handler,
 		},
 		{
 			MethodName: "CreateUrl",
-			Handler:    _Urls_CreateUrl_Handler,
+			Handler:    _UrlsService_CreateUrl_Handler,
 		},
 		{
 			MethodName: "UpdateUrl",
-			Handler:    _Urls_UpdateUrl_Handler,
+			Handler:    _UrlsService_UpdateUrl_Handler,
 		},
 		{
 			MethodName: "DeleteUrl",
-			Handler:    _Urls_DeleteUrl_Handler,
-		},
-		{
-			MethodName: "Check",
-			Handler:    _Urls_Check_Handler,
+			Handler:    _UrlsService_DeleteUrl_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

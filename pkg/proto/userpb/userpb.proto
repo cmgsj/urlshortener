@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option go_package = "urlshortener/pkg/proto/userpb";
+
+package userpb;
+	
+service UserService {
+	rpc GetUserById(GetUserByIdRequest) returns (GetUserResponse);
+	rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserResponse);
+	rpc CreateUser(CreateUserRequest) returns (NoContent);
+}
+
+message User {
+	string userId = 1;
+	string email = 2;
+}
+
+message GetUserByIdRequest {
+	string userId = 1;
+}
+
+message GetUserByEmailRequest {
+	string email = 1;
+}
+
+message GetUserResponse {
+	User user = 1;
+}
+
+message CreateUserRequest {
+	string email = 1;
+	string password = 2;
+}
+
+message NoContent {}

@@ -21,32 +21,27 @@ var (
 	cacheExpTime  = flag.Duration("cache_exp_time", time.Hour, "the cache expiry time")
 )
 
-func NewService() *cacheServer {
+func NewService() *Service {
 	flag.Parse()
-
-	server := &cacheServer{
+	service := &Service{
 		rdb:             initRedisDB(*redisAddr, *redisPassword, *redisDb),
 		cacheExpiryTime: *cacheExpTime,
 	}
-	return server
+	return service
 }
 
-func (server *cacheServer) Run() {
+func (service *Service) Run() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		logger.Fatal("failed to listen:", err)
 	}
-
 	loggerInterceptor := interceptor.NewLoggerInterceptor()
-
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(loggerInterceptor.Unary),
-		grpc.StreamInterceptor(loggerInterceptor.Stream))
-
-	cachepb.RegisterCacheServer(grpcServer, server)
-
+		grpc.StreamInterceptor(loggerInterceptor.Stream),
+	)
+	cachepb.RegisterCacheServiceServer(grpcServer, service)
 	logger.Info("Starting cache_service at:", lis.Addr())
-
 	if err := grpcServer.Serve(lis); err != nil {
 		logger.Fatal("failed to serve:", err)
 	}

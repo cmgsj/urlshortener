@@ -16,10 +16,10 @@ proto_gen:
 
 swagger_gen:
 	swag fmt 
-	swag init -g pkg/services/api/api.go
+	swag init -o pkg/services/api/api_docs -g pkg/services/api/api.go
 
 docker_swagger_update: swagger_gen
-	docker compose run --rm api_service sh -c "swag fmt; swag init -g pkg/services/api/api.go"
+	docker compose run --rm api_service sh -c "swag init -o pkg/services/api/api_docs -g pkg/services/api/api.go"
 
 run_redis:
 	docker run -d -p 6379:6379 --name redi_cache_local redis
