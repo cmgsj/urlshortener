@@ -26,7 +26,7 @@ var (
 // @Success     200 {string} string "pong"
 // @Failure     500 {object} ErrorResponse
 // @Router      /ping [get]
-func (service *Service) Pong(ctx *gin.Context) {
+func (s *Service) Pong(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "pong")
 }
 
@@ -42,26 +42,26 @@ func (service *Service) Pong(ctx *gin.Context) {
 // @Failure     404   {object} ErrorResponse
 // @Failure     500   {object} ErrorResponse
 // @Router      /url/{urlId} [get]
-func (service *Service) GetUrl(ctx *gin.Context) {
+func (s *Service) GetUrl(ctx *gin.Context) {
 	urlId := ctx.Param(UrlIdParam)
-	if service.cacheServiceOk {
-		c, cancel := makeCtx()
+	if s.cacheServiceOk {
+		c, cancel := makeUnaryCtx()
 		defer cancel()
-		cacheRes, err := service.cacheClient.GetUrl(c, &cachepb.GetUrlRequest{UrlId: urlId})
+		cacheRes, err := s.cacheClient.Get(c, &cachepb.GetRequest{Key: urlId})
 		if err == nil {
 			urlDTO := UrlDTO{
 				UrlId:       urlId,
-				RedirectUrl: cacheRes.RedirectUrl,
+				RedirectUrl: cacheRes.GetValue(),
 				NewUrl:      fmt.Sprintf("%s/%s", BaseUrl, urlId),
 			}
 			ctx.JSON(http.StatusOK, urlDTO)
 			return
 		}
 	}
-	if service.urlsServiceOk {
-		c, cancel := makeCtx()
+	if s.urlsServiceOk {
+		c, cancel := makeUnaryCtx()
 		defer cancel()
-		urlRes, err := service.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
+		urlRes, err := s.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err == nil {
 			urlDTO := UrlDTO{
 				UrlId:       urlId,
@@ -89,30 +89,30 @@ func (service *Service) GetUrl(ctx *gin.Context) {
 // @Failure     400 {object} ErrorResponse
 // @Failure     500 {object} ErrorResponse
 // @Router      /url [post]
-func (service *Service) PostUrl(ctx *gin.Context) {
+func (s *Service) PostUrl(ctx *gin.Context) {
 	var body CreateUrlRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	if service.urlsServiceOk {
-		c, cancel := makeCtx()
+	if s.urlsServiceOk {
+		c, cancel := makeUnaryCtx()
 		defer cancel()
-		urlRes, err := service.urlsClient.CreateUrl(c, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
+		urlRes, err := s.urlsClient.CreateUrl(c, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 			return
 		}
-		if service.cacheServiceOk {
-			c, cancel = makeCtx()
+		if s.cacheServiceOk {
+			c, cancel = makeUnaryCtx()
 			defer cancel()
-			_, err = service.cacheClient.SetUrl(c, &cachepb.SetUrlRequest{Url: &urlspb.Url{UrlId: urlRes.UrlId, RedirectUrl: body.RedirectUrl}})
+			_, err = s.cacheClient.Set(c, &cachepb.SetRequest{Key: urlRes.GetUrlId(), Value: body.RedirectUrl})
 			if err != nil {
 				logger.Error(err)
 			}
 		}
 		urlDTO := UrlDTO{
-			UrlId:       urlRes.UrlId,
+			UrlId:       urlRes.GetUrlId(),
 			RedirectUrl: body.RedirectUrl,
 			NewUrl:      fmt.Sprintf("%s/%s", BaseUrl, urlRes.UrlId),
 		}
@@ -132,21 +132,21 @@ func (service *Service) PostUrl(ctx *gin.Context) {
 // @Failure     404 {object} ErrorResponse
 // @Failure     500 {object} ErrorResponse
 // @Router      /{urlId} [get]
-func (service *Service) RedirectToUrl(ctx *gin.Context) {
+func (s *Service) RedirectToUrl(ctx *gin.Context) {
 	urlId := ctx.Param(UrlIdParam)
-	if service.cacheServiceOk {
-		c, cancel := makeCtx()
+	if s.cacheServiceOk {
+		c, cancel := makeUnaryCtx()
 		defer cancel()
-		cacheRes, err := service.cacheClient.GetUrl(c, &cachepb.GetUrlRequest{UrlId: urlId})
+		cacheRes, err := s.cacheClient.Get(c, &cachepb.GetRequest{Key: urlId})
 		if err == nil {
-			ctx.Redirect(http.StatusFound, cacheRes.RedirectUrl)
+			ctx.Redirect(http.StatusFound, cacheRes.GetValue())
 			return
 		}
 	}
-	if service.urlsServiceOk {
-		c, cancel := makeCtx()
+	if s.urlsServiceOk {
+		c, cancel := makeUnaryCtx()
 		defer cancel()
-		urlRes, err := service.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
+		urlRes, err := s.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err == nil {
 			ctx.Redirect(http.StatusFound, urlRes.GetUrl().GetRedirectUrl())
 		} else {

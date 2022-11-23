@@ -1,0 +1,2 @@
+TODO: use command line flags in services and in docker compose
+TODO: check for errors and log them when creating and seeding tables

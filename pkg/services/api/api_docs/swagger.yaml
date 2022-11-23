@@ -135,4 +135,9 @@ paths:
       - url
 schemes:
 - http
+securityDefinitions:
+  JWT_AUTH:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -21,7 +21,7 @@ func NewAuthInterceptor() *AuthInterceptor {
 	return &AuthInterceptor{}
 }
 
-func (i *AuthInterceptor) Unary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (a *AuthInterceptor) Unary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	data, ok := metadata.FromIncomingContext(ctx)
 	if !ok || len(data["auth"]) != 1 {
 		logger.Error("No metadata found")
@@ -33,7 +33,7 @@ func (i *AuthInterceptor) Unary(ctx context.Context, req interface{}, info *grpc
 	return handler(ctx, req)
 }
 
-func (i *AuthInterceptor) Stream(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+func (a *AuthInterceptor) Stream(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	data, ok := metadata.FromIncomingContext(stream.Context())
 	if !ok || len(data["auth"]) != 1 {
 		logger.Error("No metadata found")

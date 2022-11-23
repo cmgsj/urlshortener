@@ -6,13 +6,13 @@ import (
 )
 
 func ScheduleTask(task func(), d time.Duration) (stop func()) {
-	logger.Info("Scheduling periodic task in:", d)
+	logger.Info("Scheduling periodic task... delay:", d)
 	timer := time.AfterFunc(d, task)
 	return func() { timer.Stop() }
 }
 
 func SchedulePeriodicTask(task func(), d time.Duration) (stop func()) {
-	logger.Info("Scheduling periodic task in:", d)
+	logger.Info("Scheduling periodic task... delay:", d)
 	ticker := time.NewTicker(d)
 	done := make(chan struct{}, 1)
 	go func(ticker *time.Ticker, task func(), done <-chan struct{}) {

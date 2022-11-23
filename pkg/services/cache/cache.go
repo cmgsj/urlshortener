@@ -11,6 +11,8 @@ import (
 	"urlshortener/pkg/proto/cachepb"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 var (
@@ -30,18 +32,27 @@ func NewService() *Service {
 	return service
 }
 
-func (service *Service) Run() {
+func (s *Service) Run() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		logger.Fatal("failed to listen:", err)
 	}
+
 	loggerInterceptor := interceptor.NewLoggerInterceptor()
+
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(loggerInterceptor.Unary),
 		grpc.StreamInterceptor(loggerInterceptor.Stream),
 	)
-	cachepb.RegisterCacheServiceServer(grpcServer, service)
-	logger.Info("Starting cache_service at:", lis.Addr())
+
+	healthServer := health.NewServer()
+
+	healthServer.SetServingStatus("api.service", healthpb.HealthCheckResponse_SERVING)
+
+	healthpb.RegisterHealthServer(grpcServer, healthServer)
+	cachepb.RegisterCacheServiceServer(grpcServer, s)
+
+	logger.Info("Starting cache.service at:", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {
 		logger.Fatal("failed to serve:", err)
 	}

@@ -9,52 +9,53 @@ import (
 type UrlEntity struct {
 	UrlId       string
 	RedirectUrl string
+	UserId      int64
 }
 
-func initSqliteDB(sqliteDbName string) *sql.DB {
+func intiDB(sqliteDbName string) *sql.DB {
 	db, err := sql.Open("sqlite3", sqliteDbName)
 	if err != nil {
 		logger.Fatal("failed to open sqlite db:", err)
 	}
-	err = createUrlsTable(db, context.Background())
-	if err != nil {
-		logger.Fatal("failed to create table:", err)
-	}
 	return db
 }
 
-func createUrlsTable(db *sql.DB, ctx context.Context) error {
-	_, err := db.ExecContext(ctx, "CREATE TABLE IF NOT EXISTS urls (url_id TEXT PRIMARY KEY, redirect_url TEXT UNIQUE)")
-	if err != nil {
-		return err
-	}
-	_, err = db.ExecContext(ctx, "CREATE INDEX IF NOT EXISTS redirect_url_index ON urls (redirect_url)")
-	return err
-}
-
-func getUrl(db *sql.DB, ctx context.Context, urlId string) (*UrlEntity, error) {
+func getUrlById(ctx context.Context, db *sql.DB, urlId string) (*UrlEntity, error) {
 	u := &UrlEntity{}
-	err := db.QueryRowContext(ctx, "SELECT * FROM urls WHERE url_id = ?", urlId).Scan(&u.UrlId, &u.RedirectUrl)
+	err := db.QueryRowContext(ctx, "SELECT * FROM urls WHERE url_id = ?", urlId).Scan(&u.UrlId, &u.RedirectUrl, &u.UserId)
 	return u, err
 }
 
-func getUrlByRedirectUrl(db *sql.DB, ctx context.Context, redirectUrl string) (*UrlEntity, error) {
-	u := &UrlEntity{}
-	err := db.QueryRowContext(ctx, "SELECT * FROM urls WHERE redirect_url = ?", redirectUrl).Scan(&u.UrlId, &u.RedirectUrl)
-	return u, err
-}
+// func getUrlsByUserId(ctx context.Context, db *sql.DB, userId int64) ([]*UrlEntity, error) {
+// 	rows, err := db.QueryContext(ctx, "SELECT * FROM urls WHERE user_id = ?", userId)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
 
-func createUrl(db *sql.DB, ctx context.Context, urlId string, redirectUrl string) error {
-	_, err := db.ExecContext(ctx, "INSERT INTO urls VALUES (?, ?)", urlId, redirectUrl)
+// 	var urls []*UrlEntity
+// 	for rows.Next() {
+// 		u := &UrlEntity{}
+// 		err := rows.Scan(&u.UrlId, &u.RedirectUrl, &u.UserId)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		urls = append(urls, u)
+// 	}
+// 	return urls, nil
+// }
+
+func createUrl(ctx context.Context, db *sql.DB, urlId string, redirectUrl string, userId int64) error {
+	_, err := db.ExecContext(ctx, "INSERT INTO urls (url_id, redirect_url, user_id) VALUES (?, ?, ?)", urlId, redirectUrl, userId)
 	return err
 }
 
-func updateUrl(db *sql.DB, ctx context.Context, urlId string, redirectUrl string) error {
-	_, err := db.ExecContext(ctx, "UPDATE urls SET redirect_url = ? WHERE url_id = ?", redirectUrl, urlId)
+func updateUrl(ctx context.Context, db *sql.DB, urlId string, redirectUrl string, userId int64) error {
+	_, err := db.ExecContext(ctx, "UPDATE urls SET redirect_url = ? WHERE url_id = ? AND user_id = ?", redirectUrl, urlId, userId)
 	return err
 }
 
-func deleteUrl(db *sql.DB, ctx context.Context, urlId string) error {
-	_, err := db.ExecContext(ctx, "DELETE FROM urls WHERE url_id = ?", urlId)
+func deleteUrl(ctx context.Context, db *sql.DB, urlId string, userId int64) error {
+	_, err := db.ExecContext(ctx, "DELETE FROM urls WHERE url_id = ? AND user_id = ?", urlId, userId)
 	return err
 }

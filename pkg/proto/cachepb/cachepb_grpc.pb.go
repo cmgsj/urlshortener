@@ -22,8 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CacheServiceClient interface {
-	GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error)
-	SetUrl(ctx context.Context, in *SetUrlRequest, opts ...grpc.CallOption) (*NoContent, error)
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*NoContent, error)
 }
 
 type cacheServiceClient struct {
@@ -34,18 +34,18 @@ func NewCacheServiceClient(cc grpc.ClientConnInterface) CacheServiceClient {
 	return &cacheServiceClient{cc}
 }
 
-func (c *cacheServiceClient) GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error) {
-	out := new(GetUrlResponse)
-	err := c.cc.Invoke(ctx, "/cachepb.CacheService/GetUrl", in, out, opts...)
+func (c *cacheServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
+	out := new(GetResponse)
+	err := c.cc.Invoke(ctx, "/cachepb.CacheService/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *cacheServiceClient) SetUrl(ctx context.Context, in *SetUrlRequest, opts ...grpc.CallOption) (*NoContent, error) {
+func (c *cacheServiceClient) Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*NoContent, error) {
 	out := new(NoContent)
-	err := c.cc.Invoke(ctx, "/cachepb.CacheService/SetUrl", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/cachepb.CacheService/Set", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +56,8 @@ func (c *cacheServiceClient) SetUrl(ctx context.Context, in *SetUrlRequest, opts
 // All implementations must embed UnimplementedCacheServiceServer
 // for forward compatibility
 type CacheServiceServer interface {
-	GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error)
-	SetUrl(context.Context, *SetUrlRequest) (*NoContent, error)
+	Get(context.Context, *GetRequest) (*GetResponse, error)
+	Set(context.Context, *SetRequest) (*NoContent, error)
 	mustEmbedUnimplementedCacheServiceServer()
 }
 
@@ -65,11 +65,11 @@ type CacheServiceServer interface {
 type UnimplementedCacheServiceServer struct {
 }
 
-func (UnimplementedCacheServiceServer) GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUrl not implemented")
+func (UnimplementedCacheServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedCacheServiceServer) SetUrl(context.Context, *SetUrlRequest) (*NoContent, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SetUrl not implemented")
+func (UnimplementedCacheServiceServer) Set(context.Context, *SetRequest) (*NoContent, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
 }
 func (UnimplementedCacheServiceServer) mustEmbedUnimplementedCacheServiceServer() {}
 
@@ -84,38 +84,38 @@ func RegisterCacheServiceServer(s grpc.ServiceRegistrar, srv CacheServiceServer)
 	s.RegisterService(&CacheService_ServiceDesc, srv)
 }
 
-func _CacheService_GetUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUrlRequest)
+func _CacheService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).GetUrl(ctx, in)
+		return srv.(CacheServiceServer).Get(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cachepb.CacheService/GetUrl",
+		FullMethod: "/cachepb.CacheService/Get",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).GetUrl(ctx, req.(*GetUrlRequest))
+		return srv.(CacheServiceServer).Get(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CacheService_SetUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetUrlRequest)
+func _CacheService_Set_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).SetUrl(ctx, in)
+		return srv.(CacheServiceServer).Set(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cachepb.CacheService/SetUrl",
+		FullMethod: "/cachepb.CacheService/Set",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).SetUrl(ctx, req.(*SetUrlRequest))
+		return srv.(CacheServiceServer).Set(ctx, req.(*SetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -128,12 +128,12 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CacheServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetUrl",
-			Handler:    _CacheService_GetUrl_Handler,
+			MethodName: "Get",
+			Handler:    _CacheService_Get_Handler,
 		},
 		{
-			MethodName: "SetUrl",
-			Handler:    _CacheService_SetUrl_Handler,
+			MethodName: "Set",
+			Handler:    _CacheService_Set_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
