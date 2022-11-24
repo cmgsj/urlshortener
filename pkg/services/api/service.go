@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"urlshortener/pkg/logger"
 	"urlshortener/pkg/proto/cachepb"
 
 	"urlshortener/pkg/proto/urlspb"
@@ -12,13 +11,15 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
 type Service struct {
 	name              string
-	router            *gin.Engine
 	trustedProxies    []string
+	router            *gin.Engine
+	logger            *zap.Logger
 	urlsClient        urlspb.UrlsServiceClient
 	urlsHealthClient  healthpb.HealthClient
 	urlsServiceOk     bool
@@ -40,61 +41,62 @@ func (s *Service) RegisterEndpoints() {
 func (s *Service) RegisterTrustedProxies() {
 	err := s.router.SetTrustedProxies(nil)
 	if err != nil {
-		logger.Fatal("failed to set trusted proxies:", err)
+		s.logger.Fatal("failed to set trusted proxies", zap.Error(err))
 	}
 }
 
 func (s *Service) CheckServices() {
-	go checkService(s.name, s.urlsHealthClient, s.urlsServiceName, &s.urlsServiceOk)
-	go checkService(s.name, s.cacheHealthClient, s.cacheServiceName, &s.cacheServiceOk)
+	go s.checkService(s.name, s.urlsHealthClient, s.urlsServiceName, &s.urlsServiceOk)
+	go s.checkService(s.name, s.cacheHealthClient, s.cacheServiceName, &s.cacheServiceOk)
 }
 
 func (s *Service) WatchServices() {
-	go watchService(s.name, s.urlsHealthClient, s.urlsServiceName, &s.urlsServiceOk)
-	go watchService(s.name, s.cacheHealthClient, s.cacheServiceName, &s.cacheServiceOk)
+	go s.watchService(s.name, s.urlsHealthClient, s.urlsServiceName, &s.urlsServiceOk)
+	go s.watchService(s.name, s.cacheHealthClient, s.cacheServiceName, &s.cacheServiceOk)
 }
 
-func checkService(name string, client healthpb.HealthClient, serviceName string, active *bool) {
+func (s *Service) checkService(name string, client healthpb.HealthClient, serviceName string, active *bool) {
 	ctx, cancel := makeUnaryCtx()
 	defer cancel()
 	_, err := client.Check(ctx, &healthpb.HealthCheckRequest{Service: name})
 	if err != nil {
 		*active = false
-		logger.Error("failed to ping:", serviceName, err)
+		s.logger.Error("failed to check:", zap.String("service", serviceName), zap.Error(err))
 	} else {
 		*active = true
-		logger.Info(serviceName, "is active")
+		s.logger.Info("service is active", zap.String("service", serviceName))
 	}
 }
 
-func watchService(name string, client healthpb.HealthClient, serviceName string, active *bool) {
+func (s *Service) watchService(name string, client healthpb.HealthClient, serviceName string, active *bool) {
 	ctx, cancel := makeStreamCtx()
 	defer cancel()
 	stream, err := client.Watch(ctx, &healthpb.HealthCheckRequest{Service: name})
 	if err != nil {
 		*active = false
-		logger.Error("failed to watch:", serviceName, err)
+		s.logger.Error("failed to watch:", zap.String("service", serviceName), zap.Error(err))
 		return
 	}
 	for {
 		res, err := stream.Recv()
 		if err != nil {
 			*active = false
-			logger.Error("failed to receive:", serviceName, err)
+			s.logger.Error("failed to receive:", zap.String("service", serviceName), zap.Error(err))
 			return
 		}
 		if res.GetStatus() == healthpb.HealthCheckResponse_SERVING {
 			*active = true
-			logger.Info(serviceName, "is active")
+			s.logger.Info("service is active", zap.String("service", serviceName))
 		} else {
 			*active = false
-			logger.Error(serviceName, "is inactive, status:", res.GetStatus())
+			s.logger.Info("service is not active", zap.String("service", serviceName))
 		}
 	}
 }
 
 func makeUnaryCtx() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), time.Second)
+
 }
 
 func makeStreamCtx() (context.Context, context.CancelFunc) {

@@ -2,12 +2,12 @@ package cache
 
 import (
 	"context"
-	"urlshortener/pkg/logger"
 
 	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
 )
 
-func initRedisDB(redisAddr string, redisPassword string, redisDb int) *redis.Client {
+func (s *Service) initRedisDB(redisAddr string, redisPassword string, redisDb int) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     redisAddr,
 		Password: redisPassword,
@@ -15,7 +15,7 @@ func initRedisDB(redisAddr string, redisPassword string, redisDb int) *redis.Cli
 	})
 	_, err := rdb.Ping(context.Background()).Result()
 	if err != nil {
-		logger.Fatal("failed to connect to redis:", err)
+		s.logger.Fatal("failed to connect to redis:", zap.Error(err))
 	}
-	return rdb
+	s.rdb = rdb
 }

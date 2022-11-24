@@ -1,17 +1,14 @@
 package urls
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"net"
-
-	"urlshortener/pkg/db"
 	"urlshortener/pkg/interceptor"
-	"urlshortener/pkg/logger"
 	"urlshortener/pkg/proto/urlspb"
 
 	_ "github.com/mattn/go-sqlite3"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -26,37 +23,33 @@ var (
 func NewService() *Service {
 	flag.Parse()
 	service := &Service{
-		db: intiDB(*urlsDB),
+		healthServer: health.NewServer(),
+		logger:       zap.Must(zap.NewDevelopment()),
 	}
-	db.CreateTables(context.Background(), service.db)
-	db.SeedDB(context.Background(), service.db)
+	service.intiDB(*urlsDB)
+	service.healthServer.SetServingStatus("api.service", healthpb.HealthCheckResponse_SERVING)
 	return service
 }
 
 func (s *Service) Run() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
-		logger.Fatal("failed to listen:", err)
+		s.logger.Fatal("failed to listen:", zap.Error(err))
 	}
 
-	loggerInterceptor := interceptor.NewLoggerInterceptor()
+	loggerInterceptor := interceptor.NewLogger()
 
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(loggerInterceptor.Unary),
 		grpc.StreamInterceptor(loggerInterceptor.Stream),
 	)
+	reflection.Register(grpcServer)
 
-	reflection.Register(grpcServer) // for testing
-
-	healthServer := health.NewServer()
-
-	healthServer.SetServingStatus("api.service", healthpb.HealthCheckResponse_SERVING)
-
-	healthpb.RegisterHealthServer(grpcServer, healthServer)
+	healthpb.RegisterHealthServer(grpcServer, s.healthServer)
 	urlspb.RegisterUrlsServiceServer(grpcServer, s)
 
-	logger.Info("Starting urls.service at:", lis.Addr())
+	s.logger.Info("Starting urls.service at:", zap.String("address", lis.Addr().String()))
 	if err := grpcServer.Serve(lis); err != nil {
-		logger.Fatal("failed to serve:", err)
+		s.logger.Fatal("failed to serve:", zap.Error(err))
 	}
 }

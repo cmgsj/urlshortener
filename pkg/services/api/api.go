@@ -3,14 +3,15 @@ package api
 import (
 	"flag"
 	"fmt"
+	"log"
 
-	"urlshortener/pkg/logger"
 	"urlshortener/pkg/proto/cachepb"
 
 	"urlshortener/pkg/proto/urlspb"
 	_ "urlshortener/pkg/services/api/api_docs"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -21,7 +22,6 @@ var (
 	port      = flag.Int("port", 8080, "the port to serve on")
 	urlsAddr  = flag.String("urls_addr", "urls.service:8081", "url service address")
 	cacheAddr = flag.String("cache_addr", "cache.service:8082", "cache service address")
-	logLevel  = flag.String("log_level", "info", "the log level")
 )
 
 // @title                      URL Shortener API
@@ -45,10 +45,14 @@ func NewService() *Service {
 	flag.Parse()
 	urlsConn := dialGrpc(*urlsAddr)
 	cacheConn := dialGrpc(*cacheAddr)
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.New()
+	router.Use(gin.Recovery(), gin.Logger())
 	service := &Service{
 		name:              "api.service",
-		router:            gin.Default(),
 		trustedProxies:    []string{"127.0.0.1"},
+		router:            router,
+		logger:            zap.Must(zap.NewDevelopment()),
 		urlsClient:        urlspb.NewUrlsServiceClient(urlsConn),
 		urlsHealthClient:  healthpb.NewHealthClient(urlsConn),
 		urlsServiceName:   "urls.service",
@@ -62,21 +66,19 @@ func NewService() *Service {
 }
 
 func (s *Service) Run() {
-	logger.SetLogLevel(logger.LevelFromString(*logLevel))
-	// s.checkServices()
+	s.CheckServices()
 	s.WatchServices()
-	logger.Info("Starting server on port:", *port)
-	logger.Info(fmt.Sprintf("Swagger docs available at http://localhost:%d/docs/index.html", *port))
+	s.logger.Info("Starting server on:", zap.Int("port", *port))
+	s.logger.Info(fmt.Sprintf("Swagger docs available at http://localhost:%d/docs/index.html", *port))
 	if err := s.router.Run(fmt.Sprintf(":%d", *port)); err != nil {
-		logger.Fatal("failed to serve:", err)
+		s.logger.Fatal("Failed to start server:", zap.Error(err))
 	}
 }
 
 func dialGrpc(addr string) *grpc.ClientConn {
-
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatal("failed to connect:", err)
+		log.Fatal("failed to connect:", err)
 	}
 	return conn
 }

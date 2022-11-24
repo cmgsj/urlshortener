@@ -2,25 +2,41 @@ package interceptor
 
 import (
 	"context"
-	"urlshortener/pkg/logger"
+	"time"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
-type LoggerInterceptor struct{}
-
-func NewLoggerInterceptor() *LoggerInterceptor {
-	return &LoggerInterceptor{}
+type Logger struct {
+	logger *zap.Logger
 }
 
-func (l *LoggerInterceptor) Unary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	logger.Info("--> Unary Interceptor:", info.FullMethod)
-	// logger.Info(metadata.FromIncomingContext(ctx))
-	return handler(ctx, req)
+func NewLogger() *Logger {
+	return &Logger{
+		logger: zap.Must(zap.NewDevelopment()),
+	}
 }
 
-func (l *LoggerInterceptor) Stream(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-	logger.Info("--> Stream Interceptor:", info.FullMethod)
-	// logger.Info(metadata.FromIncomingContext(stream.Context()))
-	return handler(srv, stream)
+func (l *Logger) Unary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	l.logger.Info("--> Unary Interceptor:", zap.String("method", info.FullMethod))
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		l.logger.Info("metadata:", zap.Any("data", md))
+	}
+	start := time.Now()
+	res, err := handler(ctx, req)
+	l.logger.Info("<-- Unary Interceptor:", zap.String("method", info.FullMethod), zap.Duration("elapsed", time.Since(start)), zap.Error(err))
+	return res, err
+}
+
+func (l *Logger) Stream(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	l.logger.Info("--> Stream Interceptor:", zap.String("method", info.FullMethod))
+	if md, ok := metadata.FromIncomingContext(stream.Context()); ok {
+		l.logger.Info("metadata:", zap.Any("data", md))
+	}
+	start := time.Now()
+	err := handler(srv, stream)
+	l.logger.Info("<-- Stream Interceptor:", zap.String("method", info.FullMethod), zap.Duration("elapsed", time.Since(start)), zap.Error(err))
+	return err
 }

@@ -4,14 +4,17 @@ import (
 	"context"
 	"net"
 	"testing"
-	"urlshortener/pkg/logger"
+
 	"urlshortener/pkg/proto/urlspb"
 	"urlshortener/pkg/services/urls"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/test/bufconn"
 )
+
+var logger = zap.Must(zap.NewDevelopment())
 
 func TestUrlsService(t *testing.T) {
 	lis := bufconn.Listen(1024 * 1024)
@@ -19,7 +22,7 @@ func TestUrlsService(t *testing.T) {
 	urlspb.RegisterUrlsServiceServer(srv, urls.NewService())
 	go func() {
 		if err := srv.Serve(lis); err != nil {
-			logger.Fatal("Server exited with error:", err)
+			logger.Fatal("Server exited with error:", zap.Error(err))
 		}
 	}()
 
@@ -28,7 +31,7 @@ func TestUrlsService(t *testing.T) {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		logger.Fatal("Failed to dial bufnet:", err)
+		logger.Fatal("Failed to dial bufnet:", zap.Error(err))
 	}
 	defer conn.Close()
 

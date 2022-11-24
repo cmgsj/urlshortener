@@ -3,7 +3,9 @@ package urls
 import (
 	"context"
 	"database/sql"
-	"urlshortener/pkg/logger"
+	"urlshortener/pkg/database"
+
+	"go.uber.org/zap"
 )
 
 type UrlEntity struct {
@@ -12,12 +14,22 @@ type UrlEntity struct {
 	UserId      int64
 }
 
-func intiDB(sqliteDbName string) *sql.DB {
-	db, err := sql.Open("sqlite3", sqliteDbName)
+func (s *Service) intiDB(dbName string) {
+	db, err := sql.Open("sqlite3", dbName)
 	if err != nil {
-		logger.Fatal("failed to open sqlite db:", err)
+		s.logger.Fatal("failed to open sqlite db:", zap.Error(err))
 	}
-	return db
+	err = database.CreateTables(context.Background(), db)
+	if err != nil {
+		s.logger.Fatal("failed to create tables:", zap.Error(err))
+	}
+	err = database.SeedDB(context.Background(), db)
+	if err != nil {
+		s.logger.Error("failed to seed db:", zap.Error(err))
+	} else {
+		s.logger.Info("db seeded")
+	}
+	s.db = db
 }
 
 func getUrlById(ctx context.Context, db *sql.DB, urlId string) (*UrlEntity, error) {

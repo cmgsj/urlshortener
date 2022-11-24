@@ -1,20 +1,22 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
-	"urlshortener/pkg/logger"
 	"urlshortener/pkg/proto/cachepb"
 	"urlshortener/pkg/proto/urlspb"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 var (
-	BaseUrl                  = "http://localhost:8080"
-	UrlIdParam               = "urlId"
-	ServicesUnavailableError = ErrorResponse{Error: "services unavailable"}
+	BaseUrl                = "http://localhost:8080"
+	UrlIdParam             = "urlId"
+	ErrServicesUnavailable = errors.New("services unavailable")
+	ServicesUnavailable    = ErrorResponse{Error: ErrServicesUnavailable.Error()}
 )
 
 // Pong
@@ -74,7 +76,7 @@ func (s *Service) GetUrl(ctx *gin.Context) {
 		}
 		return
 	}
-	ctx.JSON(http.StatusInternalServerError, ServicesUnavailableError)
+	ctx.JSON(http.StatusInternalServerError, ServicesUnavailable)
 }
 
 // PostUrl
@@ -108,7 +110,7 @@ func (s *Service) PostUrl(ctx *gin.Context) {
 			defer cancel()
 			_, err = s.cacheClient.Set(c, &cachepb.SetRequest{Key: urlRes.GetUrlId(), Value: body.RedirectUrl})
 			if err != nil {
-				logger.Error(err)
+				s.logger.Error("failed to set cache", zap.Error(err))
 			}
 		}
 		urlDTO := UrlDTO{
@@ -119,7 +121,7 @@ func (s *Service) PostUrl(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, urlDTO)
 		return
 	}
-	ctx.JSON(http.StatusInternalServerError, ServicesUnavailableError)
+	ctx.JSON(http.StatusInternalServerError, ServicesUnavailable)
 }
 
 // RedirectToUrl
@@ -154,5 +156,5 @@ func (s *Service) RedirectToUrl(ctx *gin.Context) {
 		}
 		return
 	}
-	ctx.JSON(http.StatusInternalServerError, ServicesUnavailableError)
+	ctx.JSON(http.StatusInternalServerError, ServicesUnavailable)
 }

@@ -9,9 +9,10 @@ format:
 	gofmt -w .
 
 proto_gen:
-	@for file in $$(find ./pkg -type f -name '*.proto'); do \
+	@for file in $$(find pkg/proto -type f -name '*.proto'); do \
 		echo $$file; \
-		protoc --proto_path=. --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative $$file; \
+		protoc --proto_path=. --go_out=. --go_opt=paths=source_relative \
+			--go-grpc_out=. --go-grpc_opt=paths=source_relative $$file; \
 	done
 	
 swagger_gen:

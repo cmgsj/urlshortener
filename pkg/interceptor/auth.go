@@ -2,8 +2,8 @@ package interceptor
 
 import (
 	"context"
-	"urlshortener/pkg/logger"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -15,32 +15,36 @@ var (
 	UnauthenticatedError = status.Error(codes.Unauthenticated, "unauthenticated")
 )
 
-type AuthInterceptor struct{}
-
-func NewAuthInterceptor() *AuthInterceptor {
-	return &AuthInterceptor{}
+type Auth struct {
+	logger *zap.Logger
 }
 
-func (a *AuthInterceptor) Unary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func NewAuth() *Auth {
+	return &Auth{
+		logger: zap.Must(zap.NewDevelopment()),
+	}
+}
+
+func (a *Auth) Unary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	data, ok := metadata.FromIncomingContext(ctx)
 	if !ok || len(data["auth"]) != 1 {
-		logger.Error("No metadata found")
+		a.logger.Error("No metadata found")
 		return nil, InvalidAuthHeader
 	}
 	token := data["auth"][0]
-	logger.Info("metadata:", data)
-	logger.Info("auth:", token)
+	a.logger.Info("metadata:", zap.Any("data", data))
+	a.logger.Info("auth:", zap.String("token", token))
 	return handler(ctx, req)
 }
 
-func (a *AuthInterceptor) Stream(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+func (a *Auth) Stream(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	data, ok := metadata.FromIncomingContext(stream.Context())
 	if !ok || len(data["auth"]) != 1 {
-		logger.Error("No metadata found")
+		a.logger.Error("No metadata found")
 		return InvalidAuthHeader
 	}
 	token := data["auth"][0]
-	logger.Info("metadata:", data)
-	logger.Info("auth:", token)
+	a.logger.Info("metadata:", zap.Any("data", data))
+	a.logger.Info("auth:", zap.String("token", token))
 	return handler(srv, stream)
 }

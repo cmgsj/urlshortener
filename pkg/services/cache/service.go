@@ -6,33 +6,37 @@ import (
 	"urlshortener/pkg/proto/cachepb"
 
 	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/status"
 )
 
 var (
-	UrlNotFoundError    = status.Error(codes.NotFound, "url not found")
-	InternalServerError = status.Error(codes.Internal, "internal server error")
+	ErrUrlNotFound         = status.Error(codes.NotFound, "url not found")
+	ErrInternalServerError = status.Error(codes.Internal, "internal server error")
 )
 
 type Service struct {
 	cachepb.UnimplementedCacheServiceServer
-	rdb             *redis.Client
-	cacheExpiryTime time.Duration
+	healthServer *health.Server
+	logger       *zap.Logger
+	rdb          *redis.Client
+	cacheExpTime time.Duration
 }
 
-func (s *Service) GetUrl(ctx context.Context, req *cachepb.GetRequest) (*cachepb.GetResponse, error) {
+func (s *Service) Get(ctx context.Context, req *cachepb.GetRequest) (*cachepb.GetResponse, error) {
 	redirectUrl, err := s.rdb.Get(ctx, req.GetKey()).Result()
 	if err != nil {
-		return nil, UrlNotFoundError
+		return nil, ErrUrlNotFound
 	}
 	return &cachepb.GetResponse{Value: redirectUrl}, nil
 }
 
-func (s *Service) SetUrl(ctx context.Context, req *cachepb.SetRequest) (*cachepb.NoContent, error) {
-	err := s.rdb.Set(ctx, req.GetKey(), req.GetValue(), s.cacheExpiryTime).Err()
+func (s *Service) Set(ctx context.Context, req *cachepb.SetRequest) (*cachepb.NoContent, error) {
+	err := s.rdb.Set(ctx, req.GetKey(), req.GetValue(), s.cacheExpTime).Err()
 	if err != nil {
-		return nil, InternalServerError
+		return nil, ErrInternalServerError
 	}
 	return &cachepb.NoContent{}, nil
 }
