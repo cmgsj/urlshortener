@@ -73,8 +73,5 @@ volumes:
       o: bind
       device: ${PWD}/pkg
   redis_data:
-  postgres_data:
-  
-
-
+  # postgres_data:
   

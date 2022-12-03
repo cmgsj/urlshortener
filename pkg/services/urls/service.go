@@ -15,10 +15,10 @@ import (
 )
 
 var (
-	ErrInvalidUrl          = status.Error(codes.InvalidArgument, "invalid url argument")
-	ErrUrlNotFound         = status.Error(codes.NotFound, "url not found")
-	ErrUrlAlreadyExists    = status.Error(codes.AlreadyExists, "url already exists")
-	ErrInternalServerError = status.Error(codes.Internal, "internal server error")
+	ErrInvalidUrl       = status.Error(codes.InvalidArgument, "invalid url argument")
+	ErrUrlNotFound      = status.Error(codes.NotFound, "url not found")
+	ErrUrlAlreadyExists = status.Error(codes.AlreadyExists, "url already exists")
+	ErrInternal         = status.Error(codes.Internal, "internal error")
 )
 
 type Service struct {
@@ -39,7 +39,7 @@ func (s *Service) GetUrl(ctx context.Context, req *urlspb.GetUrlRequest) (*urlsp
 func (s *Service) CreateUrl(ctx context.Context, req *urlspb.CreateUrlRequest) (*urlspb.CreateUrlResponse, error) {
 	urlId, err := generateID()
 	if err != nil {
-		return nil, ErrInternalServerError
+		return nil, ErrInternal
 	}
 	if !validateUrl(req.GetRedirectUrl()) {
 		return nil, ErrInvalidUrl

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"urlshortener/pkg/grpcutil"
 	"urlshortener/pkg/proto/cachepb"
 	"urlshortener/pkg/proto/urlspb"
 
@@ -47,7 +48,7 @@ func (s *Service) Pong(ctx *gin.Context) {
 func (s *Service) GetUrl(ctx *gin.Context) {
 	urlId := ctx.Param(UrlIdParam)
 	if s.cacheServiceOk {
-		c, cancel := makeUnaryCtx()
+		c, cancel := grpcutil.MakeUnaryCtx()
 		defer cancel()
 		cacheRes, err := s.cacheClient.Get(c, &cachepb.GetRequest{Key: urlId})
 		if err == nil {
@@ -61,7 +62,7 @@ func (s *Service) GetUrl(ctx *gin.Context) {
 		}
 	}
 	if s.urlsServiceOk {
-		c, cancel := makeUnaryCtx()
+		c, cancel := grpcutil.MakeUnaryCtx()
 		defer cancel()
 		urlRes, err := s.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err == nil {
@@ -98,7 +99,7 @@ func (s *Service) PostUrl(ctx *gin.Context) {
 		return
 	}
 	if s.urlsServiceOk {
-		c, cancel := makeUnaryCtx()
+		c, cancel := grpcutil.MakeUnaryCtx()
 		defer cancel()
 		urlRes, err := s.urlsClient.CreateUrl(c, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
 		if err != nil {
@@ -106,7 +107,7 @@ func (s *Service) PostUrl(ctx *gin.Context) {
 			return
 		}
 		if s.cacheServiceOk {
-			c, cancel = makeUnaryCtx()
+			c, cancel = grpcutil.MakeUnaryCtx()
 			defer cancel()
 			_, err = s.cacheClient.Set(c, &cachepb.SetRequest{Key: urlRes.GetUrlId(), Value: body.RedirectUrl})
 			if err != nil {
@@ -137,7 +138,7 @@ func (s *Service) PostUrl(ctx *gin.Context) {
 func (s *Service) RedirectToUrl(ctx *gin.Context) {
 	urlId := ctx.Param(UrlIdParam)
 	if s.cacheServiceOk {
-		c, cancel := makeUnaryCtx()
+		c, cancel := grpcutil.MakeUnaryCtx()
 		defer cancel()
 		cacheRes, err := s.cacheClient.Get(c, &cachepb.GetRequest{Key: urlId})
 		if err == nil {
@@ -146,7 +147,7 @@ func (s *Service) RedirectToUrl(ctx *gin.Context) {
 		}
 	}
 	if s.urlsServiceOk {
-		c, cancel := makeUnaryCtx()
+		c, cancel := grpcutil.MakeUnaryCtx()
 		defer cancel()
 		urlRes, err := s.urlsClient.GetUrl(c, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err == nil {

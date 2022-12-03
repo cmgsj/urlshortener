@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	ErrUrlNotFound         = status.Error(codes.NotFound, "url not found")
-	ErrInternalServerError = status.Error(codes.Internal, "internal server error")
+	ErrKeyNotFound = status.Error(codes.NotFound, "key not found")
+	ErrInternal    = status.Error(codes.Internal, "internal error")
 )
 
 type Service struct {
@@ -26,17 +26,17 @@ type Service struct {
 }
 
 func (s *Service) Get(ctx context.Context, req *cachepb.GetRequest) (*cachepb.GetResponse, error) {
-	redirectUrl, err := s.rdb.Get(ctx, req.GetKey()).Result()
+	value, err := s.rdb.Get(ctx, req.GetKey()).Result()
 	if err != nil {
-		return nil, ErrUrlNotFound
+		return nil, ErrKeyNotFound
 	}
-	return &cachepb.GetResponse{Value: redirectUrl}, nil
+	return &cachepb.GetResponse{Value: value}, nil
 }
 
 func (s *Service) Set(ctx context.Context, req *cachepb.SetRequest) (*cachepb.NoContent, error) {
 	err := s.rdb.Set(ctx, req.GetKey(), req.GetValue(), s.cacheExpTime).Err()
 	if err != nil {
-		return nil, ErrInternalServerError
+		return nil, ErrInternal
 	}
 	return &cachepb.NoContent{}, nil
 }

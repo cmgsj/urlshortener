@@ -3,8 +3,8 @@ package api
 import (
 	"flag"
 	"fmt"
-	"log"
 
+	"urlshortener/pkg/grpcutil"
 	"urlshortener/pkg/proto/cachepb"
 
 	"urlshortener/pkg/proto/urlspb"
@@ -13,8 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
@@ -43,8 +41,8 @@ var (
 
 func NewService() *Service {
 	flag.Parse()
-	urlsConn := dialGrpc(*urlsAddr)
-	cacheConn := dialGrpc(*cacheAddr)
+	urlsConn := grpcutil.DialGrpc(*urlsAddr)
+	cacheConn := grpcutil.DialGrpc(*cacheAddr)
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	router.Use(gin.Recovery(), gin.Logger())
@@ -56,9 +54,11 @@ func NewService() *Service {
 		urlsClient:        urlspb.NewUrlsServiceClient(urlsConn),
 		urlsHealthClient:  healthpb.NewHealthClient(urlsConn),
 		urlsServiceName:   "urls.service",
+		urlsServiceOk:     false,
 		cacheClient:       cachepb.NewCacheServiceClient(cacheConn),
 		cacheHealthClient: healthpb.NewHealthClient(cacheConn),
 		cacheServiceName:  "cache.service",
+		cacheServiceOk:    false,
 	}
 	service.RegisterEndpoints()
 	service.RegisterTrustedProxies()
@@ -73,12 +73,4 @@ func (s *Service) Run() {
 	if err := s.router.Run(fmt.Sprintf(":%d", *port)); err != nil {
 		s.logger.Fatal("Failed to start server:", zap.Error(err))
 	}
-}
-
-func dialGrpc(addr string) *grpc.ClientConn {
-	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal("failed to connect:", err)
-	}
-	return conn
 }

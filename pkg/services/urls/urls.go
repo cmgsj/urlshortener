@@ -37,14 +37,14 @@ func (s *Service) Run() {
 		s.logger.Fatal("failed to listen:", zap.Error(err))
 	}
 
-	loggerInterceptor := interceptor.NewLogger()
+	loggerInterceptor := interceptor.NewLogger(s.logger)
 
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(loggerInterceptor.Unary),
 		grpc.StreamInterceptor(loggerInterceptor.Stream),
 	)
-	reflection.Register(grpcServer)
 
+	reflection.Register(grpcServer)
 	healthpb.RegisterHealthServer(grpcServer, s.healthServer)
 	urlspb.RegisterUrlsServiceServer(grpcServer, s)
 

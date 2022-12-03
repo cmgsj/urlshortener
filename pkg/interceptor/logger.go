@@ -13,10 +13,8 @@ type Logger struct {
 	logger *zap.Logger
 }
 
-func NewLogger() *Logger {
-	return &Logger{
-		logger: zap.Must(zap.NewDevelopment()),
-	}
+func NewLogger(logger *zap.Logger) *Logger {
+	return &Logger{logger: logger}
 }
 
 func (l *Logger) Unary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {

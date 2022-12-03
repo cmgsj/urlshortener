@@ -1,9 +1,7 @@
 package api
 
 import (
-	"context"
-	"time"
-
+	"urlshortener/pkg/grpcutil"
 	"urlshortener/pkg/proto/cachepb"
 
 	"urlshortener/pkg/proto/urlspb"
@@ -46,59 +44,11 @@ func (s *Service) RegisterTrustedProxies() {
 }
 
 func (s *Service) CheckServices() {
-	go s.checkService(s.name, s.urlsHealthClient, s.urlsServiceName, &s.urlsServiceOk)
-	go s.checkService(s.name, s.cacheHealthClient, s.cacheServiceName, &s.cacheServiceOk)
+	go grpcutil.CheckService(s.name, s.logger, s.urlsHealthClient, s.urlsServiceName, &s.urlsServiceOk)
+	go grpcutil.CheckService(s.name, s.logger, s.cacheHealthClient, s.cacheServiceName, &s.cacheServiceOk)
 }
 
 func (s *Service) WatchServices() {
-	go s.watchService(s.name, s.urlsHealthClient, s.urlsServiceName, &s.urlsServiceOk)
-	go s.watchService(s.name, s.cacheHealthClient, s.cacheServiceName, &s.cacheServiceOk)
-}
-
-func (s *Service) checkService(name string, client healthpb.HealthClient, serviceName string, active *bool) {
-	ctx, cancel := makeUnaryCtx()
-	defer cancel()
-	_, err := client.Check(ctx, &healthpb.HealthCheckRequest{Service: name})
-	if err != nil {
-		*active = false
-		s.logger.Error("failed to check:", zap.String("service", serviceName), zap.Error(err))
-	} else {
-		*active = true
-		s.logger.Info("service is active", zap.String("service", serviceName))
-	}
-}
-
-func (s *Service) watchService(name string, client healthpb.HealthClient, serviceName string, active *bool) {
-	ctx, cancel := makeStreamCtx()
-	defer cancel()
-	stream, err := client.Watch(ctx, &healthpb.HealthCheckRequest{Service: name})
-	if err != nil {
-		*active = false
-		s.logger.Error("failed to watch:", zap.String("service", serviceName), zap.Error(err))
-		return
-	}
-	for {
-		res, err := stream.Recv()
-		if err != nil {
-			*active = false
-			s.logger.Error("failed to receive:", zap.String("service", serviceName), zap.Error(err))
-			return
-		}
-		if res.GetStatus() == healthpb.HealthCheckResponse_SERVING {
-			*active = true
-			s.logger.Info("service is active", zap.String("service", serviceName))
-		} else {
-			*active = false
-			s.logger.Info("service is not active", zap.String("service", serviceName))
-		}
-	}
-}
-
-func makeUnaryCtx() (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), time.Second)
-
-}
-
-func makeStreamCtx() (context.Context, context.CancelFunc) {
-	return context.WithCancel(context.Background())
+	go grpcutil.WatchService(s.name, s.logger, s.urlsHealthClient, s.urlsServiceName, &s.urlsServiceOk)
+	go grpcutil.WatchService(s.name, s.logger, s.cacheHealthClient, s.cacheServiceName, &s.cacheServiceOk)
 }
