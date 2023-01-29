@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: src/auth_service/pkg/proto/cachepb/cachepb.proto
+// source: src/cache_service/pkg/proto/cachepb/cachepb.proto
 
 package cachepb
 
@@ -22,8 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CacheServiceClient interface {
-	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
-	Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*NoContent, error)
+	GetItem(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error)
+	PutItem(ctx context.Context, in *PutItemRequest, opts ...grpc.CallOption) (*PutItemResponse, error)
 }
 
 type cacheServiceClient struct {
@@ -34,18 +34,18 @@ func NewCacheServiceClient(cc grpc.ClientConnInterface) CacheServiceClient {
 	return &cacheServiceClient{cc}
 }
 
-func (c *cacheServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
-	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, "/cachepb.CacheService/Get", in, out, opts...)
+func (c *cacheServiceClient) GetItem(ctx context.Context, in *GetItemRequest, opts ...grpc.CallOption) (*GetItemResponse, error) {
+	out := new(GetItemResponse)
+	err := c.cc.Invoke(ctx, "/cachepb.CacheService/GetItem", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *cacheServiceClient) Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*NoContent, error) {
-	out := new(NoContent)
-	err := c.cc.Invoke(ctx, "/cachepb.CacheService/Set", in, out, opts...)
+func (c *cacheServiceClient) PutItem(ctx context.Context, in *PutItemRequest, opts ...grpc.CallOption) (*PutItemResponse, error) {
+	out := new(PutItemResponse)
+	err := c.cc.Invoke(ctx, "/cachepb.CacheService/PutItem", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +56,8 @@ func (c *cacheServiceClient) Set(ctx context.Context, in *SetRequest, opts ...gr
 // All implementations must embed UnimplementedCacheServiceServer
 // for forward compatibility
 type CacheServiceServer interface {
-	Get(context.Context, *GetRequest) (*GetResponse, error)
-	Set(context.Context, *SetRequest) (*NoContent, error)
+	GetItem(context.Context, *GetItemRequest) (*GetItemResponse, error)
+	PutItem(context.Context, *PutItemRequest) (*PutItemResponse, error)
 	mustEmbedUnimplementedCacheServiceServer()
 }
 
@@ -65,11 +65,11 @@ type CacheServiceServer interface {
 type UnimplementedCacheServiceServer struct {
 }
 
-func (UnimplementedCacheServiceServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+func (UnimplementedCacheServiceServer) GetItem(context.Context, *GetItemRequest) (*GetItemResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetItem not implemented")
 }
-func (UnimplementedCacheServiceServer) Set(context.Context, *SetRequest) (*NoContent, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
+func (UnimplementedCacheServiceServer) PutItem(context.Context, *PutItemRequest) (*PutItemResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PutItem not implemented")
 }
 func (UnimplementedCacheServiceServer) mustEmbedUnimplementedCacheServiceServer() {}
 
@@ -84,38 +84,38 @@ func RegisterCacheServiceServer(s grpc.ServiceRegistrar, srv CacheServiceServer)
 	s.RegisterService(&CacheService_ServiceDesc, srv)
 }
 
-func _CacheService_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRequest)
+func _CacheService_GetItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetItemRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).Get(ctx, in)
+		return srv.(CacheServiceServer).GetItem(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cachepb.CacheService/Get",
+		FullMethod: "/cachepb.CacheService/GetItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).Get(ctx, req.(*GetRequest))
+		return srv.(CacheServiceServer).GetItem(ctx, req.(*GetItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CacheService_Set_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SetRequest)
+func _CacheService_PutItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PutItemRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CacheServiceServer).Set(ctx, in)
+		return srv.(CacheServiceServer).PutItem(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cachepb.CacheService/Set",
+		FullMethod: "/cachepb.CacheService/PutItem",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CacheServiceServer).Set(ctx, req.(*SetRequest))
+		return srv.(CacheServiceServer).PutItem(ctx, req.(*PutItemRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -128,14 +128,14 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*CacheServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Get",
-			Handler:    _CacheService_Get_Handler,
+			MethodName: "GetItem",
+			Handler:    _CacheService_GetItem_Handler,
 		},
 		{
-			MethodName: "Set",
-			Handler:    _CacheService_Set_Handler,
+			MethodName: "PutItem",
+			Handler:    _CacheService_PutItem_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "src/auth_service/pkg/proto/cachepb/cachepb.proto",
+	Metadata: "src/cache_service/pkg/proto/cachepb/cachepb.proto",
 }

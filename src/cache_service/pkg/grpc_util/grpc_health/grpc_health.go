@@ -1,7 +1,7 @@
 package grpc_health
 
 import (
-	"cache_service/pkg/cache/grpc_util"
+	"cache_service/pkg/grpc_util"
 	"sync/atomic"
 	"time"
 

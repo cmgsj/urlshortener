@@ -93,7 +93,7 @@ func (s *Service) PostUrl(c *gin.Context) {
 		if s.cacheServiceOk.Load() {
 			ctx, cancel = grpc_util.MakeUnaryCtx()
 			defer cancel()
-			_, err = s.cacheClient.Set(ctx, &cachepb.SetRequest{Key: urlRes.GetUrlId(), Value: body.RedirectUrl})
+			_, err = s.cacheClient.PutItem(ctx, &cachepb.PutItemRequest{Item: &cachepb.Item{Key: urlRes.GetUrlId(), Value: body.RedirectUrl}})
 			if err != nil {
 				s.logger.Error("failed to set cache", zap.Error(err))
 			}
@@ -137,9 +137,9 @@ func (s *Service) getRedirectUrl(urlId string) (string, error) {
 	if s.cacheServiceOk.Load() {
 		ctx, cancel := grpc_util.MakeUnaryCtx()
 		defer cancel()
-		cacheRes, err := s.cacheClient.Get(ctx, &cachepb.GetRequest{Key: urlId})
+		cacheRes, err := s.cacheClient.GetItem(ctx, &cachepb.GetItemRequest{Key: urlId})
 		if err == nil {
-			return cacheRes.GetValue(), nil
+			return cacheRes.GetItem().GetValue(), nil
 		}
 	}
 	if s.urlsServiceOk.Load() {

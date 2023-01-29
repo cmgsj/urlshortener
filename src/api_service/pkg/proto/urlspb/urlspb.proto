@@ -10,8 +10,8 @@ package urlspb;
 service UrlsService {
 	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse) {}
 	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse) {}
-	rpc UpdateUrl(UpdateUrlRequest) returns (NoContent) {}
-	rpc DeleteUrl(DeleteUrlRequest) returns (NoContent) {}
+	rpc UpdateUrl(UpdateUrlRequest) returns (UpdateUrlResponse) {}
+	rpc DeleteUrl(DeleteUrlRequest) returns (DeleteUrlResponse) {}
 }
 
 message Url {
@@ -39,8 +39,10 @@ message UpdateUrlRequest {
 	Url url = 1;
 }
 
+message UpdateUrlResponse {}
+
 message DeleteUrlRequest {
 	string urlId = 1;
 }
 
-message NoContent {}
+message DeleteUrlResponse {}

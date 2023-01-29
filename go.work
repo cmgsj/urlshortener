@@ -2,7 +2,6 @@ go 1.19
 
 use (
 	./src/api_service
-	./src/auth_service
 	./src/cache_service
 	./src/urls_service
 )

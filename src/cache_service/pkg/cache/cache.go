@@ -1,8 +1,8 @@
 package cache
 
 import (
-	"cache_service/pkg/cache/grpc_util/grpc_interceptor"
-	"cache_service/pkg/cache/proto/cachepb"
+	"cache_service/pkg/grpc_util/grpc_interceptor"
+	"cache_service/pkg/proto/cachepb"
 	"fmt"
 
 	"net"

@@ -37,43 +37,40 @@ func (s *Service) GetUrl(ctx context.Context, req *urlspb.GetUrlRequest) (*urlsp
 }
 
 func (s *Service) CreateUrl(ctx context.Context, req *urlspb.CreateUrlRequest) (*urlspb.CreateUrlResponse, error) {
-	urlId, err := generateID()
+	urlId, err := generateUrlId()
 	if err != nil {
 		return nil, ErrInternal
 	}
-	if !validateUrl(req.GetRedirectUrl()) {
+	if !isValidUrl(req.GetRedirectUrl()) {
 		return nil, ErrInvalidUrl
 	}
-	var userId int64 = 1 //TODO: get user id from auth service
-	err = createUrl(ctx, s.db, urlId, req.GetRedirectUrl(), userId)
+	err = createUrl(ctx, s.db, urlId, req.GetRedirectUrl())
 	if err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
 	return &urlspb.CreateUrlResponse{UrlId: urlId}, nil
 }
 
-func (s *Service) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlRequest) (*urlspb.NoContent, error) {
-	if !validateUrl(req.GetUrl().GetRedirectUrl()) {
+func (s *Service) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlRequest) (*urlspb.UpdateUrlResponse, error) {
+	if !isValidUrl(req.GetUrl().GetRedirectUrl()) {
 		return nil, ErrInvalidUrl
 	}
-	var userId int64 = 1 //TODO: get user id from auth service
-	err := updateUrl(ctx, s.db, req.GetUrl().GetUrlId(), req.GetUrl().GetRedirectUrl(), userId)
+	err := updateUrl(ctx, s.db, req.GetUrl().GetUrlId(), req.GetUrl().GetRedirectUrl())
 	if err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
-	return &urlspb.NoContent{}, nil
+	return &urlspb.UpdateUrlResponse{}, nil
 }
 
-func (s *Service) DeleteUrl(ctx context.Context, req *urlspb.DeleteUrlRequest) (*urlspb.NoContent, error) {
-	var userId int64 = 1 //TODO: get user id from auth service
-	err := deleteUrl(ctx, s.db, req.GetUrlId(), userId)
+func (s *Service) DeleteUrl(ctx context.Context, req *urlspb.DeleteUrlRequest) (*urlspb.DeleteUrlResponse, error) {
+	err := deleteUrl(ctx, s.db, req.GetUrlId())
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}
-	return &urlspb.NoContent{}, nil
+	return &urlspb.DeleteUrlResponse{}, nil
 }
 
-func generateID() (string, error) {
+func generateUrlId() (string, error) {
 	var data [8]byte
 	if _, err := rand.Read(data[:]); err != nil {
 		return "", err
@@ -81,7 +78,7 @@ func generateID() (string, error) {
 	return base64.RawURLEncoding.EncodeToString(data[:]), nil
 }
 
-func validateUrl(urlStr string) bool {
+func isValidUrl(urlStr string) bool {
 	_, err := url.ParseRequestURI(urlStr)
 	return err == nil
 }

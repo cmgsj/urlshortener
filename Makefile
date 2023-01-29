@@ -1,4 +1,4 @@
-default: format proto_gen swagger_gen
+default: format proto_gen swagger_gen tidy
 
 format:
 	gofmt -w .
@@ -14,17 +14,18 @@ swagger_gen:
 	swag fmt 
 	swag init -o src/api_service/pkg/docs -g src/api_service/pkg/api/api.go
 
+tidy:
+	cd src/api_service && go mod tidy && cd ../..
+	cd src/cache_service && go mod tidy && cd ../..
+	cd src/urls_service && go mod tidy && cd ../..
+
 test:
 	go test -v ./src/api_service/...
-	go test -v ./src/auth_service/...
 	go test -v ./src/cache_service/...
 	go test -v ./src/urls_service/...
 
 run_api:
 	env $$(cat .env | grep -v ^# | sed -E -e "s/=.+_service/=localhost/g") go run api_service
-
-run_auth:
-	env $$(cat .env | grep -v ^# | sed -E -e "s/=.+_service/=localhost/g") go run auth_service
 
 run_cache:
 	env $$(cat .env | grep -v ^# | sed -E -e "s/=.+_service/=localhost/g") go run cache_service
@@ -34,14 +35,7 @@ run_urls:
 
 run_redis:
 	docker run -d -p 6379:6379 --name redis_local redis || docker start redis_local || echo "redis is running"
-
-tidy:
-	cd src/api_service && go mod tidy && cd ../..
-	cd src/auth_service && go mod tidy && cd ../..
-	cd src/cache_service && go mod tidy && cd ../..
-	cd src/urls_service && go mod tidy && cd ../..
-
-
+	
 # docker exec -it [container] bash
 # docker compose run --rm [container] sh -c "[command]"
 # docker compose up --build -V

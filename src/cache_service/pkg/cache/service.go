@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"cache_service/pkg/cache/proto/cachepb"
+	"cache_service/pkg/proto/cachepb"
 	"context"
 
 	"time"
@@ -26,18 +26,18 @@ type Service struct {
 	cacheExpTime time.Duration
 }
 
-func (s *Service) Get(ctx context.Context, req *cachepb.GetRequest) (*cachepb.GetResponse, error) {
+func (s *Service) GetItem(ctx context.Context, req *cachepb.GetItemRequest) (*cachepb.GetItemResponse, error) {
 	value, err := s.rdb.Get(ctx, req.GetKey()).Result()
 	if err != nil {
 		return nil, ErrKeyNotFound
 	}
-	return &cachepb.GetResponse{Value: value}, nil
+	return &cachepb.GetItemResponse{Item: &cachepb.Item{Key: req.GetKey(), Value: value}}, nil
 }
 
-func (s *Service) Set(ctx context.Context, req *cachepb.SetRequest) (*cachepb.NoContent, error) {
-	err := s.rdb.Set(ctx, req.GetKey(), req.GetValue(), s.cacheExpTime).Err()
+func (s *Service) PutItem(ctx context.Context, req *cachepb.PutItemRequest) (*cachepb.PutItemResponse, error) {
+	err := s.rdb.Set(ctx, req.GetItem().GetKey(), req.GetItem().GetValue(), s.cacheExpTime).Err()
 	if err != nil {
 		return nil, ErrInternal
 	}
-	return &cachepb.NoContent{}, nil
+	return &cachepb.PutItemResponse{}, nil
 }

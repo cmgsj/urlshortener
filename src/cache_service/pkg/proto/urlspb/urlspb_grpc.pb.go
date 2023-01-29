@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: src/auth_service/pkg/proto/urlspb/urlspb.proto
+// source: src/cache_service/pkg/proto/urlspb/urlspb.proto
 
 package urlspb
 
@@ -24,8 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type UrlsServiceClient interface {
 	GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error)
 	CreateUrl(ctx context.Context, in *CreateUrlRequest, opts ...grpc.CallOption) (*CreateUrlResponse, error)
-	UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*NoContent, error)
-	DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*NoContent, error)
+	UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*UpdateUrlResponse, error)
+	DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*DeleteUrlResponse, error)
 }
 
 type urlsServiceClient struct {
@@ -54,8 +54,8 @@ func (c *urlsServiceClient) CreateUrl(ctx context.Context, in *CreateUrlRequest,
 	return out, nil
 }
 
-func (c *urlsServiceClient) UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*NoContent, error) {
-	out := new(NoContent)
+func (c *urlsServiceClient) UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*UpdateUrlResponse, error) {
+	out := new(UpdateUrlResponse)
 	err := c.cc.Invoke(ctx, "/urlspb.UrlsService/UpdateUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -63,8 +63,8 @@ func (c *urlsServiceClient) UpdateUrl(ctx context.Context, in *UpdateUrlRequest,
 	return out, nil
 }
 
-func (c *urlsServiceClient) DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*NoContent, error) {
-	out := new(NoContent)
+func (c *urlsServiceClient) DeleteUrl(ctx context.Context, in *DeleteUrlRequest, opts ...grpc.CallOption) (*DeleteUrlResponse, error) {
+	out := new(DeleteUrlResponse)
 	err := c.cc.Invoke(ctx, "/urlspb.UrlsService/DeleteUrl", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -78,8 +78,8 @@ func (c *urlsServiceClient) DeleteUrl(ctx context.Context, in *DeleteUrlRequest,
 type UrlsServiceServer interface {
 	GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error)
 	CreateUrl(context.Context, *CreateUrlRequest) (*CreateUrlResponse, error)
-	UpdateUrl(context.Context, *UpdateUrlRequest) (*NoContent, error)
-	DeleteUrl(context.Context, *DeleteUrlRequest) (*NoContent, error)
+	UpdateUrl(context.Context, *UpdateUrlRequest) (*UpdateUrlResponse, error)
+	DeleteUrl(context.Context, *DeleteUrlRequest) (*DeleteUrlResponse, error)
 	mustEmbedUnimplementedUrlsServiceServer()
 }
 
@@ -93,10 +93,10 @@ func (UnimplementedUrlsServiceServer) GetUrl(context.Context, *GetUrlRequest) (*
 func (UnimplementedUrlsServiceServer) CreateUrl(context.Context, *CreateUrlRequest) (*CreateUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUrl not implemented")
 }
-func (UnimplementedUrlsServiceServer) UpdateUrl(context.Context, *UpdateUrlRequest) (*NoContent, error) {
+func (UnimplementedUrlsServiceServer) UpdateUrl(context.Context, *UpdateUrlRequest) (*UpdateUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUrl not implemented")
 }
-func (UnimplementedUrlsServiceServer) DeleteUrl(context.Context, *DeleteUrlRequest) (*NoContent, error) {
+func (UnimplementedUrlsServiceServer) DeleteUrl(context.Context, *DeleteUrlRequest) (*DeleteUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUrl not implemented")
 }
 func (UnimplementedUrlsServiceServer) mustEmbedUnimplementedUrlsServiceServer() {}
@@ -209,5 +209,5 @@ var UrlsService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "src/auth_service/pkg/proto/urlspb/urlspb.proto",
+	Metadata: "src/cache_service/pkg/proto/urlspb/urlspb.proto",
 }
