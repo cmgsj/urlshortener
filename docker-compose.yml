@@ -8,42 +8,33 @@ services:
       - urls_service
       - cache_service
     build:
-      context: .
-      dockerfile: cmd/api/Dockerfile
+      context: src/api_service
     env_file:
       - .env
     ports:
-      - "${API_PORT}:${API_PORT}"
-    volumes:
-      - pkg_data:/usr/src/app/pkg
+      - "${API_SVC_PORT}:${API_SVC_PORT}"
 
   urls_service:
     container_name: urls_service
-    depends_on:
-      - postgres_db
+    # depends_on:
+    #   - postgres_db
     build:
-      context: .
-      dockerfile: cmd/urls/Dockerfile
+      context: src/urls_service
     env_file:
       - .env
     ports:
-      - "${CACHE_PORT}:${CACHE_PORT}"
-    volumes:
-      - pkg_data:/usr/src/app/pkg
+      - "${CACHE_SVC_PORT}:${CACHE_SVC_PORT}"
   
   cache_service:
     container_name: cache_service
     depends_on:
       - redis_cache
     build:
-      context: .
-      dockerfile: cmd/cache/Dockerfile
+      context: src/cache_service
     env_file:
       - .env
     ports:
-      - "${URLS_PORT}:${URLS_PORT}"
-    volumes:
-      - pkg_data:/usr/src/app/pkg
+      - "${URLS_SVC_PORT}:${URLS_SVC_PORT}"
 
   redis_cache:
     container_name: redis_cache
@@ -66,12 +57,6 @@ services:
 #      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  pkg_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/pkg
   redis_data:
   # postgres_data:
   
