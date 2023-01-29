@@ -34,7 +34,7 @@ run_urls:
 	env $$(cat .env | grep -v ^# | sed -E -e "s/=.+_service/=localhost/g") go run urls_service
 
 run_redis:
-	docker run -d -p 6379:6379 --name redis_local redis || docker start redis_local || echo "redis is running"
+	docker run -d -p 6379:6379 --name redis_cache redis || docker start redis_cache || echo "redis is running"
 	
 # docker exec -it [container] bash
 # docker compose run --rm [container] sh -c "[command]"

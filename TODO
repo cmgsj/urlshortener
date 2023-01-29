@@ -1,4 +1,2 @@
 TODO: add TLS
-TODO: add api gateway (auth) service
-TODO: add/integrate user service
 TODO: add Docker build stages to minimize container size

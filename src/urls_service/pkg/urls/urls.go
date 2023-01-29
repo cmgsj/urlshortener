@@ -2,6 +2,7 @@ package urls
 
 import (
 	"fmt"
+
 	"urls_service/pkg/grpc_util/grpc_interceptor"
 	"urls_service/pkg/proto/urlspb"
 
@@ -29,7 +30,6 @@ func NewService() *Service {
 		logger:       zap.Must(zap.NewDevelopment()),
 	}
 	service.intiDB(DB_URI)
-	service.healthServer.SetServingStatus(API_SVC_NAME, healthpb.HealthCheckResponse_SERVING)
 	return service
 }
 
@@ -49,6 +49,8 @@ func (s *Service) Run() {
 	reflection.Register(grpcServer)
 	healthpb.RegisterHealthServer(grpcServer, s.healthServer)
 	urlspb.RegisterUrlsServiceServer(grpcServer, s)
+
+	s.healthServer.SetServingStatus(API_SVC_NAME, healthpb.HealthCheckResponse_SERVING)
 
 	s.logger.Info("Starting", zap.String("service", URLS_SVC_NAME), zap.String("address", lis.Addr().String()))
 	if err := grpcServer.Serve(lis); err != nil {

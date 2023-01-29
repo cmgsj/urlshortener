@@ -43,7 +43,6 @@ func NewService() *Service {
 		service.logger.Fatal("failed to convert REDIS_DB to int:", zap.Error(err))
 	}
 	service.initRedisDB(REDIS_ADDR, REDIS_PASSWORD, redisdb)
-	service.healthServer.SetServingStatus(API_SVC_NAME, healthpb.HealthCheckResponse_SERVING)
 	return service
 }
 
@@ -61,8 +60,10 @@ func (s *Service) Run() {
 	)
 
 	reflection.Register(grpcServer)
-	healthpb.RegisterHealthServer(grpcServer, s.healthServer)
 	cachepb.RegisterCacheServiceServer(grpcServer, s)
+	healthpb.RegisterHealthServer(grpcServer, s.healthServer)
+
+	s.healthServer.SetServingStatus(API_SVC_NAME, healthpb.HealthCheckResponse_SERVING)
 
 	s.logger.Info("Starting", zap.String("service", CACHE_SVC_NAME), zap.String("address", lis.Addr().String()))
 	if err := grpcServer.Serve(lis); err != nil {

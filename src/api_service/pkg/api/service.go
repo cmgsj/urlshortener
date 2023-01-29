@@ -31,9 +31,9 @@ type Service struct {
 func (s *Service) RegisterEndpoints() {
 	s.router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	s.router.GET("/ping", s.Pong)
-	s.router.Any("/:urlId", s.RedirectToUrl)
 	s.router.GET("/url/:urlId", s.GetUrl)
 	s.router.POST("/url", s.PostUrl)
+	s.router.Any("/:urlId", s.RedirectToUrl)
 }
 
 func (s *Service) RegisterTrustedProxies() {

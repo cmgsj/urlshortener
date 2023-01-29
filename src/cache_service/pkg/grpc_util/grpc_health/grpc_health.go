@@ -79,7 +79,7 @@ func WatchServices(svcName string, logger *zap.Logger, d time.Duration, clients 
 				logger.Error("unknown service", zap.String("service", s))
 				continue
 			}
-			go CheckService(svcName, logger, client, done)
+			go WatchService(svcName, logger, client, done)
 		default:
 			time.Sleep(d)
 		}

@@ -72,7 +72,7 @@ func (s *Service) Run() {
 		{HealthClient: s.urlsHealthClient, Active: &s.urlsServiceOk, Name: s.urlsServiceName},
 		{HealthClient: s.cacheHealthClient, Active: &s.cacheServiceOk, Name: s.cacheServiceName},
 	})
-	s.addr = fmt.Sprintf("localhost:%s", API_SVC_PORT)
+	s.addr = fmt.Sprintf("localhost:%s", API_SVC_PORT) // TODO: delete this line
 	s.logger.Info("Starting", zap.String("service", API_SVC_NAME), zap.String("port", API_SVC_PORT))
 	s.logger.Info(fmt.Sprintf("Swagger docs available at http://%s/docs/index.html", s.addr))
 	if err := s.router.Run(fmt.Sprintf(":%s", API_SVC_PORT)); err != nil {
