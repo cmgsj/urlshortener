@@ -66,22 +66,16 @@ func WatchService(svcName string, logger *zap.Logger, client *HealthClient, done
 
 func WatchServices(svcName string, logger *zap.Logger, d time.Duration, clients []*HealthClient) {
 	m := make(map[string]*HealthClient)
-	done := make(chan string)
+	done := make(chan string, len(clients))
 	for _, client := range clients {
 		m[client.Name] = client
 		go WatchService(svcName, logger, client, done)
 	}
-	for {
-		select {
-		case s := <-done:
-			client, ok := m[s]
-			if !ok {
-				logger.Error("unknown service", zap.String("service", s))
-				continue
-			}
-			go WatchService(svcName, logger, client, done)
-		default:
-			time.Sleep(d)
+	for clientSvcName := range done {
+		if client, ok := m[clientSvcName]; ok {
+			go func() { time.Sleep(d); WatchService(svcName, logger, client, done) }()
+		} else {
+			logger.Error("unknown service", zap.String("service", clientSvcName))
 		}
 	}
 }
