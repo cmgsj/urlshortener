@@ -8,10 +8,10 @@ option java_outer_classname = "UrlsPb";
 package urlspb;
 	
 service UrlsService {
-	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse);
-	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse);
-	rpc UpdateUrl(UpdateUrlRequest) returns (NoContent);
-	rpc DeleteUrl(DeleteUrlRequest) returns (NoContent);
+	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse) {}
+	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse) {}
+	rpc UpdateUrl(UpdateUrlRequest) returns (NoContent) {}
+	rpc DeleteUrl(DeleteUrlRequest) returns (NoContent) {}
 }
 
 message Url {

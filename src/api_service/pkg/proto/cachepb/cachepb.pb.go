@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.28.1
 // 	protoc        v3.21.12
-// source: src/proto/pkg/cachepb/cachepb.proto
+// source: src/api_service/pkg/proto/cachepb/cachepb.proto
 
 package cachepb
 
@@ -31,7 +31,7 @@ type GetRequest struct {
 func (x *GetRequest) Reset() {
 	*x = GetRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[0]
+		mi := &file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -44,7 +44,7 @@ func (x *GetRequest) String() string {
 func (*GetRequest) ProtoMessage() {}
 
 func (x *GetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[0]
+	mi := &file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +57,7 @@ func (x *GetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRequest.ProtoReflect.Descriptor instead.
 func (*GetRequest) Descriptor() ([]byte, []int) {
-	return file_src_proto_pkg_cachepb_cachepb_proto_rawDescGZIP(), []int{0}
+	return file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GetRequest) GetKey() string {
@@ -78,7 +78,7 @@ type GetResponse struct {
 func (x *GetResponse) Reset() {
 	*x = GetResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[1]
+		mi := &file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -91,7 +91,7 @@ func (x *GetResponse) String() string {
 func (*GetResponse) ProtoMessage() {}
 
 func (x *GetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[1]
+	mi := &file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -104,7 +104,7 @@ func (x *GetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetResponse.ProtoReflect.Descriptor instead.
 func (*GetResponse) Descriptor() ([]byte, []int) {
-	return file_src_proto_pkg_cachepb_cachepb_proto_rawDescGZIP(), []int{1}
+	return file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetResponse) GetValue() string {
@@ -126,7 +126,7 @@ type SetRequest struct {
 func (x *SetRequest) Reset() {
 	*x = SetRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[2]
+		mi := &file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -139,7 +139,7 @@ func (x *SetRequest) String() string {
 func (*SetRequest) ProtoMessage() {}
 
 func (x *SetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[2]
+	mi := &file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -152,7 +152,7 @@ func (x *SetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetRequest.ProtoReflect.Descriptor instead.
 func (*SetRequest) Descriptor() ([]byte, []int) {
-	return file_src_proto_pkg_cachepb_cachepb_proto_rawDescGZIP(), []int{2}
+	return file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SetRequest) GetKey() string {
@@ -178,7 +178,7 @@ type NoContent struct {
 func (x *NoContent) Reset() {
 	*x = NoContent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[3]
+		mi := &file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -191,7 +191,7 @@ func (x *NoContent) String() string {
 func (*NoContent) ProtoMessage() {}
 
 func (x *NoContent) ProtoReflect() protoreflect.Message {
-	mi := &file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[3]
+	mi := &file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -204,31 +204,32 @@ func (x *NoContent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NoContent.ProtoReflect.Descriptor instead.
 func (*NoContent) Descriptor() ([]byte, []int) {
-	return file_src_proto_pkg_cachepb_cachepb_proto_rawDescGZIP(), []int{3}
+	return file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescGZIP(), []int{3}
 }
 
-var File_src_proto_pkg_cachepb_cachepb_proto protoreflect.FileDescriptor
+var File_src_api_service_pkg_proto_cachepb_cachepb_proto protoreflect.FileDescriptor
 
-var file_src_proto_pkg_cachepb_cachepb_proto_rawDesc = []byte{
-	0x0a, 0x23, 0x73, 0x72, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x70, 0x6b, 0x67, 0x2f,
-	0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2f, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x07, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x22, 0x1e,
-	0x0a, 0x0a, 0x47, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03,
-	0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x23,
-	0x0a, 0x0b, 0x47, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a,
-	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61,
-	0x6c, 0x75, 0x65, 0x22, 0x34, 0x0a, 0x0a, 0x53, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
-	0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x0b, 0x0a, 0x09, 0x4e, 0x6f, 0x43,
-	0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x32, 0x70, 0x0a, 0x0c, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53,
-	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x30, 0x0a, 0x03, 0x47, 0x65, 0x74, 0x12, 0x13, 0x2e,
-	0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x14, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2e, 0x47, 0x65, 0x74,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2e, 0x0a, 0x03, 0x53, 0x65, 0x74, 0x12,
-	0x13, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2e, 0x53, 0x65, 0x74, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2e, 0x4e,
-	0x6f, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x42, 0x34, 0x0a, 0x07, 0x63, 0x61, 0x63, 0x68,
+var file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDesc = []byte{
+	0x0a, 0x2f, 0x73, 0x72, 0x63, 0x2f, 0x61, 0x70, 0x69, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x65, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x61, 0x63, 0x68,
+	0x65, 0x70, 0x62, 0x2f, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x12, 0x07, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x22, 0x1e, 0x0a, 0x0a, 0x47, 0x65,
+	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x22, 0x23, 0x0a, 0x0b, 0x47, 0x65,
+	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c,
+	0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22,
+	0x34, 0x0a, 0x0a, 0x53, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a,
+	0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12,
+	0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x0b, 0x0a, 0x09, 0x4e, 0x6f, 0x43, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x32, 0x74, 0x0a, 0x0c, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x12, 0x32, 0x0a, 0x03, 0x47, 0x65, 0x74, 0x12, 0x13, 0x2e, 0x63, 0x61, 0x63, 0x68,
+	0x65, 0x70, 0x62, 0x2e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x14,
+	0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x30, 0x0a, 0x03, 0x53, 0x65, 0x74, 0x12, 0x13, 0x2e,
+	0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2e, 0x53, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x12, 0x2e, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x2e, 0x4e, 0x6f, 0x43,
+	0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x00, 0x42, 0x34, 0x0a, 0x07, 0x63, 0x61, 0x63, 0x68,
 	0x65, 0x70, 0x62, 0x42, 0x07, 0x43, 0x61, 0x63, 0x68, 0x65, 0x50, 0x62, 0x50, 0x01, 0x5a, 0x1e,
 	0x75, 0x72, 0x6c, 0x73, 0x68, 0x6f, 0x72, 0x74, 0x65, 0x6e, 0x65, 0x72, 0x2f, 0x70, 0x6b, 0x67,
 	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x61, 0x63, 0x68, 0x65, 0x70, 0x62, 0x62, 0x06,
@@ -236,25 +237,25 @@ var file_src_proto_pkg_cachepb_cachepb_proto_rawDesc = []byte{
 }
 
 var (
-	file_src_proto_pkg_cachepb_cachepb_proto_rawDescOnce sync.Once
-	file_src_proto_pkg_cachepb_cachepb_proto_rawDescData = file_src_proto_pkg_cachepb_cachepb_proto_rawDesc
+	file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescOnce sync.Once
+	file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescData = file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDesc
 )
 
-func file_src_proto_pkg_cachepb_cachepb_proto_rawDescGZIP() []byte {
-	file_src_proto_pkg_cachepb_cachepb_proto_rawDescOnce.Do(func() {
-		file_src_proto_pkg_cachepb_cachepb_proto_rawDescData = protoimpl.X.CompressGZIP(file_src_proto_pkg_cachepb_cachepb_proto_rawDescData)
+func file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescGZIP() []byte {
+	file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescOnce.Do(func() {
+		file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescData = protoimpl.X.CompressGZIP(file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescData)
 	})
-	return file_src_proto_pkg_cachepb_cachepb_proto_rawDescData
+	return file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDescData
 }
 
-var file_src_proto_pkg_cachepb_cachepb_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_src_proto_pkg_cachepb_cachepb_proto_goTypes = []interface{}{
+var file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_src_api_service_pkg_proto_cachepb_cachepb_proto_goTypes = []interface{}{
 	(*GetRequest)(nil),  // 0: cachepb.GetRequest
 	(*GetResponse)(nil), // 1: cachepb.GetResponse
 	(*SetRequest)(nil),  // 2: cachepb.SetRequest
 	(*NoContent)(nil),   // 3: cachepb.NoContent
 }
-var file_src_proto_pkg_cachepb_cachepb_proto_depIdxs = []int32{
+var file_src_api_service_pkg_proto_cachepb_cachepb_proto_depIdxs = []int32{
 	0, // 0: cachepb.CacheService.Get:input_type -> cachepb.GetRequest
 	2, // 1: cachepb.CacheService.Set:input_type -> cachepb.SetRequest
 	1, // 2: cachepb.CacheService.Get:output_type -> cachepb.GetResponse
@@ -266,13 +267,13 @@ var file_src_proto_pkg_cachepb_cachepb_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_src_proto_pkg_cachepb_cachepb_proto_init() }
-func file_src_proto_pkg_cachepb_cachepb_proto_init() {
-	if File_src_proto_pkg_cachepb_cachepb_proto != nil {
+func init() { file_src_api_service_pkg_proto_cachepb_cachepb_proto_init() }
+func file_src_api_service_pkg_proto_cachepb_cachepb_proto_init() {
+	if File_src_api_service_pkg_proto_cachepb_cachepb_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetRequest); i {
 			case 0:
 				return &v.state
@@ -284,7 +285,7 @@ func file_src_proto_pkg_cachepb_cachepb_proto_init() {
 				return nil
 			}
 		}
-		file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetResponse); i {
 			case 0:
 				return &v.state
@@ -296,7 +297,7 @@ func file_src_proto_pkg_cachepb_cachepb_proto_init() {
 				return nil
 			}
 		}
-		file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SetRequest); i {
 			case 0:
 				return &v.state
@@ -308,7 +309,7 @@ func file_src_proto_pkg_cachepb_cachepb_proto_init() {
 				return nil
 			}
 		}
-		file_src_proto_pkg_cachepb_cachepb_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NoContent); i {
 			case 0:
 				return &v.state
@@ -325,18 +326,18 @@ func file_src_proto_pkg_cachepb_cachepb_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_src_proto_pkg_cachepb_cachepb_proto_rawDesc,
+			RawDescriptor: file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_src_proto_pkg_cachepb_cachepb_proto_goTypes,
-		DependencyIndexes: file_src_proto_pkg_cachepb_cachepb_proto_depIdxs,
-		MessageInfos:      file_src_proto_pkg_cachepb_cachepb_proto_msgTypes,
+		GoTypes:           file_src_api_service_pkg_proto_cachepb_cachepb_proto_goTypes,
+		DependencyIndexes: file_src_api_service_pkg_proto_cachepb_cachepb_proto_depIdxs,
+		MessageInfos:      file_src_api_service_pkg_proto_cachepb_cachepb_proto_msgTypes,
 	}.Build()
-	File_src_proto_pkg_cachepb_cachepb_proto = out.File
-	file_src_proto_pkg_cachepb_cachepb_proto_rawDesc = nil
-	file_src_proto_pkg_cachepb_cachepb_proto_goTypes = nil
-	file_src_proto_pkg_cachepb_cachepb_proto_depIdxs = nil
+	File_src_api_service_pkg_proto_cachepb_cachepb_proto = out.File
+	file_src_api_service_pkg_proto_cachepb_cachepb_proto_rawDesc = nil
+	file_src_api_service_pkg_proto_cachepb_cachepb_proto_goTypes = nil
+	file_src_api_service_pkg_proto_cachepb_cachepb_proto_depIdxs = nil
 }

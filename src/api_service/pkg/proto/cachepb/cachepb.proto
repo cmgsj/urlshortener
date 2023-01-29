@@ -8,8 +8,8 @@ option java_outer_classname = "CachePb";
 package cachepb;
 
 service CacheService {
-	rpc Get(GetRequest) returns (GetResponse);
-	rpc Set(SetRequest) returns (NoContent);
+	rpc Get(GetRequest) returns (GetResponse) {}
+	rpc Set(SetRequest) returns (NoContent) {}
 }
 
 message GetRequest {

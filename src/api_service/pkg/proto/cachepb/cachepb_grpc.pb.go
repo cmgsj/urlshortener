@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: src/proto/pkg/cachepb/cachepb.proto
+// source: src/api_service/pkg/proto/cachepb/cachepb.proto
 
 package cachepb
 
@@ -137,5 +137,5 @@ var CacheService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "src/proto/pkg/cachepb/cachepb.proto",
+	Metadata: "src/api_service/pkg/proto/cachepb/cachepb.proto",
 }
