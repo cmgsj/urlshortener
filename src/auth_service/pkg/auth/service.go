@@ -1,9 +1,9 @@
 package auth
 
 import (
+	"auth_service/pkg/proto/authpb"
 	"context"
 	"database/sql"
-	"proto/pkg/authpb"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"

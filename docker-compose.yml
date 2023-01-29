@@ -13,6 +13,8 @@ services:
       - .env
     ports:
       - "${API_SVC_PORT}:${API_SVC_PORT}"
+    volumes:
+      - ./src/api_service:/usr/src/app
 
   urls_service:
     container_name: urls_service
@@ -24,6 +26,8 @@ services:
       - .env
     ports:
       - "${CACHE_SVC_PORT}:${CACHE_SVC_PORT}"
+    volumes:
+      - ./src/urls_service:/usr/src/app
   
   cache_service:
     container_name: cache_service
@@ -35,6 +39,8 @@ services:
       - .env
     ports:
       - "${URLS_SVC_PORT}:${URLS_SVC_PORT}"
+    volumes:
+      - ./src/cache_service:/usr/src/app
 
   redis_cache:
     container_name: redis_cache

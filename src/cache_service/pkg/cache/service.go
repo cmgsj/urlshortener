@@ -1,8 +1,9 @@
 package cache
 
 import (
+	"cache_service/pkg/cache/proto/cachepb"
 	"context"
-	"proto/pkg/cachepb"
+
 	"time"
 
 	"github.com/go-redis/redis/v8"

@@ -2,10 +2,11 @@ package api
 
 import (
 	_ "api_service/pkg/docs"
-	"grpc_util/pkg/grpc_dial"
-	"grpc_util/pkg/grpc_health"
-	"proto/pkg/cachepb"
-	"proto/pkg/urlspb"
+	"api_service/pkg/grpc_util"
+	"api_service/pkg/grpc_util/grpc_health"
+	"api_service/pkg/proto/cachepb"
+	"api_service/pkg/proto/urlspb"
+	"time"
 
 	"fmt"
 	"os"
@@ -44,8 +45,8 @@ var (
 // @description:               'Authorization header: "Bearer [token]"'
 
 func NewService() *Service {
-	urlsConn := grpc_dial.DialGrpc(URLS_SVC_ADDR)
-	cacheConn := grpc_dial.DialGrpc(CACHE_SVC_ADDR)
+	urlsConn := grpc_util.Dial(URLS_SVC_ADDR)
+	cacheConn := grpc_util.Dial(CACHE_SVC_ADDR)
 	router := gin.New()
 	router.Use(gin.Recovery(), gin.Logger())
 	service := &Service{
@@ -67,7 +68,7 @@ func NewService() *Service {
 }
 
 func (s *Service) Run() {
-	go grpc_health.WatchServices(s.name, s.logger, []*grpc_health.HealthClient{
+	go grpc_health.WatchServices(s.name, s.logger, time.Second, []*grpc_health.HealthClient{
 		{HealthClient: s.urlsHealthClient, Active: &s.urlsServiceOk, Name: s.urlsServiceName},
 		{HealthClient: s.cacheHealthClient, Active: &s.cacheServiceOk, Name: s.cacheServiceName},
 	})

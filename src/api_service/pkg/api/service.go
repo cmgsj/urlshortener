@@ -1,8 +1,8 @@
 package api
 
 import (
-	"proto/pkg/cachepb"
-	"proto/pkg/urlspb"
+	"api_service/pkg/proto/cachepb"
+	"api_service/pkg/proto/urlspb"
 	"sync/atomic"
 
 	"github.com/gin-gonic/gin"

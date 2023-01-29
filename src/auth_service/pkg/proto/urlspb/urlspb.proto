@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option go_package = "urlshortener/pkg/proto/urlspb";
+option java_multiple_files = true;
+option java_package = "urlspb";
+option java_outer_classname = "UrlsPb";
+
+package urlspb;
+	
+service UrlsService {
+	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse);
+	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse);
+	rpc UpdateUrl(UpdateUrlRequest) returns (NoContent);
+	rpc DeleteUrl(DeleteUrlRequest) returns (NoContent);
+}
+
+message Url {
+	string urlId = 1;
+	string redirectUrl = 2;
+}
+
+message GetUrlRequest {
+	string urlId = 1;
+}
+
+message GetUrlResponse {
+	Url url = 1;
+}
+
+message CreateUrlRequest {
+	string redirectUrl = 1;
+}
+
+message CreateUrlResponse {
+	string urlId = 1;
+}
+
+message UpdateUrlRequest {
+	Url url = 1;
+}
+
+message DeleteUrlRequest {
+	string urlId = 1;
+}
+
+message NoContent {}

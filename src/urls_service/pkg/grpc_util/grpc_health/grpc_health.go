@@ -1,9 +1,9 @@
 package grpc_health
 
 import (
-	"grpc_util/pkg/grpc_ctx"
 	"sync/atomic"
 	"time"
+	"urls_service/pkg/grpc_util"
 
 	"go.uber.org/zap"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -16,7 +16,7 @@ type HealthClient struct {
 }
 
 func CheckService(svcName string, logger *zap.Logger, client *HealthClient, done chan<- string) {
-	ctx, cancel := grpc_ctx.MakeUnaryCtx()
+	ctx, cancel := grpc_util.MakeUnaryCtx()
 	defer cancel()
 	_, err := client.Check(ctx, &healthpb.HealthCheckRequest{Service: svcName})
 	if err != nil {
@@ -37,7 +37,7 @@ func CheckServices(svcName string, logger *zap.Logger, clients []*HealthClient) 
 }
 
 func WatchService(svcName string, logger *zap.Logger, client *HealthClient, done chan<- string) {
-	ctx, cancel := grpc_ctx.MakeStreamCtx()
+	ctx, cancel := grpc_util.MakeStreamCtx()
 	defer cancel()
 	stream, err := client.Watch(ctx, &healthpb.HealthCheckRequest{Service: svcName})
 	if err != nil {
@@ -64,7 +64,7 @@ func WatchService(svcName string, logger *zap.Logger, client *HealthClient, done
 	}
 }
 
-func WatchServices(svcName string, logger *zap.Logger, clients []*HealthClient) {
+func WatchServices(svcName string, logger *zap.Logger, d time.Duration, clients []*HealthClient) {
 	m := make(map[string]*HealthClient)
 	done := make(chan string)
 	for _, client := range clients {
@@ -81,7 +81,7 @@ func WatchServices(svcName string, logger *zap.Logger, clients []*HealthClient) 
 			}
 			go CheckService(svcName, logger, client, done)
 		default:
-			time.Sleep(time.Second)
+			time.Sleep(d)
 		}
 	}
 }

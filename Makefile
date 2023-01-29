@@ -4,7 +4,7 @@ format:
 	gofmt -w .
 
 proto_gen:
-	@for file in $$(find src/proto/pkg -type f -name '*.proto'); do \
+	@for file in $$(find src -type f -name '*.proto'); do \
 		echo $$file; \
 		protoc --proto_path=. --go_out=. --go_opt=paths=source_relative \
 			--go-grpc_out=. --go-grpc_opt=paths=source_relative $$file; \
@@ -34,6 +34,13 @@ run_urls:
 
 run_redis:
 	docker run -d -p 6379:6379 --name redis_local redis || docker start redis_local || echo "redis is running"
+
+tidy:
+	cd src/api_service && go mod tidy && cd ../..
+	cd src/auth_service && go mod tidy && cd ../..
+	cd src/cache_service && go mod tidy && cd ../..
+	cd src/urls_service && go mod tidy && cd ../..
+
 
 # docker exec -it [container] bash
 # docker compose run --rm [container] sh -c "[command]"

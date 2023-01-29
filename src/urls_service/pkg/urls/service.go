@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"net/url"
-	"proto/pkg/urlspb"
+	"urls_service/pkg/proto/urlspb"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"

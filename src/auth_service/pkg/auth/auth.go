@@ -1,12 +1,12 @@
 package auth
 
 import (
+	"auth_service/pkg/grpc_util/grpc_interceptor"
+	"auth_service/pkg/proto/authpb"
 	"fmt"
-	"grpc_util/pkg/grpc_interceptor"
 
 	"net"
 	"os"
-	"proto/pkg/authpb"
 
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"

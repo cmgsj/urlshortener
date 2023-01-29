@@ -12,7 +12,7 @@
 *.out
 
 # Folder for go binaries
-/bin
+bin/
 
 # sqlite3 database
 *.db

@@ -2,10 +2,11 @@ package urls
 
 import (
 	"fmt"
-	"grpc_util/pkg/grpc_interceptor"
+	"urls_service/pkg/grpc_util/grpc_interceptor"
+	"urls_service/pkg/proto/urlspb"
+
 	"net"
 	"os"
-	"proto/pkg/urlspb"
 
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"

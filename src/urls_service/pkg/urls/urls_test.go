@@ -3,9 +3,10 @@ package urls_test
 import (
 	"context"
 	"net"
-	"proto/pkg/urlspb"
+
 	"testing"
 
+	"urls_service/pkg/proto/urlspb"
 	"urls_service/pkg/urls"
 
 	"go.uber.org/zap"

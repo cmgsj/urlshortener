@@ -14,7 +14,7 @@ RUN swag fmt
 RUN swag init -o pkg/docs -g pkg/api/api.go
 
 RUN go install github.com/githubnemo/CompileDaemon@latest
-CMD CompileDaemon --build="go build -o app ." --command=./app
+CMD CompileDaemon --build="go build -o ./bin/app ." --command=./bin/app
 
-# RUN go build -o app .
-# CMD ./app
+# RUN go build -o ./bin/app .
+# CMD ./bin/app

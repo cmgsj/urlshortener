@@ -1,16 +1,18 @@
 package api
 
 import (
+	"api_service/pkg/grpc_util"
+	"api_service/pkg/proto/cachepb"
+	"api_service/pkg/proto/urlspb"
 	"errors"
 	"fmt"
-	"grpc_util/pkg/grpc_ctx"
+
 	"net/http"
-	"proto/pkg/cachepb"
-	"proto/pkg/urlspb"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
+
 	"google.golang.org/grpc/status"
 )
 
@@ -81,7 +83,7 @@ func (s *Service) PostUrl(c *gin.Context) {
 		return
 	}
 	if s.urlsServiceOk.Load() {
-		ctx, cancel := grpc_ctx.MakeUnaryCtx()
+		ctx, cancel := grpc_util.MakeUnaryCtx()
 		defer cancel()
 		urlRes, err := s.urlsClient.CreateUrl(ctx, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
 		if err != nil {
@@ -89,7 +91,7 @@ func (s *Service) PostUrl(c *gin.Context) {
 			return
 		}
 		if s.cacheServiceOk.Load() {
-			ctx, cancel = grpc_ctx.MakeUnaryCtx()
+			ctx, cancel = grpc_util.MakeUnaryCtx()
 			defer cancel()
 			_, err = s.cacheClient.Set(ctx, &cachepb.SetRequest{Key: urlRes.GetUrlId(), Value: body.RedirectUrl})
 			if err != nil {
@@ -133,7 +135,7 @@ func (s *Service) makeUrlResponse(c *gin.Context, redirect bool) {
 
 func (s *Service) getRedirectUrl(urlId string) (string, error) {
 	if s.cacheServiceOk.Load() {
-		ctx, cancel := grpc_ctx.MakeUnaryCtx()
+		ctx, cancel := grpc_util.MakeUnaryCtx()
 		defer cancel()
 		cacheRes, err := s.cacheClient.Get(ctx, &cachepb.GetRequest{Key: urlId})
 		if err == nil {
@@ -141,7 +143,7 @@ func (s *Service) getRedirectUrl(urlId string) (string, error) {
 		}
 	}
 	if s.urlsServiceOk.Load() {
-		ctx, cancel := grpc_ctx.MakeUnaryCtx()
+		ctx, cancel := grpc_util.MakeUnaryCtx()
 		defer cancel()
 		urlRes, err := s.urlsClient.GetUrl(ctx, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err != nil {
