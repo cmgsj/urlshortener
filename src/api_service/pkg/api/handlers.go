@@ -1,16 +1,15 @@
 package api
 
 import (
-	"api_service/pkg/grpc_util"
-	"api_service/pkg/proto/cachepb"
 	"api_service/pkg/proto/urlspb"
 	"errors"
 	"fmt"
+	"time"
 
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 
 	"google.golang.org/grpc/status"
@@ -45,7 +44,7 @@ func (s *Service) Pong(c *gin.Context) {
 // @Failure     500 {object} ErrorResponse
 // @Router      /{urlId} [GET]
 func (s *Service) RedirectToUrl(c *gin.Context) {
-	s.makeUrlResponse(c, true)
+	s.makeGetUrlResponse(c, true)
 }
 
 // GetUrl
@@ -61,7 +60,7 @@ func (s *Service) RedirectToUrl(c *gin.Context) {
 // @Failure     500   {object} ErrorResponse
 // @Router      /url/{urlId} [GET]
 func (s *Service) GetUrl(c *gin.Context) {
-	s.makeUrlResponse(c, false)
+	s.makeGetUrlResponse(c, false)
 }
 
 // PostUrl
@@ -83,21 +82,14 @@ func (s *Service) PostUrl(c *gin.Context) {
 		return
 	}
 	if s.urlsServiceOk.Load() {
-		ctx, cancel := grpc_util.MakeUnaryCtx()
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
 		urlRes, err := s.urlsClient.CreateUrl(ctx, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
 		if err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 			return
 		}
-		if s.cacheServiceOk.Load() {
-			ctx, cancel = grpc_util.MakeUnaryCtx()
-			defer cancel()
-			_, err = s.cacheClient.PutItem(ctx, &cachepb.PutItemRequest{Item: &cachepb.Item{Key: urlRes.GetUrlId(), Value: body.RedirectUrl}})
-			if err != nil {
-				s.logger.Error("failed to set cache", zap.Error(err))
-			}
-		}
+		s.putInCache(urlRes.GetUrlId(), body.RedirectUrl)
 		urlDTO := UrlDTO{
 			UrlId:       urlRes.GetUrlId(),
 			RedirectUrl: body.RedirectUrl,
@@ -109,7 +101,7 @@ func (s *Service) PostUrl(c *gin.Context) {
 	c.JSON(http.StatusInternalServerError, ErrorResponse{Error: ErrServicesUnavailable.Error()})
 }
 
-func (s *Service) makeUrlResponse(c *gin.Context, redirect bool) {
+func (s *Service) makeGetUrlResponse(c *gin.Context, redirect bool) {
 	urlId := c.Param(UrlIdParam)
 	redirectUrl, err := s.getRedirectUrl(urlId)
 	if err != nil {
@@ -134,21 +126,17 @@ func (s *Service) makeUrlResponse(c *gin.Context, redirect bool) {
 }
 
 func (s *Service) getRedirectUrl(urlId string) (string, error) {
-	if s.cacheServiceOk.Load() {
-		ctx, cancel := grpc_util.MakeUnaryCtx()
-		defer cancel()
-		cacheRes, err := s.cacheClient.GetItem(ctx, &cachepb.GetItemRequest{Key: urlId})
-		if err == nil {
-			return cacheRes.GetItem().GetValue(), nil
-		}
+	if redirectUrl, err := s.getFromCache(urlId); err == nil {
+		return redirectUrl, nil
 	}
 	if s.urlsServiceOk.Load() {
-		ctx, cancel := grpc_util.MakeUnaryCtx()
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
 		urlRes, err := s.urlsClient.GetUrl(ctx, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err != nil {
 			return "", err
 		}
+		s.putInCache(urlId, urlRes.GetUrl().GetRedirectUrl())
 		return urlRes.GetUrl().GetRedirectUrl(), nil
 	}
 	return "", ErrServicesUnavailable

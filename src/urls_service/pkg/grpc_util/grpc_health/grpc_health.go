@@ -1,9 +1,9 @@
 package grpc_health
 
 import (
+	"context"
 	"sync/atomic"
 	"time"
-	"urls_service/pkg/grpc_util"
 
 	"go.uber.org/zap"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -16,7 +16,7 @@ type HealthClient struct {
 }
 
 func CheckService(svcName string, logger *zap.Logger, client *HealthClient, done chan<- string) {
-	ctx, cancel := grpc_util.MakeUnaryCtx()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	_, err := client.Check(ctx, &healthpb.HealthCheckRequest{Service: svcName})
 	if err != nil {
@@ -37,7 +37,7 @@ func CheckServices(svcName string, logger *zap.Logger, clients []*HealthClient) 
 }
 
 func WatchService(svcName string, logger *zap.Logger, client *HealthClient, done chan<- string) {
-	ctx, cancel := grpc_util.MakeStreamCtx()
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	stream, err := client.Watch(ctx, &healthpb.HealthCheckRequest{Service: svcName})
 	if err != nil {

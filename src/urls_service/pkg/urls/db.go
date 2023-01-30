@@ -3,7 +3,6 @@ package urls
 import (
 	"context"
 	"database/sql"
-	"urls_service/pkg/database"
 
 	"go.uber.org/zap"
 )
@@ -13,16 +12,41 @@ type UrlEntity struct {
 	RedirectUrl string
 }
 
+var (
+	CreateTablesSQL = `
+		CREATE TABLE IF NOT EXISTS urls
+		(
+			url_id       TEXT PRIMARY KEY,
+			redirect_url TEXT UNIQUE
+		);
+		CREATE INDEX IF NOT EXISTS redirect_url_index ON urls (redirect_url);`
+	SeedDBSQL = `
+		INSERT INTO urls
+		VALUES ('abcdef01', 'https://www.google.com'),
+			   ('abcdef02', 'https://www.youtube.com'),
+			   ('abcdef03', 'https://www.apple.com');`
+)
+
+func createTables(ctx context.Context, db *sql.DB) error {
+	_, err := db.ExecContext(ctx, CreateTablesSQL)
+	return err
+}
+
+func seedDB(ctx context.Context, db *sql.DB) error {
+	_, err := db.ExecContext(ctx, SeedDBSQL)
+	return err
+}
+
 func (s *Service) intiDB(sqliteDbName string) {
 	db, err := sql.Open("sqlite3", sqliteDbName)
 	if err != nil {
 		s.logger.Fatal("failed to open sqlite db:", zap.Error(err))
 	}
-	err = database.CreateTables(context.Background(), db)
+	err = createTables(context.Background(), db)
 	if err != nil {
 		s.logger.Fatal("failed to create tables:", zap.Error(err))
 	}
-	err = database.SeedDB(context.Background(), db)
+	err = seedDB(context.Background(), db)
 	if err != nil {
 		s.logger.Error("failed to seed db:", zap.Error(err))
 	} else {

@@ -6,7 +6,7 @@ services:
     container_name: api_service
     depends_on:
       - urls_service
-      - cache_service
+      - redis_cache
     build:
       context: src/api_service
     env_file:
@@ -25,22 +25,9 @@ services:
     env_file:
       - .env
     ports:
-      - "${CACHE_SVC_PORT}:${CACHE_SVC_PORT}"
-    volumes:
-      - ./src/urls_service:/usr/src/app
-  
-  cache_service:
-    container_name: cache_service
-    depends_on:
-      - redis_cache
-    build:
-      context: src/cache_service
-    env_file:
-      - .env
-    ports:
       - "${URLS_SVC_PORT}:${URLS_SVC_PORT}"
     volumes:
-      - ./src/cache_service:/usr/src/app
+      - ./src/urls_service:/usr/src/app
 
   redis_cache:
     container_name: redis_cache

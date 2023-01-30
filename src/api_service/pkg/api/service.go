@@ -1,11 +1,12 @@
 package api
 
 import (
-	"api_service/pkg/proto/cachepb"
 	"api_service/pkg/proto/urlspb"
 	"sync/atomic"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
@@ -13,19 +14,17 @@ import (
 )
 
 type Service struct {
-	name              string
-	addr              string
-	trustedProxies    []string
-	router            *gin.Engine
-	logger            *zap.Logger
-	urlsClient        urlspb.UrlsServiceClient
-	urlsHealthClient  healthpb.HealthClient
-	urlsServiceOk     atomic.Bool
-	urlsServiceName   string
-	cacheClient       cachepb.CacheServiceClient
-	cacheHealthClient healthpb.HealthClient
-	cacheServiceOk    atomic.Bool
-	cacheServiceName  string
+	name             string
+	addr             string
+	trustedProxies   []string
+	router           *gin.Engine
+	logger           *zap.Logger
+	urlsClient       urlspb.UrlsServiceClient
+	urlsHealthClient healthpb.HealthClient
+	urlsServiceOk    atomic.Bool
+	urlsServiceName  string
+	redisDb          *redis.Client
+	cacheExpTime     time.Duration
 }
 
 func (s *Service) RegisterEndpoints() {
