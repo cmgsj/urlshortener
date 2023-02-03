@@ -1,2 +1,2 @@
 TODO: add TLS
-TODO: add Docker build stages to minimize container size
+TODO: orchestrate with k8s

@@ -1,55 +1,37 @@
 version: "3.9"
 
-services:
-  
+services:  
   api_service:
     container_name: api_service
     depends_on:
       - urls_service
       - redis_cache
     build:
-      context: src/api_service
+      context: ../src/api_service
     env_file:
       - .env
     ports:
       - "${API_SVC_PORT}:${API_SVC_PORT}"
-    volumes:
-      - ./src/api_service:/usr/src/app
 
   urls_service:
     container_name: urls_service
     # depends_on:
     #   - postgres_db
     build:
-      context: src/urls_service
+      context: ../src/urls_service
     env_file:
       - .env
     ports:
       - "${URLS_SVC_PORT}:${URLS_SVC_PORT}"
-    volumes:
-      - ./src/urls_service:/usr/src/app
 
   redis_cache:
     container_name: redis_cache
     image: redis
-    env_file:
-      - .env
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     volumes:
       - redis_data:/data
-
-#  postgres_db:
-#     container_name: postgres_db
-#     image: "postgres"
-#     env_file:
-#       - .env
-#     ports:
-#       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
-#     volumes:
-#      - postgres_data:/var/lib/postgresql/data
-
+      
 volumes:
   redis_data:
-  # postgres_data:
-  
+   

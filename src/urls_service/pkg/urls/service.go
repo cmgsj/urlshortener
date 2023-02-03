@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"net/url"
-	"urls_service/pkg/proto/urlspb"
+	"proto/pkg/urlspb"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -23,13 +23,13 @@ var (
 
 type Service struct {
 	urlspb.UnimplementedUrlsServiceServer
-	healthServer *health.Server
-	logger       *zap.Logger
-	db           *sql.DB
+	HealthServer *health.Server
+	Logger       *zap.Logger
+	Db           *sql.DB
 }
 
 func (s *Service) GetUrl(ctx context.Context, req *urlspb.GetUrlRequest) (*urlspb.GetUrlResponse, error) {
-	urlEntity, err := getUrlById(ctx, s.db, req.GetUrlId())
+	urlEntity, err := getUrlById(ctx, s.Db, req.GetUrlId())
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}
@@ -44,7 +44,7 @@ func (s *Service) CreateUrl(ctx context.Context, req *urlspb.CreateUrlRequest) (
 	if !isValidUrl(req.GetRedirectUrl()) {
 		return nil, ErrInvalidUrl
 	}
-	err = createUrl(ctx, s.db, urlId, req.GetRedirectUrl())
+	err = createUrl(ctx, s.Db, urlId, req.GetRedirectUrl())
 	if err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
@@ -55,7 +55,7 @@ func (s *Service) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlRequest) (
 	if !isValidUrl(req.GetUrl().GetRedirectUrl()) {
 		return nil, ErrInvalidUrl
 	}
-	err := updateUrl(ctx, s.db, req.GetUrl().GetUrlId(), req.GetUrl().GetRedirectUrl())
+	err := updateUrl(ctx, s.Db, req.GetUrl().GetUrlId(), req.GetUrl().GetRedirectUrl())
 	if err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
@@ -63,7 +63,7 @@ func (s *Service) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlRequest) (
 }
 
 func (s *Service) DeleteUrl(ctx context.Context, req *urlspb.DeleteUrlRequest) (*urlspb.DeleteUrlResponse, error) {
-	err := deleteUrl(ctx, s.db, req.GetUrlId())
+	err := deleteUrl(ctx, s.Db, req.GetUrlId())
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}

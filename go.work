@@ -3,4 +3,6 @@ go 1.19
 use (
 	./src/api_service
 	./src/urls_service
+	./src/grpc_util
+	./src/proto
 )

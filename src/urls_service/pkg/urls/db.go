@@ -3,6 +3,7 @@ package urls
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"go.uber.org/zap"
 )
@@ -37,22 +38,23 @@ func seedDB(ctx context.Context, db *sql.DB) error {
 	return err
 }
 
-func (s *Service) intiDB(sqliteDbName string) {
+func (s *Service) IntiDB(sqliteDbName string) {
 	db, err := sql.Open("sqlite3", sqliteDbName)
+	fmt.Println("sqliteDbName: ", sqliteDbName)
 	if err != nil {
-		s.logger.Fatal("failed to open sqlite db:", zap.Error(err))
+		s.Logger.Fatal("failed to open sqlite db:", zap.Error(err))
 	}
 	err = createTables(context.Background(), db)
 	if err != nil {
-		s.logger.Fatal("failed to create tables:", zap.Error(err))
+		s.Logger.Fatal("failed to create tables:", zap.Error(err))
 	}
 	err = seedDB(context.Background(), db)
 	if err != nil {
-		s.logger.Error("failed to seed db:", zap.Error(err))
+		s.Logger.Error("failed to seed db:", zap.Error(err))
 	} else {
-		s.logger.Info("db seeded")
+		s.Logger.Info("db seeded")
 	}
-	s.db = db
+	s.Db = db
 }
 
 func getUrlById(ctx context.Context, db *sql.DB, urlId string) (*UrlEntity, error) {

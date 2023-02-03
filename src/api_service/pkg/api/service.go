@@ -1,7 +1,7 @@
 package api
 
 import (
-	"api_service/pkg/proto/urlspb"
+	"proto/pkg/urlspb"
 	"sync/atomic"
 	"time"
 
@@ -13,31 +13,48 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 )
 
+// @title                      URL Shortener API
+// @version                    1.0
+// @description                This is a URL shortener service.
+// @host                       localhost:8080
+// @BasePath                   /
+// @query.collection.format    multi
+// @schemes                    http
+// @contact.name               API Support
+// @contact.url                http://www.swagger.io/support
+// @contact.email              support@swagger.io
+// @license.name               MIT
+// @license.url                https://opensource.org/licenses/MIT
+// @securityDefinitions.apiKey JWT_AUTH
+// @in                         header
+// @name                       Authorization
+// @description:               'Authorization header: "Bearer [token]"'
+
 type Service struct {
-	name             string
-	addr             string
-	trustedProxies   []string
-	router           *gin.Engine
-	logger           *zap.Logger
-	urlsClient       urlspb.UrlsServiceClient
-	urlsHealthClient healthpb.HealthClient
-	urlsServiceOk    atomic.Bool
-	urlsServiceName  string
-	redisDb          *redis.Client
-	cacheExpTime     time.Duration
+	Name             string
+	Addr             string
+	TrustedProxies   []string
+	Router           *gin.Engine
+	Logger           *zap.Logger
+	UrlsClient       urlspb.UrlsServiceClient
+	UrlsHealthClient healthpb.HealthClient
+	UrlsServiceOk    atomic.Bool
+	UrlsServiceName  string
+	RedisDb          *redis.Client
+	CacheExpTime     time.Duration
 }
 
 func (s *Service) RegisterEndpoints() {
-	s.router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	s.router.GET("/ping", s.Pong)
-	s.router.GET("/url/:urlId", s.GetUrl)
-	s.router.POST("/url", s.PostUrl)
-	s.router.Any("/:urlId", s.RedirectToUrl)
+	s.Router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	s.Router.GET("/ping", s.Pong)
+	s.Router.GET("/url/:urlId", s.GetUrl)
+	s.Router.POST("/url", s.PostUrl)
+	s.Router.Any("/:urlId", s.RedirectToUrl)
 }
 
 func (s *Service) RegisterTrustedProxies() {
-	err := s.router.SetTrustedProxies(nil)
+	err := s.Router.SetTrustedProxies(nil)
 	if err != nil {
-		s.logger.Fatal("failed to set trusted proxies", zap.Error(err))
+		s.Logger.Fatal("failed to set trusted proxies", zap.Error(err))
 	}
 }

@@ -1,9 +1,9 @@
 package api
 
 import (
-	"api_service/pkg/proto/urlspb"
 	"errors"
 	"fmt"
+	"proto/pkg/urlspb"
 	"time"
 
 	"net/http"
@@ -81,10 +81,10 @@ func (s *Service) PostUrl(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	if s.urlsServiceOk.Load() {
+	if s.UrlsServiceOk.Load() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
-		urlRes, err := s.urlsClient.CreateUrl(ctx, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
+		urlRes, err := s.UrlsClient.CreateUrl(ctx, &urlspb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
 		if err != nil {
 			c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 			return
@@ -93,7 +93,7 @@ func (s *Service) PostUrl(c *gin.Context) {
 		urlDTO := UrlDTO{
 			UrlId:       urlRes.GetUrlId(),
 			RedirectUrl: body.RedirectUrl,
-			NewUrl:      fmt.Sprintf("%s/%s", s.addr, urlRes.UrlId),
+			NewUrl:      fmt.Sprintf("%s/%s", s.Addr, urlRes.UrlId),
 		}
 		c.JSON(http.StatusOK, urlDTO)
 		return
@@ -119,7 +119,7 @@ func (s *Service) makeGetUrlResponse(c *gin.Context, redirect bool) {
 		urlDTO := UrlDTO{
 			UrlId:       urlId,
 			RedirectUrl: redirectUrl,
-			NewUrl:      fmt.Sprintf("%s/%s", s.addr, urlId),
+			NewUrl:      fmt.Sprintf("%s/%s", s.Addr, urlId),
 		}
 		c.JSON(http.StatusOK, urlDTO)
 	}
@@ -129,10 +129,10 @@ func (s *Service) getRedirectUrl(urlId string) (string, error) {
 	if redirectUrl, err := s.getFromCache(urlId); err == nil {
 		return redirectUrl, nil
 	}
-	if s.urlsServiceOk.Load() {
+	if s.UrlsServiceOk.Load() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
-		urlRes, err := s.urlsClient.GetUrl(ctx, &urlspb.GetUrlRequest{UrlId: urlId})
+		urlRes, err := s.UrlsClient.GetUrl(ctx, &urlspb.GetUrlRequest{UrlId: urlId})
 		if err != nil {
 			return "", err
 		}

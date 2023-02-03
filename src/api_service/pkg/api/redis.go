@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *Service) initRedisDB(redisAddr string, redisPassword string, redisDb int) {
+func (s *Service) InitRedisDB(redisAddr string, redisPassword string, redisDb int) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     redisAddr,
 		Password: redisPassword,
@@ -17,18 +17,18 @@ func (s *Service) initRedisDB(redisAddr string, redisPassword string, redisDb in
 	})
 	_, err := rdb.Ping(context.Background()).Result()
 	if err != nil {
-		s.logger.Fatal("failed to connect to redis:", zap.Error(err))
+		s.Logger.Fatal("failed to connect to redis:", zap.Error(err))
 	}
-	s.redisDb = rdb
+	s.RedisDb = rdb
 }
 
 func (s *Service) getFromCache(key string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	value, err := s.redisDb.Get(ctx, key).Result()
+	value, err := s.RedisDb.Get(ctx, key).Result()
 	if err != nil {
 		if !errors.Is(err, redis.Nil) {
-			s.logger.Error("failed to get from cache", zap.Error(err))
+			s.Logger.Error("failed to get from cache", zap.Error(err))
 		}
 		return "", err
 	}
@@ -38,7 +38,7 @@ func (s *Service) getFromCache(key string) (string, error) {
 func (s *Service) putInCache(key string, value string) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	if err := s.redisDb.Set(ctx, key, value, s.cacheExpTime).Err(); err != nil {
-		s.logger.Error("failed to set cache", zap.Error(err))
+	if err := s.RedisDb.Set(ctx, key, value, s.CacheExpTime).Err(); err != nil {
+		s.Logger.Error("failed to set cache", zap.Error(err))
 	}
 }
