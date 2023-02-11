@@ -21,6 +21,10 @@ var (
 	ErrInternal         = status.Error(codes.Internal, "internal error")
 )
 
+var (
+	UrlIdLength = 8
+)
+
 type Service struct {
 	urlspb.UnimplementedUrlsServiceServer
 	HealthServer *health.Server
@@ -37,7 +41,7 @@ func (s *Service) GetUrl(ctx context.Context, req *urlspb.GetUrlRequest) (*urlsp
 }
 
 func (s *Service) CreateUrl(ctx context.Context, req *urlspb.CreateUrlRequest) (*urlspb.CreateUrlResponse, error) {
-	urlId, err := generateUrlId()
+	urlId, err := generateUrlId(UrlIdLength)
 	if err != nil {
 		return nil, ErrInternal
 	}
@@ -70,15 +74,15 @@ func (s *Service) DeleteUrl(ctx context.Context, req *urlspb.DeleteUrlRequest) (
 	return &urlspb.DeleteUrlResponse{}, nil
 }
 
-func generateUrlId() (string, error) {
-	var data [8]byte
-	if _, err := rand.Read(data[:]); err != nil {
+func generateUrlId(n int) (string, error) {
+	data := make([]byte, n)
+	if _, err := rand.Read(data); err != nil {
 		return "", err
 	}
-	return base64.RawURLEncoding.EncodeToString(data[:]), nil
+	return base64.RawURLEncoding.EncodeToString(data), nil
 }
 
-func isValidUrl(urlStr string) bool {
-	_, err := url.ParseRequestURI(urlStr)
+func isValidUrl(s string) bool {
+	_, err := url.ParseRequestURI(s)
 	return err == nil
 }

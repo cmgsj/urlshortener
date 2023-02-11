@@ -1,2 +1,3 @@
 TODO: add TLS
 TODO: orchestrate with k8s
+TODO: add circuit breaker
