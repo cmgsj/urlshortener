@@ -1,4 +1,15 @@
-default: build
+default: 
+	@echo "unspecifed target" && exit 1
+
+minikube: docker_build
+	minikube start --driver=docker
+	kubectl apply -f k8s
+	minikube service api-service --url
+
+docker_build: build
+	eval $$(minikube -p minikube docker-env)
+	cd src/api_service && docker build --no-cache -t cmg/api-svc . && cd ../..
+	cd src/url_service && docker build --no-cache -t cmg/url-svc . && cd ../..
 
 build: proto_gen swagger_gen
 	cd src/api_service && GOOS=linux \
@@ -15,17 +26,3 @@ proto_gen:
 	
 swagger_gen:
 	swag fmt && swag init -o src/api_service/pkg/docs -g src/api_service/pkg/api/service.go
-
-run_redis:
-	docker run -d -p 6379:6379 --name redis_cache redis || docker start redis_cache || echo "redis is running"
-
-run_api:
-	env $$(cat .env | grep -v ^# | sed -E -e "s/=.+_service/=localhost/g") go run src/api_service/cmd/api_service/main.go
-
-run_url:
-	env $$(cat .env | grep -v ^# | sed -E -e "s/=.+_service/=localhost/g") go run src/url_service/cmd/url_service/main.go
-	
-# docker exec -it [container] bash
-# docker compose run --rm [container] sh -c "[command]"
-# docker compose up --build -V
-# docker-compose down --remove-orphans

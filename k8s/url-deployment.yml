@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-deployment
+  labels:
+    app: url
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: url
+  template:
+    metadata:
+      labels:
+        app: url
+    spec:
+      containers:
+        - name: url
+          image: cmg/url-svc
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          env:
+            - name: API_SVC_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: api-svc-name
+            - name: URL_SVC_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: url-config
+                  key: url-svc-name
+            - name: URL_SVC_PORT
+              value: "8080"
+            - name: URL_DB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: url-config
+                  key: url-db-uri
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-service
+spec:
+  selector:
+    app: url
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

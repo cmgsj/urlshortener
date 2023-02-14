@@ -17,10 +17,10 @@ import (
 )
 
 var (
-	API_SVC_NAME = os.Getenv("API_SVC_NAME")
-	URL_SVC_NAME = os.Getenv("URL_SVC_NAME")
-	URL_SVC_PORT = os.Getenv("URL_SVC_PORT")
-	URL_DB_URI   = os.Getenv("URL_DB_URI")
+	ApiSvcName = os.Getenv("API_SVC_NAME")
+	UrlSvcName = os.Getenv("URL_SVC_NAME")
+	UrlSvcPort = os.Getenv("URL_SVC_PORT")
+	UrlDbUri   = os.Getenv("URL_DB_URI")
 )
 
 func main() {
@@ -28,9 +28,9 @@ func main() {
 		HealthServer: health.NewServer(),
 		Logger:       zap.Must(zap.NewDevelopment()),
 	}
-	svc.IntiDB(URL_DB_URI)
+	svc.IntiDB(UrlDbUri)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", URL_SVC_PORT))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", UrlSvcPort))
 	if err != nil {
 		svc.Logger.Fatal("failed to listen:", zap.Error(err))
 	}
@@ -45,9 +45,9 @@ func main() {
 	reflection.Register(grpcServer)
 	healthpb.RegisterHealthServer(grpcServer, svc.HealthServer)
 	urlpb.RegisterUrlServiceServer(grpcServer, svc)
-	svc.HealthServer.SetServingStatus(API_SVC_NAME, healthpb.HealthCheckResponse_SERVING)
+	svc.HealthServer.SetServingStatus(ApiSvcName, healthpb.HealthCheckResponse_SERVING)
 
-	svc.Logger.Info("Starting", zap.String("service", URL_SVC_NAME), zap.String("address", lis.Addr().String()))
+	svc.Logger.Info("Starting", zap.String("service", UrlSvcName), zap.String("address", lis.Addr().String()))
 	if err := grpcServer.Serve(lis); err != nil {
 		svc.Logger.Fatal("failed to serve:", zap.Error(err))
 	}

@@ -38,7 +38,7 @@ func (s *Service) getFromCache(key string) (string, error) {
 func (s *Service) putInCache(key string, value string) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	if err := s.RedisDb.Set(ctx, key, value, s.CacheExpTime).Err(); err != nil {
+	if err := s.RedisDb.Set(ctx, key, value, s.CacheTimeout).Err(); err != nil {
 		s.Logger.Error("failed to set cache", zap.Error(err))
 	}
 }

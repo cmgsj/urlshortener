@@ -41,7 +41,7 @@ type Service struct {
 	UrlServiceOk    atomic.Bool
 	UrlServiceName  string
 	RedisDb         *redis.Client
-	CacheExpTime    time.Duration
+	CacheTimeout    time.Duration
 }
 
 func (s *Service) RegisterEndpoints() {

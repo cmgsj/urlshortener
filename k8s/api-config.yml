@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+data:
+  api-svc-url: api-service:8080
+  api-svc-name: api-service
+  api-svc-cache-timeout: 1h
