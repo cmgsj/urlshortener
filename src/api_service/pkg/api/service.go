@@ -1,7 +1,7 @@
 package api
 
 import (
-	"proto/pkg/urlspb"
+	"proto/pkg/urlpb"
 	"sync/atomic"
 	"time"
 
@@ -31,17 +31,17 @@ import (
 // @description:               'Authorization header: "Bearer [token]"'
 
 type Service struct {
-	Name             string
-	Addr             string
-	TrustedProxies   []string
-	Router           *gin.Engine
-	Logger           *zap.Logger
-	UrlsClient       urlspb.UrlsServiceClient
-	UrlsHealthClient healthpb.HealthClient
-	UrlsServiceOk    atomic.Bool
-	UrlsServiceName  string
-	RedisDb          *redis.Client
-	CacheExpTime     time.Duration
+	Name            string
+	Addr            string
+	TrustedProxies  []string
+	Router          *gin.Engine
+	Logger          *zap.Logger
+	UrlClient       urlpb.UrlServiceClient
+	UrlHealthClient healthpb.HealthClient
+	UrlServiceOk    atomic.Bool
+	UrlServiceName  string
+	RedisDb         *redis.Client
+	CacheExpTime    time.Duration
 }
 
 func (s *Service) RegisterEndpoints() {

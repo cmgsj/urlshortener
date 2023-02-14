@@ -1,6 +1,6 @@
 package api
 
-type UrlDTO struct {
+type UrlDto struct {
 	UrlId       string `json:"urlId"`
 	RedirectUrl string `json:"redirectUrl"`
 	NewUrl      string `json:"newUrl"`

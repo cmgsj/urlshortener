@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"urls_service/pkg/urls"
-
 	"grpc_util/pkg/grpc_interceptor"
 	"net"
 	"os"
-	"proto/pkg/urlspb"
+	"proto/pkg/urlpb"
+	"url_service/pkg/url"
 
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
@@ -18,20 +17,20 @@ import (
 )
 
 var (
-	API_SVC_NAME  = os.Getenv("API_SVC_NAME")
-	URLS_SVC_NAME = os.Getenv("URLS_SVC_NAME")
-	URLS_SVC_PORT = os.Getenv("URLS_SVC_PORT")
-	DB_URI        = os.Getenv("DB_URI")
+	API_SVC_NAME = os.Getenv("API_SVC_NAME")
+	URL_SVC_NAME = os.Getenv("URL_SVC_NAME")
+	URL_SVC_PORT = os.Getenv("URL_SVC_PORT")
+	URL_DB_URI   = os.Getenv("URL_DB_URI")
 )
 
 func main() {
-	svc := &urls.Service{
+	svc := &url.Service{
 		HealthServer: health.NewServer(),
 		Logger:       zap.Must(zap.NewDevelopment()),
 	}
-	svc.IntiDB(DB_URI)
+	svc.IntiDB(URL_DB_URI)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", URLS_SVC_PORT))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", URL_SVC_PORT))
 	if err != nil {
 		svc.Logger.Fatal("failed to listen:", zap.Error(err))
 	}
@@ -45,11 +44,10 @@ func main() {
 
 	reflection.Register(grpcServer)
 	healthpb.RegisterHealthServer(grpcServer, svc.HealthServer)
-	urlspb.RegisterUrlsServiceServer(grpcServer, svc)
-
+	urlpb.RegisterUrlServiceServer(grpcServer, svc)
 	svc.HealthServer.SetServingStatus(API_SVC_NAME, healthpb.HealthCheckResponse_SERVING)
 
-	svc.Logger.Info("Starting", zap.String("service", URLS_SVC_NAME), zap.String("address", lis.Addr().String()))
+	svc.Logger.Info("Starting", zap.String("service", URL_SVC_NAME), zap.String("address", lis.Addr().String()))
 	if err := grpcServer.Serve(lis); err != nil {
 		svc.Logger.Fatal("failed to serve:", zap.Error(err))
 	}

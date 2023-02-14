@@ -1,13 +1,10 @@
 syntax = "proto3";
 
-option go_package = "urlshortener/pkg/proto/urlspb";
-option java_multiple_files = true;
-option java_package = "urlspb";
-option java_outer_classname = "UrlsPb";
+package urlpb;
 
-package urlspb;
+option go_package = "urlshortener/pkg/proto/urlpb";
 	
-service UrlsService {
+service UrlService {
 	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse) {}
 	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse) {}
 	rpc UpdateUrl(UpdateUrlRequest) returns (UpdateUrlResponse) {}

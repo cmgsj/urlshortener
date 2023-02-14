@@ -3,8 +3,8 @@ default: build
 build: proto_gen swagger_gen
 	cd src/api_service && GOOS=linux \
 		go build -o bin ./cmd/api_service && cd ../..
-	cd src/urls_service && CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOARCH=amd64 GOOS=linux CGO_ENABLED=1 \
-		go build -ldflags "-linkmode external -extldflags -static" -o bin ./cmd/urls_service && cd ../..
+	cd src/url_service && CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOARCH=amd64 GOOS=linux CGO_ENABLED=1 \
+		go build -ldflags "-linkmode external -extldflags -static" -o bin ./cmd/url_service && cd ../..
 
 proto_gen:
 	@for file in $$(find src/proto -type f -name '*.proto'); do \
@@ -22,8 +22,8 @@ run_redis:
 run_api:
 	env $$(cat .env | grep -v ^# | sed -E -e "s/=.+_service/=localhost/g") go run src/api_service/cmd/api_service/main.go
 
-run_urls:
-	env $$(cat .env | grep -v ^# | sed -E -e "s/=.+_service/=localhost/g") go run src/urls_service/cmd/urls_service/main.go
+run_url:
+	env $$(cat .env | grep -v ^# | sed -E -e "s/=.+_service/=localhost/g") go run src/url_service/cmd/url_service/main.go
 	
 # docker exec -it [container] bash
 # docker compose run --rm [container] sh -c "[command]"

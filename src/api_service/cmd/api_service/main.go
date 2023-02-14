@@ -4,7 +4,7 @@ import (
 	"api_service/pkg/api"
 	_ "api_service/pkg/docs"
 	"grpc_util/pkg/grpc_health"
-	"proto/pkg/urlspb"
+	"proto/pkg/urlpb"
 	"strconv"
 	"time"
 
@@ -27,14 +27,14 @@ var (
 	REDIS_ADDR             = os.Getenv("REDIS_ADDR")
 	REDIS_PASSWORD         = os.Getenv("REDIS_PASSWORD")
 	REDIS_DB               = os.Getenv("REDIS_DB")
-	URLS_SVC_ADDR          = os.Getenv("URLS_SVC_ADDR")
-	URLS_SVC_NAME          = os.Getenv("URLS_SVC_NAME")
+	URL_SVC_ADDR           = os.Getenv("URL_SVC_ADDR")
+	URL_SVC_NAME           = os.Getenv("URL_SVC_NAME")
 )
 
 func main() {
 	logger := zap.Must(zap.NewDevelopment())
-	logger.Info("", zap.String("URLS_SVC_ADDR", URLS_SVC_ADDR))
-	urlsConn, err := grpc.Dial(URLS_SVC_ADDR, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	logger.Info("", zap.String("URL_SVC_ADDR", URL_SVC_ADDR))
+	urlConn, err := grpc.Dial(URL_SVC_ADDR, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("failed to dial urls service:", zap.Error(err))
 	}
@@ -49,21 +49,21 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Recovery(), gin.Logger())
 	svc := &api.Service{
-		Name:             API_SVC_NAME,
-		Addr:             API_SVC_ADDR,
-		TrustedProxies:   []string{"127.0.0.1"},
-		Router:           router,
-		Logger:           logger,
-		UrlsClient:       urlspb.NewUrlsServiceClient(urlsConn),
-		UrlsHealthClient: healthpb.NewHealthClient(urlsConn),
-		UrlsServiceName:  URLS_SVC_NAME,
-		CacheExpTime:     time.Duration(cacheExpTime) * time.Second,
+		Name:            API_SVC_NAME,
+		Addr:            API_SVC_ADDR,
+		TrustedProxies:  []string{"127.0.0.1"},
+		Router:          router,
+		Logger:          logger,
+		UrlClient:       urlpb.NewUrlServiceClient(urlConn),
+		UrlHealthClient: healthpb.NewHealthClient(urlConn),
+		UrlServiceName:  URL_SVC_NAME,
+		CacheExpTime:    time.Duration(cacheExpTime) * time.Second,
 	}
 	svc.InitRedisDB(REDIS_ADDR, REDIS_PASSWORD, redisdb)
 	svc.RegisterEndpoints()
 	svc.RegisterTrustedProxies()
 	go grpc_health.WatchServices(svc.Name, svc.Logger, time.Second, []*grpc_health.HealthClient{
-		{HealthClient: svc.UrlsHealthClient, Active: &svc.UrlsServiceOk, Name: svc.UrlsServiceName},
+		{HealthClient: svc.UrlHealthClient, Active: &svc.UrlServiceOk, Name: svc.UrlServiceName},
 	})
 	svc.Addr = fmt.Sprintf("localhost:%s", API_SVC_PORT) // TODO: delete this line
 	svc.Logger.Info("Starting", zap.String("service", API_SVC_NAME), zap.String("port", API_SVC_PORT))

@@ -10,16 +10,16 @@ import (
 )
 
 func (s *Service) InitRedisDB(redisAddr string, redisPassword string, redisDb int) {
-	rdb := redis.NewClient(&redis.Options{
+	db := redis.NewClient(&redis.Options{
 		Addr:     redisAddr,
 		Password: redisPassword,
 		DB:       redisDb,
 	})
-	_, err := rdb.Ping(context.Background()).Result()
+	_, err := db.Ping(context.Background()).Result()
 	if err != nil {
 		s.Logger.Fatal("failed to connect to redis:", zap.Error(err))
 	}
-	s.RedisDb = rdb
+	s.RedisDb = db
 }
 
 func (s *Service) getFromCache(key string) (string, error) {

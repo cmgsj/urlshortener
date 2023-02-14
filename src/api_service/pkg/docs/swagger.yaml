@@ -12,7 +12,7 @@ definitions:
       error:
         type: string
     type: object
-  api.UrlDTO:
+  api.UrlDto:
     properties:
       newUrl:
         type: string
@@ -93,7 +93,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.UrlDTO'
+            $ref: '#/definitions/api.UrlDto'
         "400":
           description: Bad Request
           schema:
@@ -121,7 +121,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.UrlDTO'
+            $ref: '#/definitions/api.UrlDto'
         "404":
           description: Not Found
           schema:

@@ -77,7 +77,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDTO"
+                            "$ref": "#/definitions/api.UrlDto"
                         }
                     },
                     "400": {
@@ -119,7 +119,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDTO"
+                            "$ref": "#/definitions/api.UrlDto"
                         }
                     },
                     "404": {
@@ -194,7 +194,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.UrlDTO": {
+        "api.UrlDto": {
             "type": "object",
             "properties": {
                 "newUrl": {

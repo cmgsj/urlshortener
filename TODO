@@ -1,3 +1,3 @@
 TODO: add TLS
 TODO: orchestrate with k8s
-TODO: add circuit breaker
+TODO: add circuit breaker github.com/sony/gobreaker https://levelup.gitconnected.com/circuit-breaker-example-in-golang-e6459c87eaeb

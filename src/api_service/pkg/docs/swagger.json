@@ -73,7 +73,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDTO"
+                            "$ref": "#/definitions/api.UrlDto"
                         }
                     },
                     "400": {
@@ -115,7 +115,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDTO"
+                            "$ref": "#/definitions/api.UrlDto"
                         }
                     },
                     "404": {
@@ -190,7 +190,7 @@
                 }
             }
         },
-        "api.UrlDTO": {
+        "api.UrlDto": {
             "type": "object",
             "properties": {
                 "newUrl": {

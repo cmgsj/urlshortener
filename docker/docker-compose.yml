@@ -4,7 +4,7 @@ services:
   api_service:
     container_name: api_service
     depends_on:
-      - urls_service
+      - url_service
       - redis_cache
     build:
       context: ../src/api_service
@@ -13,16 +13,14 @@ services:
     ports:
       - "${API_SVC_PORT}:${API_SVC_PORT}"
 
-  urls_service:
-    container_name: urls_service
-    # depends_on:
-    #   - postgres_db
+  url_service:
+    container_name: url_service
     build:
-      context: ../src/urls_service
+      context: ../src/url_service
     env_file:
       - .env
     ports:
-      - "${URLS_SVC_PORT}:${URLS_SVC_PORT}"
+      - "${URL_SVC_PORT}:${URL_SVC_PORT}"
 
   redis_cache:
     container_name: redis_cache

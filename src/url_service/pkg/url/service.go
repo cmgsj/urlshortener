@@ -1,4 +1,4 @@
-package urls
+package url
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"net/url"
-	"proto/pkg/urlspb"
+	"proto/pkg/urlpb"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -26,21 +26,21 @@ var (
 )
 
 type Service struct {
-	urlspb.UnimplementedUrlsServiceServer
+	urlpb.UnimplementedUrlServiceServer
 	HealthServer *health.Server
 	Logger       *zap.Logger
 	Db           *sql.DB
 }
 
-func (s *Service) GetUrl(ctx context.Context, req *urlspb.GetUrlRequest) (*urlspb.GetUrlResponse, error) {
+func (s *Service) GetUrl(ctx context.Context, req *urlpb.GetUrlRequest) (*urlpb.GetUrlResponse, error) {
 	urlEntity, err := getUrlById(ctx, s.Db, req.GetUrlId())
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}
-	return &urlspb.GetUrlResponse{Url: &urlspb.Url{UrlId: urlEntity.UrlId, RedirectUrl: urlEntity.RedirectUrl}}, nil
+	return &urlpb.GetUrlResponse{Url: &urlpb.Url{UrlId: urlEntity.UrlId, RedirectUrl: urlEntity.RedirectUrl}}, nil
 }
 
-func (s *Service) CreateUrl(ctx context.Context, req *urlspb.CreateUrlRequest) (*urlspb.CreateUrlResponse, error) {
+func (s *Service) CreateUrl(ctx context.Context, req *urlpb.CreateUrlRequest) (*urlpb.CreateUrlResponse, error) {
 	urlId, err := generateUrlId(UrlIdLength)
 	if err != nil {
 		return nil, ErrInternal
@@ -52,10 +52,10 @@ func (s *Service) CreateUrl(ctx context.Context, req *urlspb.CreateUrlRequest) (
 	if err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
-	return &urlspb.CreateUrlResponse{UrlId: urlId}, nil
+	return &urlpb.CreateUrlResponse{UrlId: urlId}, nil
 }
 
-func (s *Service) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlRequest) (*urlspb.UpdateUrlResponse, error) {
+func (s *Service) UpdateUrl(ctx context.Context, req *urlpb.UpdateUrlRequest) (*urlpb.UpdateUrlResponse, error) {
 	if !isValidUrl(req.GetUrl().GetRedirectUrl()) {
 		return nil, ErrInvalidUrl
 	}
@@ -63,15 +63,15 @@ func (s *Service) UpdateUrl(ctx context.Context, req *urlspb.UpdateUrlRequest) (
 	if err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
-	return &urlspb.UpdateUrlResponse{}, nil
+	return &urlpb.UpdateUrlResponse{}, nil
 }
 
-func (s *Service) DeleteUrl(ctx context.Context, req *urlspb.DeleteUrlRequest) (*urlspb.DeleteUrlResponse, error) {
+func (s *Service) DeleteUrl(ctx context.Context, req *urlpb.DeleteUrlRequest) (*urlpb.DeleteUrlResponse, error) {
 	err := deleteUrl(ctx, s.Db, req.GetUrlId())
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}
-	return &urlspb.DeleteUrlResponse{}, nil
+	return &urlpb.DeleteUrlResponse{}, nil
 }
 
 func generateUrlId(n int) (string, error) {
