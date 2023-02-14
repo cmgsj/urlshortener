@@ -1,4 +1,4 @@
-package url
+package url_service
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"net/url"
-	"proto/pkg/urlpb"
+	"urlshortener/pkg/proto/urlpb"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"

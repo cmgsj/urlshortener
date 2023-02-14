@@ -1,10 +1,11 @@
-package url
+package url_service
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 
+	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
 )
 

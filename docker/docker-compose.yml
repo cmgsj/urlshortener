@@ -7,7 +7,7 @@ services:
       - url_service
       - redis_cache
     build:
-      context: ../src/api_service
+      context: ../cmd/api_service
     env_file:
       - .env
     ports:
@@ -16,7 +16,7 @@ services:
   url_service:
     container_name: url_service
     build:
-      context: ../src/url_service
+      context: ../cmd/url_service
     env_file:
       - .env
     ports:

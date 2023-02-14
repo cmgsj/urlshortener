@@ -1,9 +1,9 @@
-package api
+package api_service
 
 import (
-	"proto/pkg/urlpb"
 	"sync/atomic"
 	"time"
+	"urlshortener/pkg/proto/urlpb"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"

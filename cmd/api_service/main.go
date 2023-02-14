@@ -1,12 +1,12 @@
 package main
 
 import (
-	"api_service/pkg/api"
-	_ "api_service/pkg/docs"
-	"grpc_util/pkg/grpc_health"
-	"proto/pkg/urlpb"
 	"strconv"
 	"time"
+	"urlshortener/pkg/api_service"
+	_ "urlshortener/pkg/api_service/docs"
+	"urlshortener/pkg/grpc_util/grpc_health"
+	"urlshortener/pkg/proto/urlpb"
 
 	"fmt"
 	"os"
@@ -53,7 +53,7 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Recovery(), gin.Logger())
 
-	svc := &api.Service{
+	svc := &api_service.Service{
 		Name:            ApiSvcName,
 		Addr:            ApiSvcUrl,
 		TrustedProxies:  []string{"127.0.0.1"},

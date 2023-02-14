@@ -1,9 +1,10 @@
-package api
+package api_service
 
 import (
 	"errors"
 	"fmt"
-	"proto/pkg/urlpb"
+	"urlshortener/pkg/proto/urlpb"
+
 	"time"
 
 	"net/http"

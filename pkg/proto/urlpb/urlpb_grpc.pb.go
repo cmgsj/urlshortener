@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: src/proto/pkg/urlpb/urlpb.proto
+// source: pkg/proto/urlpb/urlpb.proto
 
 package urlpb
 
@@ -209,5 +209,5 @@ var UrlService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "src/proto/pkg/urlpb/urlpb.proto",
+	Metadata: "pkg/proto/urlpb/urlpb.proto",
 }

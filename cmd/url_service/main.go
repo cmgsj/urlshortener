@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"grpc_util/pkg/grpc_interceptor"
 	"net"
 	"os"
-	"proto/pkg/urlpb"
-	"url_service/pkg/url"
+	"urlshortener/pkg/grpc_util/grpc_interceptor"
+	"urlshortener/pkg/proto/urlpb"
+	url_service "urlshortener/pkg/url_service"
 
-	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -24,7 +23,7 @@ var (
 )
 
 func main() {
-	svc := &url.Service{
+	svc := &url_service.Service{
 		HealthServer: health.NewServer(),
 		Logger:       zap.Must(zap.NewDevelopment()),
 	}

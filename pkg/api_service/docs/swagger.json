@@ -41,7 +41,7 @@
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     }
                 }
@@ -65,7 +65,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.CreateUrlRequest"
+                            "$ref": "#/definitions/api_service.CreateUrlRequest"
                         }
                     }
                 ],
@@ -73,19 +73,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDto"
+                            "$ref": "#/definitions/api_service.UrlDto"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     }
                 }
@@ -115,19 +115,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDto"
+                            "$ref": "#/definitions/api_service.UrlDto"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     }
                 }
@@ -157,13 +157,13 @@
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     }
                 }
@@ -171,7 +171,7 @@
         }
     },
     "definitions": {
-        "api.CreateUrlRequest": {
+        "api_service.CreateUrlRequest": {
             "type": "object",
             "required": [
                 "redirectUrl"
@@ -182,7 +182,7 @@
                 }
             }
         },
-        "api.ErrorResponse": {
+        "api_service.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -190,7 +190,7 @@
                 }
             }
         },
-        "api.UrlDto": {
+        "api_service.UrlDto": {
             "type": "object",
             "properties": {
                 "newUrl": {

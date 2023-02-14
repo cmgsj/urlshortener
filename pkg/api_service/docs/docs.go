@@ -45,7 +45,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     }
                 }
@@ -69,7 +69,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.CreateUrlRequest"
+                            "$ref": "#/definitions/api_service.CreateUrlRequest"
                         }
                     }
                 ],
@@ -77,19 +77,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDto"
+                            "$ref": "#/definitions/api_service.UrlDto"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     }
                 }
@@ -119,19 +119,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.UrlDto"
+                            "$ref": "#/definitions/api_service.UrlDto"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     }
                 }
@@ -161,13 +161,13 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api_service.ErrorResponse"
                         }
                     }
                 }
@@ -175,7 +175,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.CreateUrlRequest": {
+        "api_service.CreateUrlRequest": {
             "type": "object",
             "required": [
                 "redirectUrl"
@@ -186,7 +186,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.ErrorResponse": {
+        "api_service.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -194,7 +194,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.UrlDto": {
+        "api_service.UrlDto": {
             "type": "object",
             "properties": {
                 "newUrl": {

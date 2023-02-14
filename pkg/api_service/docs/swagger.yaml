@@ -1,18 +1,18 @@
 basePath: /
 definitions:
-  api.CreateUrlRequest:
+  api_service.CreateUrlRequest:
     properties:
       redirectUrl:
         type: string
     required:
     - redirectUrl
     type: object
-  api.ErrorResponse:
+  api_service.ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  api.UrlDto:
+  api_service.UrlDto:
     properties:
       newUrl:
         type: string
@@ -50,11 +50,11 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api_service.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api_service.ErrorResponse'
       summary: Redirect to url
       tags:
       - url
@@ -72,7 +72,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api_service.ErrorResponse'
       summary: Ping the server
       tags:
       - ping
@@ -86,22 +86,22 @@ paths:
         name: url
         required: true
         schema:
-          $ref: '#/definitions/api.CreateUrlRequest'
+          $ref: '#/definitions/api_service.CreateUrlRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.UrlDto'
+            $ref: '#/definitions/api_service.UrlDto'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api_service.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api_service.ErrorResponse'
       summary: Create a new url redirect
       tags:
       - url
@@ -121,15 +121,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.UrlDto'
+            $ref: '#/definitions/api_service.UrlDto'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api_service.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api_service.ErrorResponse'
       summary: Get url
       tags:
       - url
