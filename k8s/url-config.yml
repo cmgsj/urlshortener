@@ -4,5 +4,4 @@ metadata:
   name: url-config
 data:
   url-svc-url: url-service:8080
-  url-svc-name: url-service
   url-db-uri: db.sqllite

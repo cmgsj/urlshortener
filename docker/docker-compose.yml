@@ -1,35 +1,34 @@
 version: "3.9"
 
-services:  
-  api_service:
-    container_name: api_service
-    depends_on:
-      - url_service
-      - redis_cache
-    build:
-      context: ../cmd/api_service
-    env_file:
-      - .env
-    ports:
-      - "${API_SVC_PORT}:${API_SVC_PORT}"
+services:
+    web_service:
+        container_name: web_service
+        depends_on:
+            - url_service
+            - redis_cache
+        build:
+            context: ../cmd/web_service
+        env_file:
+            - .env
+        ports:
+            - "${WEB_SVC_PORT}:${WEB_SVC_PORT}"
 
-  url_service:
-    container_name: url_service
-    build:
-      context: ../cmd/url_service
-    env_file:
-      - .env
-    ports:
-      - "${URL_SVC_PORT}:${URL_SVC_PORT}"
+    url_service:
+        container_name: url_service
+        build:
+            context: ../cmd/url_service
+        env_file:
+            - .env
+        ports:
+            - "${URL_SVC_PORT}:${URL_SVC_PORT}"
 
-  redis_cache:
-    container_name: redis_cache
-    image: redis
-    ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
-    volumes:
-      - redis_data:/data
-      
+    redis_cache:
+        container_name: redis_cache
+        image: redis
+        ports:
+            - "${REDIS_PORT}:${REDIS_PORT}"
+        volumes:
+            - redis_data:/data
+
 volumes:
-  redis_data:
-   
+    redis_data:

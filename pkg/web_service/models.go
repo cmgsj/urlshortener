@@ -1,4 +1,4 @@
-package api_service
+package web_service
 
 type UrlDto struct {
 	UrlId       string `json:"urlId"`

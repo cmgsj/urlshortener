@@ -1,4 +1,4 @@
-module urlshortener
+module github.com/cmgsj/url-shortener
 
 go 1.19
 
@@ -6,11 +6,12 @@ require (
 	github.com/gin-gonic/gin v1.8.2
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/mattn/go-sqlite3 v1.14.16
+	github.com/sony/gobreaker v0.5.0
 	github.com/swaggo/files v1.0.0
 	github.com/swaggo/gin-swagger v1.5.3
 	github.com/swaggo/swag v1.8.10
 	go.uber.org/zap v1.24.0
-	golang.org/x/net v0.6.0
+	golang.org/x/net v0.7.0
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
 )

@@ -6,11 +6,10 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"net/url"
-	"urlshortener/pkg/proto/urlpb"
 
+	"github.com/cmgsj/url-shortener/pkg/proto/urlpb"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/status"
 )
 
@@ -27,9 +26,8 @@ var (
 
 type Service struct {
 	urlpb.UnimplementedUrlServiceServer
-	HealthServer *health.Server
-	Logger       *zap.Logger
-	Db           *sql.DB
+	Logger *zap.Logger
+	Db     *sql.DB
 }
 
 func (s *Service) GetUrl(ctx context.Context, req *urlpb.GetUrlRequest) (*urlpb.GetUrlResponse, error) {

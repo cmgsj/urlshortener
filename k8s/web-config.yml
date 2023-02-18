@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+data:
+  web-svc-url: web-service:8080
+  web-svc-cache-timeout: 1h

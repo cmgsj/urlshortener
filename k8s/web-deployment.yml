@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-deployment
+  name: web-deployment
   labels:
-    app: api
+    app: web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api
+      app: web
   template:
     metadata:
       labels:
-        app: api
+        app: web
     spec:
       containers:
-        - name: api
-          image: cmg/api-svc
+        - name: web
+          image: cmg/web-svc
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
@@ -28,23 +28,18 @@ spec:
               memory: "128Mi"
               cpu: "500m"
           env:
-            - name: API_SVC_PORT
+            - name: WEB_SVC_PORT
               value: "8080"
-            - name: API_SVC_NAME
+            - name: WEB_SVC_URL
               valueFrom:
                 configMapKeyRef:
-                  name: api-config
-                  key: api-svc-name
-            - name: API_SVC_URL
+                  name: web-config
+                  key: web-svc-url
+            - name: WEB_SVC_CACHE_TIMEOUT
               valueFrom:
                 configMapKeyRef:
-                  name: api-config
-                  key: api-svc-url
-            - name: API_SVC_CACHE_TIMEOUT
-              valueFrom:
-                configMapKeyRef:
-                  name: api-config
-                  key: api-svc-cache-timeout
+                  name: web-config
+                  key: web-svc-cache-timeout
             - name: REDIS_URL
               valueFrom:
                 configMapKeyRef:
@@ -65,21 +60,16 @@ spec:
                 configMapKeyRef:
                   name: url-config
                   key: url-svc-url
-            - name: URL_SVC_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: url-config
-                  key: url-svc-name
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: api-service
+  name: web-service
 spec:
   type: NodePort
   selector:
-    app: api
+    app: web
   ports:
     - protocol: TCP
       port: 8080

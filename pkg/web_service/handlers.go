@@ -1,18 +1,15 @@
-package api_service
+package web_service
 
 import (
 	"errors"
 	"fmt"
-	"urlshortener/pkg/proto/urlpb"
-
+	"net/http"
 	"time"
 
-	"net/http"
-
+	"github.com/cmgsj/url-shortener/pkg/proto/urlpb"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
-
 	"google.golang.org/grpc/status"
 )
 
@@ -82,24 +79,20 @@ func (s *Service) PostUrl(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	if s.UrlServiceOk.Load() {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-		urlRes, err := s.UrlClient.CreateUrl(ctx, &urlpb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
-		if err != nil {
-			c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
-			return
-		}
-		s.putInCache(urlRes.GetUrlId(), body.RedirectUrl)
-		UrlDto := UrlDto{
-			UrlId:       urlRes.GetUrlId(),
-			RedirectUrl: body.RedirectUrl,
-			NewUrl:      fmt.Sprintf("%s/%s", s.Addr, urlRes.UrlId),
-		}
-		c.JSON(http.StatusOK, UrlDto)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	urlRes, err := s.UrlClient.CreateUrl(ctx, &urlpb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	c.JSON(http.StatusInternalServerError, ErrorResponse{Error: ErrServicesUnavailable.Error()})
+	s.putInCache(urlRes.GetUrlId(), body.RedirectUrl)
+	UrlDto := UrlDto{
+		UrlId:       urlRes.GetUrlId(),
+		RedirectUrl: body.RedirectUrl,
+		NewUrl:      fmt.Sprintf("%s/%s", s.Addr, urlRes.UrlId),
+	}
+	c.JSON(http.StatusOK, UrlDto)
 }
 
 func (s *Service) makeGetUrlResponse(c *gin.Context, redirect bool) {
@@ -130,15 +123,12 @@ func (s *Service) getRedirectUrl(urlId string) (string, error) {
 	if redirectUrl, err := s.getFromCache(urlId); err == nil {
 		return redirectUrl, nil
 	}
-	if s.UrlServiceOk.Load() {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-		urlRes, err := s.UrlClient.GetUrl(ctx, &urlpb.GetUrlRequest{UrlId: urlId})
-		if err != nil {
-			return "", err
-		}
-		s.putInCache(urlId, urlRes.GetUrl().GetRedirectUrl())
-		return urlRes.GetUrl().GetRedirectUrl(), nil
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	urlRes, err := s.UrlClient.GetUrl(ctx, &urlpb.GetUrlRequest{UrlId: urlId})
+	if err != nil {
+		return "", err
 	}
-	return "", ErrServicesUnavailable
+	s.putInCache(urlId, urlRes.GetUrl().GetRedirectUrl())
+	return urlRes.GetUrl().GetRedirectUrl(), nil
 }

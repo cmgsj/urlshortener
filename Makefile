@@ -1,19 +1,19 @@
 default: 
-	@echo "unspecifed target" && exit 1
+	@echo unspecifed target && exit 1
 
 minikube: 
 	minikube start --driver=docker
-	eval $$(minikube -p minikube docker-env)
 	make docker_build
 	kubectl apply -f k8s
-	minikube service api-service --url
+	minikube service web-service --url
 
 docker_build: build
-	docker build -t cmg/api-svc -f cmd/api_service/Dockerfile .
+	eval $$(minikube -p minikube docker-env)
+	docker build -t cmg/web-svc -f cmd/web_service/Dockerfile .
 	docker build -t cmg/url-svc -f cmd/url_service/Dockerfile .
 
 build: proto_gen swagger_gen
-	GOOS=linux go build -o bin ./cmd/api_service
+	GOOS=linux go build -o bin ./cmd/web_service
 	CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOARCH=amd64 GOOS=linux CGO_ENABLED=1 go build -ldflags "-linkmode external -extldflags -static" -o bin ./cmd/url_service
 
 proto_gen:
@@ -24,7 +24,8 @@ proto_gen:
 	done
 	
 swagger_gen:
-	swag fmt pkg/api_service && swag init -o pkg/api_service/docs -g pkg/api_service/service.go
+	swag fmt pkg/web_service
+	swag init -o pkg/web_service/docs -g pkg/web_service/service.go
 
 clean:
 	rm -f bin/*
