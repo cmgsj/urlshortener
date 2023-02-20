@@ -1,4 +1,4 @@
 TODO: add TLS
-TODO: fix environment variables and keep compatibility with docker compose
-TODO: add ingress
-TODO: add circuit breaker github.com/sony/gobreaker https://levelup.gitconnected.com/circuit-breaker-example-in-golang-e6459c87eaeb
+TODO: add k8s ingress
+TODO: fix k8s environment variables and 
+TODO: make .env for docker compose

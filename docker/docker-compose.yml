@@ -1,22 +1,22 @@
 version: "3.9"
 
 services:
-    web_service:
-        container_name: web_service
+    websvc:
+        container_name: websvc
         depends_on:
-            - url_service
+            - urlsvc
             - redis_cache
         build:
-            context: ../cmd/web_service
+            context: ../cmd/websvc
         env_file:
             - .env
         ports:
             - "${WEB_SVC_PORT}:${WEB_SVC_PORT}"
 
-    url_service:
-        container_name: url_service
+    urlsvc:
+        container_name: urlsvc
         build:
-            context: ../cmd/url_service
+            context: ../cmd/urlsvc
         env_file:
             - .env
         ports:

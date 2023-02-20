@@ -9,12 +9,12 @@ minikube:
 
 docker_build: build
 	eval $$(minikube -p minikube docker-env)
-	docker build -t cmg/web-svc -f cmd/web_service/Dockerfile .
-	docker build -t cmg/url-svc -f cmd/url_service/Dockerfile .
+	docker build -t cmg/web-svc -f cmd/websvc/Dockerfile .
+	docker build -t cmg/url-svc -f cmd/urlsvc/Dockerfile .
 
 build: proto_gen swagger_gen
-	GOOS=linux go build -o bin ./cmd/web_service
-	CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOARCH=amd64 GOOS=linux CGO_ENABLED=1 go build -ldflags "-linkmode external -extldflags -static" -o bin ./cmd/url_service
+	GOOS=linux go build -o bin ./cmd/websvc
+	CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOARCH=amd64 GOOS=linux CGO_ENABLED=1 go build -ldflags "-linkmode external -extldflags -static" -o bin ./cmd/urlsvc
 
 proto_gen:
 	@for file in $$(find pkg/proto -type f -name '*.proto'); do \
@@ -24,8 +24,8 @@ proto_gen:
 	done
 	
 swagger_gen:
-	swag fmt pkg/web_service
-	swag init -o pkg/web_service/docs -g pkg/web_service/service.go
+	swag fmt pkg/websvc
+	swag init -o pkg/websvc/docs -g pkg/websvc/service.go
 
 clean:
 	rm -f bin/*

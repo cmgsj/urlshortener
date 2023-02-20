@@ -1,12 +1,11 @@
-package web_service
+package websvc
 
 import (
 	"time"
 
-	"github.com/cmgsj/url-shortener/pkg/proto/urlpb"
+	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
-	"github.com/sony/gobreaker"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
@@ -26,7 +25,6 @@ type Service struct {
 	Router         *gin.Engine
 	Logger         *zap.Logger
 	UrlClient      urlpb.UrlServiceClient
-	UrlServiceCb   *gobreaker.CircuitBreaker
 	RedisDb        *redis.Client
 	CacheTimeout   time.Duration
 }
@@ -44,21 +42,4 @@ func (s *Service) RegisterTrustedProxies() {
 	if err != nil {
 		s.Logger.Fatal("failed to set trusted proxies", zap.Error(err))
 	}
-}
-
-func MakeUrlServiceCb(logger *zap.Logger) *gobreaker.CircuitBreaker {
-	return gobreaker.NewCircuitBreaker(
-		gobreaker.Settings{
-			Name:        "url-svc-circuit-breaker",
-			MaxRequests: 3,
-			Timeout:     3 * time.Second,
-			Interval:    1 * time.Second,
-			ReadyToTrip: func(counts gobreaker.Counts) bool {
-				return counts.ConsecutiveFailures > 3
-			},
-			OnStateChange: func(name string, from gobreaker.State, to gobreaker.State) {
-				logger.Info("circuit breaker state change", zap.String("cb-name", name), zap.String("from", from.String()), zap.String("to", to.String()))
-			},
-		},
-	)
 }

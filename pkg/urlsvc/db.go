@@ -1,4 +1,4 @@
-package url_service
+package urlsvc
 
 import (
 	"context"

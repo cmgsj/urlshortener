@@ -1,18 +1,18 @@
 basePath: /
 definitions:
-  web_service.CreateUrlRequest:
+  websvc.CreateUrlRequest:
     properties:
       redirectUrl:
         type: string
     required:
     - redirectUrl
     type: object
-  web_service.ErrorResponse:
+  websvc.ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  web_service.UrlDto:
+  websvc.UrlDto:
     properties:
       newUrl:
         type: string
@@ -44,11 +44,11 @@ paths:
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/web_service.ErrorResponse'
+            $ref: '#/definitions/websvc.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web_service.ErrorResponse'
+            $ref: '#/definitions/websvc.ErrorResponse'
       summary: Redirect to url
       tags:
       - url
@@ -66,7 +66,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web_service.ErrorResponse'
+            $ref: '#/definitions/websvc.ErrorResponse'
       summary: Ping the server
       tags:
       - ping
@@ -80,22 +80,22 @@ paths:
         name: url
         required: true
         schema:
-          $ref: '#/definitions/web_service.CreateUrlRequest'
+          $ref: '#/definitions/websvc.CreateUrlRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web_service.UrlDto'
+            $ref: '#/definitions/websvc.UrlDto'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web_service.ErrorResponse'
+            $ref: '#/definitions/websvc.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web_service.ErrorResponse'
+            $ref: '#/definitions/websvc.ErrorResponse'
       summary: Create a new url redirect
       tags:
       - url
@@ -115,15 +115,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web_service.UrlDto'
+            $ref: '#/definitions/websvc.UrlDto'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/web_service.ErrorResponse'
+            $ref: '#/definitions/websvc.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web_service.ErrorResponse'
+            $ref: '#/definitions/websvc.ErrorResponse'
       summary: Get url
       tags:
       - url

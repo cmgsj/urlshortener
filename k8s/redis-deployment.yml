@@ -36,6 +36,20 @@ spec:
                 secretKeyRef:
                   name: redis-secret
                   key: redis-password
+          volumeMounts:
+            - mountPath: /redis-master-data
+              name: data
+            - mountPath: /redis-master
+              name: config
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: redis-config
+            items:
+              - key: redis-config
+                path: redis.conf
 
 ---
 apiVersion: v1

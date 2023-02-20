@@ -1,4 +1,4 @@
-package url_service
+package urlsvc
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"net/url"
 
-	"github.com/cmgsj/url-shortener/pkg/proto/urlpb"
+	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

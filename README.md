@@ -1,3 +1,3 @@
 # urlshortener
 
-simple url shortener service: rest API, sqlite db, and redis cache over gRPC
+url shortener service: REST API, sqlite DB, and redis cache over gRPC

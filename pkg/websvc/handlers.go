@@ -1,4 +1,4 @@
-package web_service
+package websvc
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cmgsj/url-shortener/pkg/proto/urlpb"
+	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"

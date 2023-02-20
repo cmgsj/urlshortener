@@ -1,4 +1,4 @@
-package web_service
+package websvc
 
 type UrlDto struct {
 	UrlId       string `json:"urlId"`

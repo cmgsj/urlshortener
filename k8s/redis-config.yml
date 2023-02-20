@@ -5,3 +5,6 @@ metadata:
 data:
   redis-svc-url: redis-service:6379
   redis-db: "0"
+  redis-config: |
+    maxmemory 2mb
+    maxmemory-policy allkeys-lru

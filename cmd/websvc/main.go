@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cmgsj/url-shortener/pkg/proto/urlpb"
-	"github.com/cmgsj/url-shortener/pkg/web_service"
-	_ "github.com/cmgsj/url-shortener/pkg/web_service/docs"
+	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
+	"github.com/cmgsj/urlshortener/pkg/websvc"
+	_ "github.com/cmgsj/urlshortener/pkg/websvc/docs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -47,13 +47,12 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Recovery(), gin.Logger())
 
-	svc := &web_service.Service{
+	svc := &websvc.Service{
 		Addr:           ApiSvcUrl,
 		TrustedProxies: []string{"127.0.0.1"},
 		Router:         router,
 		Logger:         logger,
 		UrlClient:      urlpb.NewUrlServiceClient(urlConn),
-		UrlServiceCb:   web_service.MakeUrlServiceCb(logger),
 		CacheTimeout:   cacheTimeout,
 	}
 
