@@ -9,61 +9,56 @@ import (
 	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
 	"github.com/cmgsj/urlshortener/pkg/websvc"
 	_ "github.com/cmgsj/urlshortener/pkg/websvc/docs"
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var (
-	ApiSvcPort         = os.Getenv("WEB_SVC_PORT")
-	ApiSvcUrl          = os.Getenv("WEB_SVC_URL")
-	ApiSvcCacheTimeout = os.Getenv("WEB_SVC_CACHE_TIMEOUT")
-	RedisAddr          = os.Getenv("REDIS_URL")
-	RedisPassword      = os.Getenv("REDIS_PASSWORD")
-	RedisDb            = os.Getenv("REDIS_DB")
-	UrlSvcAddr         = os.Getenv("URL_SVC_ADDR")
-)
-
 func main() {
-	logger := zap.Must(zap.NewDevelopment())
+	var (
+		logger             = zap.Must(zap.NewDevelopment())
+		apiSvcPort         = os.Getenv("WEB_SVC_PORT")
+		apiSvcUrl          = os.Getenv("WEB_SVC_URL")
+		apiSvcCacheTimeout = os.Getenv("WEB_SVC_CACHE_TIMEOUT")
+		redisAddr          = os.Getenv("REDIS_URL")
+		redisPassword      = os.Getenv("REDIS_PASSWORD")
+		redisDb            = os.Getenv("REDIS_DB")
+		urlSvcAddr         = os.Getenv("URL_SVC_ADDR")
+	)
 
-	urlConn, err := grpc.Dial(UrlSvcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	urlConn, err := grpc.Dial(urlSvcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("failed to dial url service:", zap.Error(err))
 	}
 
-	cacheTimeout, err := time.ParseDuration(ApiSvcCacheTimeout)
+	cacheTimeout, err := time.ParseDuration(apiSvcCacheTimeout)
 	if err != nil {
 		logger.Fatal("failed to parse WEB_SVC_CACHE_TIMEOUT:", zap.Error(err))
 	}
 
-	redisDb, err := strconv.Atoi(RedisDb)
+	redisDbNum, err := strconv.Atoi(redisDb)
 	if err != nil {
 		logger.Fatal("failed to convert REDIS_DB to int:", zap.Error(err))
 	}
 
-	gin.SetMode(gin.ReleaseMode)
-	router := gin.New()
-	router.Use(gin.Recovery(), gin.Logger())
-
-	svc := &websvc.Service{
-		Addr:           ApiSvcUrl,
+	opt := websvc.Options{
+		Addr:           apiSvcUrl,
 		TrustedProxies: []string{"127.0.0.1"},
-		Router:         router,
 		Logger:         logger,
 		UrlClient:      urlpb.NewUrlServiceClient(urlConn),
 		CacheTimeout:   cacheTimeout,
 	}
 
-	svc.InitRedisDB(RedisAddr, RedisPassword, redisDb)
+	svc := websvc.New(opt)
+
+	svc.InitRedisDB(redisAddr, redisPassword, redisDbNum)
 	svc.RegisterEndpoints()
 	svc.RegisterTrustedProxies()
 
-	svc.Logger.Info("starting", zap.String("service", "web-svc"), zap.String("port", ApiSvcPort))
+	svc.Logger.Info("starting", zap.String("service", "web-svc"), zap.String("port", apiSvcPort))
 	svc.Logger.Info(fmt.Sprintf("swagger docs available at http://%s/docs/index.html", svc.Addr))
 
-	if err := svc.Router.Run(fmt.Sprintf(":%s", ApiSvcPort)); err != nil {
+	if err := svc.Router.Run(fmt.Sprintf(":%s", apiSvcPort)); err != nil {
 		svc.Logger.Fatal("failed to start server:", zap.Error(err))
 	}
 }

@@ -19,14 +19,38 @@ import (
 // @query.collection.format multi
 // @schemes                 http
 
-type Service struct {
-	Addr           string
-	TrustedProxies []string
-	Router         *gin.Engine
-	Logger         *zap.Logger
-	UrlClient      urlpb.UrlServiceClient
-	RedisDb        *redis.Client
-	CacheTimeout   time.Duration
+type (
+	Service struct {
+		Addr           string
+		TrustedProxies []string
+		Router         *gin.Engine
+		Logger         *zap.Logger
+		UrlClient      urlpb.UrlServiceClient
+		RedisDb        *redis.Client
+		CacheTimeout   time.Duration
+	}
+
+	Options struct {
+		Addr           string
+		TrustedProxies []string
+		Logger         *zap.Logger
+		UrlClient      urlpb.UrlServiceClient
+		CacheTimeout   time.Duration
+	}
+)
+
+func New(opt Options) *Service {
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.New()
+	router.Use(gin.Recovery(), gin.Logger())
+	return &Service{
+		Addr:           opt.Addr,
+		TrustedProxies: opt.TrustedProxies,
+		Router:         router,
+		Logger:         opt.Logger,
+		UrlClient:      opt.UrlClient,
+		CacheTimeout:   opt.CacheTimeout,
+	}
 }
 
 func (s *Service) RegisterEndpoints() {

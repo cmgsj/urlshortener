@@ -1,4 +1,4 @@
 TODO: add TLS
 TODO: add k8s ingress
-TODO: fix k8s environment variables and 
+TODO: fix k8s environment variables https://kubernetes.io/docs/concepts/services-networking/service/#discovering-services
 TODO: make .env for docker compose

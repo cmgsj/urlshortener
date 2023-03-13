@@ -27,5 +27,8 @@ swagger_gen:
 	swag fmt pkg/websvc
 	swag init -o pkg/websvc/docs -g pkg/websvc/service.go
 
+sqlc_gen:
+	sqlc generate -f pkg/urlsvc/sqlc.yaml
+
 clean:
 	rm -f bin/*
