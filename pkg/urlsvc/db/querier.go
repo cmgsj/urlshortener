@@ -9,11 +9,11 @@ import (
 )
 
 type Querier interface {
-	CreateUrl(ctx context.Context, arg CreateUrlParams) (*Url, error)
+	CreateUrl(ctx context.Context, arg *CreateUrlParams) (*Url, error)
 	DeleteUrl(ctx context.Context, urlID string) error
 	GetUrl(ctx context.Context, urlID string) (*Url, error)
 	ListUrls(ctx context.Context) ([]*Url, error)
-	UpdateUrl(ctx context.Context, arg UpdateUrlParams) error
+	UpdateUrl(ctx context.Context, arg *UpdateUrlParams) error
 }
 
 var _ Querier = (*Queries)(nil)

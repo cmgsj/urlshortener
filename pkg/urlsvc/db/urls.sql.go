@@ -10,10 +10,7 @@ import (
 )
 
 const createUrl = `-- name: CreateUrl :one
-INSERT INTO
-	urls (url_id, redirect_url)
-VALUES
-	(?, ?) RETURNING url_id, redirect_url
+INSERT INTO urls (url_id, redirect_url) VALUES (?, ?) RETURNING url_id, redirect_url
 `
 
 type CreateUrlParams struct {
@@ -21,51 +18,39 @@ type CreateUrlParams struct {
 	RedirectUrl string `db:"redirect_url" json:"redirect_url"`
 }
 
-func (q *Queries) CreateUrl(ctx context.Context, arg CreateUrlParams) (*Url, error) {
-	row := q.db.QueryRowContext(ctx, createUrl, arg.UrlID, arg.RedirectUrl)
+func (q *Queries) CreateUrl(ctx context.Context, arg *CreateUrlParams) (*Url, error) {
+	row := q.queryRow(ctx, q.createUrlStmt, createUrl, arg.UrlID, arg.RedirectUrl)
 	var i Url
 	err := row.Scan(&i.UrlID, &i.RedirectUrl)
 	return &i, err
 }
 
 const deleteUrl = `-- name: DeleteUrl :exec
-DELETE FROM urls
-WHERE
-	url_id = ?
+DELETE FROM urls WHERE url_id = ?
 `
 
 func (q *Queries) DeleteUrl(ctx context.Context, urlID string) error {
-	_, err := q.db.ExecContext(ctx, deleteUrl, urlID)
+	_, err := q.exec(ctx, q.deleteUrlStmt, deleteUrl, urlID)
 	return err
 }
 
 const getUrl = `-- name: GetUrl :one
-SELECT
-	url_id, redirect_url
-FROM
-	urls
-WHERE
-	url_id = ?
-LIMIT
-	1
+SELECT url_id, redirect_url FROM urls WHERE url_id = ? LIMIT 1
 `
 
 func (q *Queries) GetUrl(ctx context.Context, urlID string) (*Url, error) {
-	row := q.db.QueryRowContext(ctx, getUrl, urlID)
+	row := q.queryRow(ctx, q.getUrlStmt, getUrl, urlID)
 	var i Url
 	err := row.Scan(&i.UrlID, &i.RedirectUrl)
 	return &i, err
 }
 
 const listUrls = `-- name: ListUrls :many
-SELECT
-	url_id, redirect_url
-FROM
-	urls
+SELECT url_id, redirect_url FROM urls
 `
 
 func (q *Queries) ListUrls(ctx context.Context) ([]*Url, error) {
-	rows, err := q.db.QueryContext(ctx, listUrls)
+	rows, err := q.query(ctx, q.listUrlsStmt, listUrls)
 	if err != nil {
 		return nil, err
 	}
@@ -88,11 +73,7 @@ func (q *Queries) ListUrls(ctx context.Context) ([]*Url, error) {
 }
 
 const updateUrl = `-- name: UpdateUrl :exec
-UPDATE urls
-SET
-	redirect_url = ?
-WHERE
-	url_id = ?
+UPDATE urls SET redirect_url = ? WHERE url_id = ?
 `
 
 type UpdateUrlParams struct {
@@ -100,7 +81,7 @@ type UpdateUrlParams struct {
 	UrlID       string `db:"url_id" json:"url_id"`
 }
 
-func (q *Queries) UpdateUrl(ctx context.Context, arg UpdateUrlParams) error {
-	_, err := q.db.ExecContext(ctx, updateUrl, arg.RedirectUrl, arg.UrlID)
+func (q *Queries) UpdateUrl(ctx context.Context, arg *UpdateUrlParams) error {
+	_, err := q.exec(ctx, q.updateUrlStmt, updateUrl, arg.RedirectUrl, arg.UrlID)
 	return err
 }

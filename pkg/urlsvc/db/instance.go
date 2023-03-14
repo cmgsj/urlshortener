@@ -9,26 +9,12 @@ import (
 )
 
 var (
-	db Querier
 	//go:embed sql/schema/schema.sql
 	ddl string
 )
 
-func Instance() Querier {
-	return db
-}
-
-func SetInstance(dbtx DBTX) Querier {
-	db = New(dbtx)
-	return Instance()
-}
-
 func Connect(driverName, dataSourceName string) (DBTX, error) {
-	dbtx, err := sql.Open(driverName, dataSourceName)
-	if err != nil {
-		return nil, err
-	}
-	return dbtx, nil
+	return sql.Open(driverName, dataSourceName)
 }
 
 func Migrate(ctx context.Context, dbtx DBTX) (DBTX, error) {
@@ -43,4 +29,12 @@ func Must(dbtx DBTX, err error) DBTX {
 		panic(err)
 	}
 	return dbtx
+}
+
+func MustPrepare(ctx context.Context, dbtx DBTX) Querier {
+	q, err := Prepare(ctx, dbtx)
+	if err != nil {
+		panic(err)
+	}
+	return q
 }
