@@ -20,8 +20,13 @@ func main() {
 		urlSvcPort = os.Getenv("URL_SVC_PORT")
 		urlDbUri   = os.Getenv("URL_DB_URI")
 		logger     = zap.Must(zap.NewDevelopment())
-		db         = database.Must(database.Migrate(database.Must(database.New("sqlite3", urlDbUri))))
-		svc        = urlsvc.New(logger, db)
+		opt        = database.Options{
+			Driver:  "sqlite3",
+			URI:     urlDbUri,
+			Migrate: true,
+		}
+		db  = database.Must(database.New(opt))
+		svc = urlsvc.New(logger, db)
 	)
 
 	if err := svc.SeedDB(context.Background()); err != nil {

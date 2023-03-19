@@ -14,28 +14,34 @@ var (
 	ddl string
 )
 
-type DB struct {
-	Tx    *sql.DB
-	Query sqlc.Querier
-}
+type (
+	DB struct {
+		Tx    *sql.DB
+		Query sqlc.Querier
+	}
+	Options struct {
+		Driver  string
+		URI     string
+		Migrate bool
+	}
+)
 
-func New(driverName, dataSourceName string) (*DB, error) {
-	db, err := sql.Open(driverName, dataSourceName)
+func New(opt Options) (*DB, error) {
+	tx, err := sql.Open(opt.Driver, opt.URI)
 	if err != nil {
 		return nil, err
 	}
-	querier, err := sqlc.Prepare(context.Background(), db)
+	ctx := context.Background()
+	if opt.Migrate {
+		if _, err = tx.ExecContext(ctx, ddl); err != nil {
+			return nil, err
+		}
+	}
+	querier, err := sqlc.Prepare(ctx, tx)
 	if err != nil {
 		return nil, err
 	}
-	return &DB{Tx: db, Query: querier}, nil
-}
-
-func Migrate(db *DB) (*DB, error) {
-	if _, err := db.Tx.ExecContext(context.Background(), ddl); err != nil {
-		return nil, err
-	}
-	return db, nil
+	return &DB{Tx: tx, Query: querier}, nil
 }
 
 func Must(db *DB, err error) *DB {
@@ -43,4 +49,8 @@ func Must(db *DB, err error) *DB {
 		panic(err)
 	}
 	return db
+}
+
+func DDL() string {
+	return ddl
 }
