@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
+	urlv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/url/v1"
 	"github.com/cmgsj/urlshortener/pkg/websvc"
 	_ "github.com/cmgsj/urlshortener/pkg/websvc/docs"
 	"go.uber.org/zap"
@@ -45,10 +45,9 @@ func main() {
 		Addr:           apiSvcUrl,
 		TrustedProxies: []string{"127.0.0.1"},
 		Logger:         logger,
-		UrlClient:      urlpb.NewUrlServiceClient(urlConn),
+		UrlClient:      urlv1.NewUrlServiceClient(urlConn),
 		CacheTimeout:   cacheTimeout,
 	}
-
 	svc := websvc.New(opt)
 
 	svc.InitRedisDB(redisAddr, redisPassword, redisDbNum)

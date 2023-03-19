@@ -6,10 +6,10 @@ import (
 	"net"
 	"os"
 
+	urlv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/url/v1"
 	"github.com/cmgsj/urlshortener/pkg/grpcutil/interceptor"
-	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
 	"github.com/cmgsj/urlshortener/pkg/urlsvc"
-	"github.com/cmgsj/urlshortener/pkg/urlsvc/db"
+	"github.com/cmgsj/urlshortener/pkg/urlsvc/database"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -17,15 +17,14 @@ import (
 
 func main() {
 	var (
-		ctx        = context.Background()
 		urlSvcPort = os.Getenv("URL_SVC_PORT")
 		urlDbUri   = os.Getenv("URL_DB_URI")
 		logger     = zap.Must(zap.NewDevelopment())
-		querier    = db.MustPrepare(ctx, db.Must(db.Migrate(ctx, db.Must(db.Connect("sqlite3", urlDbUri)))))
-		svc        = urlsvc.New(logger, querier)
+		db         = database.Must(database.Migrate(database.Must(database.New("sqlite3", urlDbUri))))
+		svc        = urlsvc.New(logger, db)
 	)
 
-	if err := svc.SeedDB(ctx); err != nil {
+	if err := svc.SeedDB(context.Background()); err != nil {
 		svc.Logger.Fatal("failed to seed DB:", zap.Error(err))
 	}
 
@@ -37,7 +36,7 @@ func main() {
 	)
 
 	reflection.Register(grpcServer)
-	urlpb.RegisterUrlServiceServer(grpcServer, svc)
+	urlv1.RegisterUrlServiceServer(grpcServer, svc)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", urlSvcPort))
 	if err != nil {

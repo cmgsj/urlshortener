@@ -6,8 +6,9 @@ import (
 	"encoding/base64"
 	"net/url"
 
-	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
-	"github.com/cmgsj/urlshortener/pkg/urlsvc/db"
+	urlv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/url/v1"
+	sqlc "github.com/cmgsj/urlshortener/pkg/gen/sqlc/url/v1"
+	"github.com/cmgsj/urlshortener/pkg/urlsvc/database"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,27 +24,27 @@ var (
 )
 
 type Service struct {
-	urlpb.UnimplementedUrlServiceServer
-	Logger  *zap.Logger
-	Querier db.Querier
+	urlv1.UnimplementedUrlServiceServer
+	Logger *zap.Logger
+	DB     *database.DB
 }
 
-func New(logger *zap.Logger, querier db.Querier) *Service {
+func New(logger *zap.Logger, db *database.DB) *Service {
 	return &Service{
-		Logger:  logger,
-		Querier: querier,
+		Logger: logger,
+		DB:     db,
 	}
 }
 
-func (s *Service) GetUrl(ctx context.Context, req *urlpb.GetUrlRequest) (*urlpb.GetUrlResponse, error) {
-	u, err := s.Querier.GetUrl(ctx, req.GetUrlId())
+func (s *Service) GetUrl(ctx context.Context, req *urlv1.GetUrlRequest) (*urlv1.GetUrlResponse, error) {
+	u, err := s.DB.Query.GetUrl(ctx, req.GetUrlId())
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}
-	return &urlpb.GetUrlResponse{Url: &urlpb.Url{UrlId: u.UrlID, RedirectUrl: u.RedirectUrl}}, nil
+	return &urlv1.GetUrlResponse{Url: &urlv1.Url{UrlId: u.UrlID, RedirectUrl: u.RedirectUrl}}, nil
 }
 
-func (s *Service) CreateUrl(ctx context.Context, req *urlpb.CreateUrlRequest) (*urlpb.CreateUrlResponse, error) {
+func (s *Service) CreateUrl(ctx context.Context, req *urlv1.CreateUrlRequest) (*urlv1.CreateUrlResponse, error) {
 	urlId, err := generateUrlId(UrlIdLength)
 	if err != nil {
 		return nil, ErrInternal
@@ -51,46 +52,46 @@ func (s *Service) CreateUrl(ctx context.Context, req *urlpb.CreateUrlRequest) (*
 	if !isValidUrl(req.GetRedirectUrl()) {
 		return nil, ErrInvalidUrl
 	}
-	arg := &db.CreateUrlParams{
+	param := &sqlc.CreateUrlParams{
 		UrlID:       urlId,
 		RedirectUrl: req.GetRedirectUrl(),
 	}
-	u, err := s.Querier.CreateUrl(ctx, arg)
+	u, err := s.DB.Query.CreateUrl(ctx, param)
 	if err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
-	return &urlpb.CreateUrlResponse{UrlId: u.UrlID}, nil
+	return &urlv1.CreateUrlResponse{UrlId: u.UrlID}, nil
 }
 
-func (s *Service) UpdateUrl(ctx context.Context, req *urlpb.UpdateUrlRequest) (*urlpb.UpdateUrlResponse, error) {
+func (s *Service) UpdateUrl(ctx context.Context, req *urlv1.UpdateUrlRequest) (*urlv1.UpdateUrlResponse, error) {
 	if !isValidUrl(req.GetUrl().GetRedirectUrl()) {
 		return nil, ErrInvalidUrl
 	}
-	arg := &db.UpdateUrlParams{
+	param := &sqlc.UpdateUrlParams{
 		UrlID:       req.GetUrl().GetUrlId(),
 		RedirectUrl: req.GetUrl().GetRedirectUrl(),
 	}
-	if err := s.Querier.UpdateUrl(ctx, arg); err != nil {
+	if err := s.DB.Query.UpdateUrl(ctx, param); err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
-	return &urlpb.UpdateUrlResponse{}, nil
+	return &urlv1.UpdateUrlResponse{}, nil
 }
 
-func (s *Service) DeleteUrl(ctx context.Context, req *urlpb.DeleteUrlRequest) (*urlpb.DeleteUrlResponse, error) {
-	if err := s.Querier.DeleteUrl(ctx, req.GetUrlId()); err != nil {
+func (s *Service) DeleteUrl(ctx context.Context, req *urlv1.DeleteUrlRequest) (*urlv1.DeleteUrlResponse, error) {
+	if err := s.DB.Query.DeleteUrl(ctx, req.GetUrlId()); err != nil {
 		return nil, ErrUrlNotFound
 	}
-	return &urlpb.DeleteUrlResponse{}, nil
+	return &urlv1.DeleteUrlResponse{}, nil
 }
 
 func (s *Service) SeedDB(ctx context.Context) error {
-	args := []*db.CreateUrlParams{
+	params := []*sqlc.CreateUrlParams{
 		{UrlID: "abcdef01", RedirectUrl: "https://www.google.com"},
 		{UrlID: "abcdef02", RedirectUrl: "https://www.youtube.com"},
 		{UrlID: "abcdef03", RedirectUrl: "https://www.apple.com"},
 	}
-	for _, arg := range args {
-		if _, err := s.Querier.CreateUrl(ctx, arg); err != nil {
+	for _, param := range params {
+		if _, err := s.DB.Query.CreateUrl(ctx, param); err != nil {
 			return err
 		}
 	}

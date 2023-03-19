@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package urlpb;
+package url;
 
-option go_package = "urlshortener/pkg/proto/urlpb";
+option go_package = "github.com/cmgsj/urlshortener/pkg/gen/proto/url/v1;url";
 	
 service UrlService {
 	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse) {}

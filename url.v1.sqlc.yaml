@@ -1,13 +1,13 @@
 version: 2
 sql:
   - engine: "sqlite"
-    schema: "db/sql/schema"
-    queries: "db/sql/query"
+    schema: "pkg/urlsvc/database/sql/v1/schema"
+    queries: "pkg/urlsvc/database/sql/v1/query"
     strict_function_checks: true
     gen:
       go:
-        package: "db"
-        out: "db"
+        package: "sqlc"
+        out: "pkg/gen/sqlc/url/v1"
         emit_interface: true
         emit_result_struct_pointers: true
         emit_params_struct_pointers: true

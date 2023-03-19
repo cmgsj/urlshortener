@@ -1,0 +1,16 @@
+version: v1
+plugins:
+  - plugin: go
+    out: pkg/gen
+    opt:
+      - paths=source_relative
+  - plugin: go-grpc
+    out: pkg/gen
+    opt:
+      - paths=source_relative
+  - plugin: grpc-gateway
+    out: pkg/gen
+    opt:
+      - paths=source_relative
+  - name: openapiv2
+    out: pkg/gen

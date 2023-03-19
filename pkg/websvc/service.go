@@ -3,7 +3,7 @@ package websvc
 import (
 	"time"
 
-	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
+	urlv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/url/v1"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	swaggerFiles "github.com/swaggo/files"
@@ -11,13 +11,13 @@ import (
 	"go.uber.org/zap"
 )
 
-// @title                   URL Shortener API
-// @version                 1.0
-// @description             This is a URL shortener service.
-// @host                    localhost:8080
-// @BasePath                /
-// @query.collection.format multi
-// @schemes                 http
+//	@title						URL Shortener API
+//	@version					1.0
+//	@description				This is a URL shortener service.
+//	@host						localhost:8080
+//	@BasePath					/
+//	@query.collection.format	multi
+//	@schemes					http
 
 type (
 	Service struct {
@@ -25,7 +25,7 @@ type (
 		TrustedProxies []string
 		Router         *gin.Engine
 		Logger         *zap.Logger
-		UrlClient      urlpb.UrlServiceClient
+		UrlClient      urlv1.UrlServiceClient
 		RedisDb        *redis.Client
 		CacheTimeout   time.Duration
 	}
@@ -34,7 +34,7 @@ type (
 		Addr           string
 		TrustedProxies []string
 		Logger         *zap.Logger
-		UrlClient      urlpb.UrlServiceClient
+		UrlClient      urlv1.UrlServiceClient
 		CacheTimeout   time.Duration
 	}
 )

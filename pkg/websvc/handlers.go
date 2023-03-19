@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cmgsj/urlshortener/pkg/proto/urlpb"
+	urlv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/url/v1"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
@@ -19,60 +19,60 @@ var (
 )
 
 // Pong
-// @Summary     Ping the server
-// @ID          ping
-// @Tags        ping
-// @Description Ping the server
-// @Produce     text/plain
-// @Success     200 {string} string "pong"
-// @Failure     500 {object} ErrorResponse
-// @Router      /ping [GET]
+//	@Summary		Ping the server
+//	@ID				ping
+//	@Tags			ping
+//	@Description	Ping the server
+//	@Produce		text/plain
+//	@Success		200	{string}	string	"pong"
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/ping [GET]
 func (s *Service) Pong(c *gin.Context) {
 	c.String(http.StatusOK, "pong")
 }
 
 // RedirectToUrl
-// @Summary     Redirect to url
-// @ID          redirect-url
-// @Tags        url
-// @Description Redirect to url
-// @Param       urlId path string true "url id"
-// @Success     302
-// @Failure     404 {object} ErrorResponse
-// @Failure     500 {object} ErrorResponse
-// @Router      /{urlId} [GET]
+//	@Summary		Redirect to url
+//	@ID				redirect-url
+//	@Tags			url
+//	@Description	Redirect to url
+//	@Param			urlId	path	string	true	"url id"
+//	@Success		302
+//	@Failure		404	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/{urlId} [GET]
 func (s *Service) RedirectToUrl(c *gin.Context) {
 	s.makeGetUrlResponse(c, true)
 }
 
 // GetUrl
-// @Summary     Get url
-// @ID          get-url
-// @Tags        url
-// @Description Get url
-// @Consume     application/json
-// @Produce     application/json
-// @Param       urlId path     string true "url id"
-// @Success     200   {object} UrlDto
-// @Failure     404   {object} ErrorResponse
-// @Failure     500   {object} ErrorResponse
-// @Router      /url/{urlId} [GET]
+//	@Summary		Get url
+//	@ID				get-url
+//	@Tags			url
+//	@Description	Get url
+//	@Consume		application/json
+//	@Produce		application/json
+//	@Param			urlId	path		string	true	"url id"
+//	@Success		200		{object}	UrlDto
+//	@Failure		404		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/url/{urlId} [GET]
 func (s *Service) GetUrl(c *gin.Context) {
 	s.makeGetUrlResponse(c, false)
 }
 
 // PostUrl
-// @Summary     Create a new url redirect
-// @ID          create-url
-// @Tags        url
-// @Description Create a new url redirect
-// @Consume     application/json
-// @Produce     application/json
-// @Param       url body     CreateUrlRequest true "url"
-// @Success     200 {object} UrlDto
-// @Failure     400 {object} ErrorResponse
-// @Failure     500 {object} ErrorResponse
-// @Router      /url [POST]
+//	@Summary		Create a new url redirect
+//	@ID				create-url
+//	@Tags			url
+//	@Description	Create a new url redirect
+//	@Consume		application/json
+//	@Produce		application/json
+//	@Param			url	body		CreateUrlRequest	true	"url"
+//	@Success		200	{object}	UrlDto
+//	@Failure		400	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/url [POST]
 func (s *Service) PostUrl(c *gin.Context) {
 	var body CreateUrlRequest
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -81,7 +81,7 @@ func (s *Service) PostUrl(c *gin.Context) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	urlRes, err := s.UrlClient.CreateUrl(ctx, &urlpb.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
+	urlRes, err := s.UrlClient.CreateUrl(ctx, &urlv1.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
@@ -125,7 +125,7 @@ func (s *Service) getRedirectUrl(urlId string) (string, error) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	urlRes, err := s.UrlClient.GetUrl(ctx, &urlpb.GetUrlRequest{UrlId: urlId})
+	urlRes, err := s.UrlClient.GetUrl(ctx, &urlv1.GetUrlRequest{UrlId: urlId})
 	if err != nil {
 		return "", err
 	}
