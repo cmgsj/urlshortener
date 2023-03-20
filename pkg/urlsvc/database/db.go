@@ -9,83 +9,64 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var (
-	//go:embed sql/v1/schema/schema.sql
-	ddl string
-)
-
-type DB struct {
-	Query sqlc.Querier
-	qrs   *sqlc.Queries
-	db    *sql.DB
+type DB interface {
+	sqlc.Querier
+	Ping(context.Context) error
+	ExecTx(context.Context, TxFunc) error
+	BeginTx(context.Context) (Tx, error)
 }
 
-type Options struct {
-	Driver      string
-	ConnString  string
-	AutoMigrate bool
+type Tx interface {
+	sqlc.Querier
+	Rollback() error
+	Commit() error
 }
 
-func New(opts Options) (*DB, error) {
-	db, err := sql.Open(opts.Driver, opts.ConnString)
-	if err != nil {
-		return nil, err
-	}
-	ctx := context.Background()
-	if opts.AutoMigrate {
-		if _, err = db.ExecContext(ctx, ddl); err != nil {
-			return nil, err
-		}
-	}
-	q, err := sqlc.Prepare(ctx, db)
-	if err != nil {
-		return nil, err
-	}
-	return &DB{Query: q, qrs: q, db: db}, nil
+var _ DB = (*dbImpl)(nil)
+
+type dbImpl struct {
+	sqlc.Querier
+	qrs *sqlc.Queries
+	db  *sql.DB
 }
 
-func Must(db *DB, err error) *DB {
-	if err != nil {
-		panic(err)
-	}
-	return db
-}
-
-func (db *DB) Ping(ctx context.Context) error {
+func (db *dbImpl) Ping(ctx context.Context) error {
 	return db.db.PingContext(ctx)
 }
 
 type TxFunc func(sqlc.Querier) error
 
-func (db *DB) ExecTx(ctx context.Context, txFunc TxFunc) error {
+func (db *dbImpl) ExecTx(ctx context.Context, txFunc TxFunc) error {
 	tx, err := db.BeginTx(ctx)
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
-	if err = txFunc(tx.Query); err != nil {
+	if err = txFunc(tx); err != nil {
 		return err
 	}
 	return tx.Commit()
 }
 
-func (db *DB) BeginTx(ctx context.Context) (*Tx, error) {
+func (db *dbImpl) BeginTx(ctx context.Context) (Tx, error) {
 	tx, err := db.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
-	return &Tx{Query: db.qrs.WithTx(tx), tx: tx}, nil
+	return &txImpl{Querier: db.qrs.WithTx(tx), tx: tx}, nil
 }
 
-type Tx struct {
-	Query sqlc.Querier
-	tx    *sql.Tx
+var _ Tx = (*txImpl)(nil)
+
+type txImpl struct {
+	sqlc.Querier
+	tx *sql.Tx
 }
 
-func (tx *Tx) Rollback() error {
+func (tx *txImpl) Rollback() error {
 	return tx.tx.Rollback()
 }
 
-func (tx *Tx) Commit() error {
+func (tx *txImpl) Commit() error {
 	return tx.tx.Commit()
 }
