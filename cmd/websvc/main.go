@@ -57,7 +57,7 @@ func main() {
 	svc.Logger.Info("starting", zap.String("service", "web-svc"), zap.String("port", apiSvcPort))
 	svc.Logger.Info(fmt.Sprintf("swagger docs available at http://%s/docs/index.html", svc.Addr))
 
-	if err := svc.Router.Run(fmt.Sprintf(":%s", apiSvcPort)); err != nil {
+	if err := svc.Router.Run(":" + apiSvcPort); err != nil {
 		svc.Logger.Fatal("failed to start server:", zap.Error(err))
 	}
 }

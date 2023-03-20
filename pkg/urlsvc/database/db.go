@@ -16,8 +16,9 @@ var (
 
 type (
 	DB struct {
-		Tx    *sql.DB
-		Query sqlc.Querier
+		sqlc.Querier
+		q  *sqlc.Queries
+		db *sql.DB
 	}
 	Options struct {
 		Driver  string
@@ -26,22 +27,22 @@ type (
 	}
 )
 
-func New(opt Options) (*DB, error) {
-	tx, err := sql.Open(opt.Driver, opt.URI)
+func New(opts Options) (*DB, error) {
+	db, err := sql.Open(opts.Driver, opts.URI)
 	if err != nil {
 		return nil, err
 	}
 	ctx := context.Background()
-	if opt.Migrate {
-		if _, err = tx.ExecContext(ctx, ddl); err != nil {
+	if opts.Migrate {
+		if _, err = db.ExecContext(ctx, ddl); err != nil {
 			return nil, err
 		}
 	}
-	querier, err := sqlc.Prepare(ctx, tx)
+	queries, err := sqlc.Prepare(ctx, db)
 	if err != nil {
 		return nil, err
 	}
-	return &DB{Tx: tx, Query: querier}, nil
+	return &DB{Querier: queries, q: queries, db: db}, nil
 }
 
 func Must(db *DB, err error) *DB {
@@ -51,6 +52,20 @@ func Must(db *DB, err error) *DB {
 	return db
 }
 
-func DDL() string {
-	return ddl
+type TxFunc func(sqlc.Querier) error
+
+func (db *DB) ExecTx(ctx context.Context, txFunc TxFunc) error {
+	tx, err := db.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if err = txFunc(db.q.WithTx(tx)); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+func (db *DB) Ping(ctx context.Context) error {
+	return db.db.PingContext(ctx)
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"os"
 
@@ -20,12 +19,12 @@ func main() {
 		urlSvcPort = os.Getenv("URL_SVC_PORT")
 		urlDbUri   = os.Getenv("URL_DB_URI")
 		logger     = zap.Must(zap.NewDevelopment())
-		opt        = database.Options{
+		opts       = database.Options{
 			Driver:  "sqlite3",
 			URI:     urlDbUri,
 			Migrate: true,
 		}
-		db  = database.Must(database.New(opt))
+		db  = database.Must(database.New(opts))
 		svc = urlsvc.New(logger, db)
 	)
 
@@ -43,7 +42,7 @@ func main() {
 	reflection.Register(grpcServer)
 	urlv1.RegisterUrlServiceServer(grpcServer, svc)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", urlSvcPort))
+	lis, err := net.Listen("tcp", ":"+urlSvcPort)
 	if err != nil {
 		svc.Logger.Fatal("failed to listen:", zap.Error(err))
 	}
