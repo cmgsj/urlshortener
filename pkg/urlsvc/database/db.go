@@ -14,35 +14,34 @@ var (
 	ddl string
 )
 
-type (
-	DB struct {
-		sqlc.Querier
-		q  *sqlc.Queries
-		db *sql.DB
-	}
-	Options struct {
-		Driver  string
-		URI     string
-		Migrate bool
-	}
-)
+type DB struct {
+	Query sqlc.Querier
+	qrs   *sqlc.Queries
+	db    *sql.DB
+}
+
+type Options struct {
+	Driver      string
+	ConnString  string
+	AutoMigrate bool
+}
 
 func New(opts Options) (*DB, error) {
-	db, err := sql.Open(opts.Driver, opts.URI)
+	db, err := sql.Open(opts.Driver, opts.ConnString)
 	if err != nil {
 		return nil, err
 	}
 	ctx := context.Background()
-	if opts.Migrate {
+	if opts.AutoMigrate {
 		if _, err = db.ExecContext(ctx, ddl); err != nil {
 			return nil, err
 		}
 	}
-	queries, err := sqlc.Prepare(ctx, db)
+	q, err := sqlc.Prepare(ctx, db)
 	if err != nil {
 		return nil, err
 	}
-	return &DB{Querier: queries, q: queries, db: db}, nil
+	return &DB{Query: q, qrs: q, db: db}, nil
 }
 
 func Must(db *DB, err error) *DB {
@@ -52,20 +51,41 @@ func Must(db *DB, err error) *DB {
 	return db
 }
 
+func (db *DB) Ping(ctx context.Context) error {
+	return db.db.PingContext(ctx)
+}
+
 type TxFunc func(sqlc.Querier) error
 
 func (db *DB) ExecTx(ctx context.Context, txFunc TxFunc) error {
-	tx, err := db.db.BeginTx(ctx, nil)
+	tx, err := db.BeginTx(ctx)
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
-	if err = txFunc(db.q.WithTx(tx)); err != nil {
+	if err = txFunc(tx.Query); err != nil {
 		return err
 	}
 	return tx.Commit()
 }
 
-func (db *DB) Ping(ctx context.Context) error {
-	return db.db.PingContext(ctx)
+func (db *DB) BeginTx(ctx context.Context) (*Tx, error) {
+	tx, err := db.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	return &Tx{Query: db.qrs.WithTx(tx), tx: tx}, nil
+}
+
+type Tx struct {
+	Query sqlc.Querier
+	tx    *sql.Tx
+}
+
+func (tx *Tx) Rollback() error {
+	return tx.tx.Rollback()
+}
+
+func (tx *Tx) Commit() error {
+	return tx.tx.Commit()
 }

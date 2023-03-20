@@ -37,7 +37,7 @@ func New(logger *zap.Logger, db *database.DB) *Service {
 }
 
 func (s *Service) GetUrl(ctx context.Context, req *urlv1.GetUrlRequest) (*urlv1.GetUrlResponse, error) {
-	u, err := s.DB.GetUrl(ctx, req.GetUrlId())
+	u, err := s.DB.Query.GetUrl(ctx, req.GetUrlId())
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}
@@ -56,7 +56,7 @@ func (s *Service) CreateUrl(ctx context.Context, req *urlv1.CreateUrlRequest) (*
 		UrlID:       urlId,
 		RedirectUrl: req.GetRedirectUrl(),
 	}
-	u, err := s.DB.CreateUrl(ctx, param)
+	u, err := s.DB.Query.CreateUrl(ctx, param)
 	if err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
@@ -71,14 +71,14 @@ func (s *Service) UpdateUrl(ctx context.Context, req *urlv1.UpdateUrlRequest) (*
 		UrlID:       req.GetUrl().GetUrlId(),
 		RedirectUrl: req.GetUrl().GetRedirectUrl(),
 	}
-	if err := s.DB.UpdateUrl(ctx, param); err != nil {
+	if err := s.DB.Query.UpdateUrl(ctx, param); err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
 	return &urlv1.UpdateUrlResponse{}, nil
 }
 
 func (s *Service) DeleteUrl(ctx context.Context, req *urlv1.DeleteUrlRequest) (*urlv1.DeleteUrlResponse, error) {
-	if err := s.DB.DeleteUrl(ctx, req.GetUrlId()); err != nil {
+	if err := s.DB.Query.DeleteUrl(ctx, req.GetUrlId()); err != nil {
 		return nil, ErrUrlNotFound
 	}
 	return &urlv1.DeleteUrlResponse{}, nil
@@ -91,7 +91,7 @@ func (s *Service) SeedDB(ctx context.Context) error {
 		{UrlID: "abcdef03", RedirectUrl: "https://www.apple.com"},
 	}
 	for _, param := range params {
-		if _, err := s.DB.CreateUrl(ctx, param); err != nil {
+		if _, err := s.DB.Query.CreateUrl(ctx, param); err != nil {
 			return err
 		}
 	}

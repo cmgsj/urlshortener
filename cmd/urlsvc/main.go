@@ -20,9 +20,9 @@ func main() {
 		urlDbUri   = os.Getenv("URL_DB_URI")
 		logger     = zap.Must(zap.NewDevelopment())
 		opts       = database.Options{
-			Driver:  "sqlite3",
-			URI:     urlDbUri,
-			Migrate: true,
+			Driver:      "sqlite3",
+			ConnString:  urlDbUri,
+			AutoMigrate: true,
 		}
 		db  = database.Must(database.New(opts))
 		svc = urlsvc.New(logger, db)
