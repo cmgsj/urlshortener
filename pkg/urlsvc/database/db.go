@@ -9,64 +9,55 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type DB interface {
-	sqlc.Querier
-	Ping(context.Context) error
-	ExecTx(context.Context, TxFunc) error
-	BeginTx(context.Context) (Tx, error)
-}
+var (
+	//go:embed sql/v1/schema/schema.sql
+	ddl string
+)
 
-type Tx interface {
-	sqlc.Querier
-	Rollback() error
-	Commit() error
-}
-
-var _ DB = (*dbImpl)(nil)
-
-type dbImpl struct {
-	sqlc.Querier
-	qrs *sqlc.Queries
-	db  *sql.DB
-}
-
-func (db *dbImpl) Ping(ctx context.Context) error {
-	return db.db.PingContext(ctx)
-}
-
-type TxFunc func(sqlc.Querier) error
-
-func (db *dbImpl) ExecTx(ctx context.Context, txFunc TxFunc) error {
-	tx, err := db.BeginTx(ctx)
-	if err != nil {
-		return err
+type (
+	DB interface {
+		sqlc.Querier
+		Ping(context.Context) error
+		ExecTx(context.Context, TxFunc) error
+		BeginTx(context.Context) (Tx, error)
 	}
-	defer tx.Rollback()
-	if err = txFunc(tx); err != nil {
-		return err
-	}
-	return tx.Commit()
-}
 
-func (db *dbImpl) BeginTx(ctx context.Context) (Tx, error) {
-	tx, err := db.db.BeginTx(ctx, nil)
+	Tx interface {
+		sqlc.Querier
+		Rollback() error
+		Commit() error
+	}
+
+	TxFunc func(sqlc.Querier) error
+
+	Options struct {
+		Driver      string
+		ConnString  string
+		AutoMigrate bool
+	}
+)
+
+func New(opts Options) (DB, error) {
+	db, err := sql.Open(opts.Driver, opts.ConnString)
 	if err != nil {
 		return nil, err
 	}
-	return &txImpl{Querier: db.qrs.WithTx(tx), tx: tx}, nil
+	ctx := context.Background()
+	if opts.AutoMigrate {
+		if _, err = db.ExecContext(ctx, ddl); err != nil {
+			return nil, err
+		}
+	}
+	q, err := sqlc.Prepare(ctx, db)
+	if err != nil {
+		return nil, err
+	}
+	return newDBImpl(q, db), nil
 }
 
-var _ Tx = (*txImpl)(nil)
-
-type txImpl struct {
-	sqlc.Querier
-	tx *sql.Tx
-}
-
-func (tx *txImpl) Rollback() error {
-	return tx.tx.Rollback()
-}
-
-func (tx *txImpl) Commit() error {
-	return tx.tx.Commit()
+func Must(db DB, err error) DB {
+	if err != nil {
+		panic(err)
+	}
+	return db
 }
