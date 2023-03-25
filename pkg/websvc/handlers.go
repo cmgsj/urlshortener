@@ -19,6 +19,7 @@ var (
 )
 
 // Pong
+//
 //	@Summary		Ping the server
 //	@ID				ping
 //	@Tags			ping
@@ -32,6 +33,7 @@ func (s *Service) Pong(c *gin.Context) {
 }
 
 // RedirectToUrl
+//
 //	@Summary		Redirect to url
 //	@ID				redirect-url
 //	@Tags			url
@@ -46,6 +48,7 @@ func (s *Service) RedirectToUrl(c *gin.Context) {
 }
 
 // GetUrl
+//
 //	@Summary		Get url
 //	@ID				get-url
 //	@Tags			url
@@ -62,6 +65,7 @@ func (s *Service) GetUrl(c *gin.Context) {
 }
 
 // PostUrl
+//
 //	@Summary		Create a new url redirect
 //	@ID				create-url
 //	@Tags			url

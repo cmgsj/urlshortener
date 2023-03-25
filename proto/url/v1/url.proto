@@ -4,16 +4,47 @@ package url;
 
 option go_package = "github.com/cmgsj/urlshortener/pkg/gen/proto/url/v1;url";
 	
+import "proto/google/api/annotations.proto";
+
 service UrlService {
-	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse) {}
-	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse) {}
-	rpc UpdateUrl(UpdateUrlRequest) returns (UpdateUrlResponse) {}
-	rpc DeleteUrl(DeleteUrlRequest) returns (DeleteUrlResponse) {}
+	rpc ListUrls(ListUrlsRequest) returns (ListUrlsResponse) {
+		option (google.api.http) = {
+			get: "/v1/url"
+		};
+	}
+	rpc GetUrl(GetUrlRequest) returns (GetUrlResponse) {
+		option (google.api.http) = {
+			get: "/v1/url/{urlId}"
+		};
+	}
+	rpc CreateUrl(CreateUrlRequest) returns (CreateUrlResponse) {
+		option (google.api.http) = {
+			post: "/v1/url"
+			body: "*"
+		};
+	}
+	rpc UpdateUrl(UpdateUrlRequest) returns (UpdateUrlResponse) {
+		option (google.api.http) = {
+			put: "/v1/url/{url.urlId}"
+			body: "*"
+		};
+	}
+	rpc DeleteUrl(DeleteUrlRequest) returns (DeleteUrlResponse) {
+		option (google.api.http) = {
+			delete: "/v1/url/{urlId}"
+		};
+	}
 }
 
 message Url {
 	string urlId = 1;
 	string redirectUrl = 2;
+}
+
+message ListUrlsRequest {}
+
+message ListUrlsResponse {
+	repeated Url urls = 1;
 }
 
 message GetUrlRequest {

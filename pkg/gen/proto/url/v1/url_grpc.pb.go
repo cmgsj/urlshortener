@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+	UrlService_ListUrls_FullMethodName  = "/url.UrlService/ListUrls"
 	UrlService_GetUrl_FullMethodName    = "/url.UrlService/GetUrl"
 	UrlService_CreateUrl_FullMethodName = "/url.UrlService/CreateUrl"
 	UrlService_UpdateUrl_FullMethodName = "/url.UrlService/UpdateUrl"
@@ -29,6 +30,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UrlServiceClient interface {
+	ListUrls(ctx context.Context, in *ListUrlsRequest, opts ...grpc.CallOption) (*ListUrlsResponse, error)
 	GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error)
 	CreateUrl(ctx context.Context, in *CreateUrlRequest, opts ...grpc.CallOption) (*CreateUrlResponse, error)
 	UpdateUrl(ctx context.Context, in *UpdateUrlRequest, opts ...grpc.CallOption) (*UpdateUrlResponse, error)
@@ -41,6 +43,15 @@ type urlServiceClient struct {
 
 func NewUrlServiceClient(cc grpc.ClientConnInterface) UrlServiceClient {
 	return &urlServiceClient{cc}
+}
+
+func (c *urlServiceClient) ListUrls(ctx context.Context, in *ListUrlsRequest, opts ...grpc.CallOption) (*ListUrlsResponse, error) {
+	out := new(ListUrlsResponse)
+	err := c.cc.Invoke(ctx, UrlService_ListUrls_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *urlServiceClient) GetUrl(ctx context.Context, in *GetUrlRequest, opts ...grpc.CallOption) (*GetUrlResponse, error) {
@@ -83,6 +94,7 @@ func (c *urlServiceClient) DeleteUrl(ctx context.Context, in *DeleteUrlRequest, 
 // All implementations must embed UnimplementedUrlServiceServer
 // for forward compatibility
 type UrlServiceServer interface {
+	ListUrls(context.Context, *ListUrlsRequest) (*ListUrlsResponse, error)
 	GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error)
 	CreateUrl(context.Context, *CreateUrlRequest) (*CreateUrlResponse, error)
 	UpdateUrl(context.Context, *UpdateUrlRequest) (*UpdateUrlResponse, error)
@@ -94,6 +106,9 @@ type UrlServiceServer interface {
 type UnimplementedUrlServiceServer struct {
 }
 
+func (UnimplementedUrlServiceServer) ListUrls(context.Context, *ListUrlsRequest) (*ListUrlsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUrls not implemented")
+}
 func (UnimplementedUrlServiceServer) GetUrl(context.Context, *GetUrlRequest) (*GetUrlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUrl not implemented")
 }
@@ -117,6 +132,24 @@ type UnsafeUrlServiceServer interface {
 
 func RegisterUrlServiceServer(s grpc.ServiceRegistrar, srv UrlServiceServer) {
 	s.RegisterService(&UrlService_ServiceDesc, srv)
+}
+
+func _UrlService_ListUrls_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUrlsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UrlServiceServer).ListUrls(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UrlService_ListUrls_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UrlServiceServer).ListUrls(ctx, req.(*ListUrlsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _UrlService_GetUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -198,6 +231,10 @@ var UrlService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "url.UrlService",
 	HandlerType: (*UrlServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "ListUrls",
+			Handler:    _UrlService_ListUrls_Handler,
+		},
 		{
 			MethodName: "GetUrl",
 			Handler:    _UrlService_GetUrl_Handler,

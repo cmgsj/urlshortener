@@ -30,7 +30,7 @@ func (db *dbImpl) ExecTx(ctx context.Context, txFunc TxFunc) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 	if err = txFunc(tx); err != nil {
 		return err
 	}

@@ -24,7 +24,7 @@ var (
 )
 
 type Service struct {
-	urlv1.UnimplementedUrlServiceServer
+	*urlv1.UnimplementedUrlServiceServer
 	Logger *zap.Logger
 	DB     database.DB
 }
@@ -34,6 +34,22 @@ func New(logger *zap.Logger, db database.DB) *Service {
 		Logger: logger,
 		DB:     db,
 	}
+}
+
+func (s *Service) ListUrls(ctx context.Context, req *urlv1.ListUrlsRequest) (*urlv1.ListUrlsResponse, error) {
+	urls, err := s.DB.ListUrls(ctx)
+	if err != nil {
+		return nil, ErrInternal
+	}
+	urlsv1 := make([]*urlv1.Url, 0, len(urls))
+	for _, u := range urls {
+		uv1 := &urlv1.Url{
+			UrlId:       u.UrlID,
+			RedirectUrl: u.RedirectUrl,
+		}
+		urlsv1 = append(urlsv1, uv1)
+	}
+	return &urlv1.ListUrlsResponse{Urls: urlsv1}, nil
 }
 
 func (s *Service) GetUrl(ctx context.Context, req *urlv1.GetUrlRequest) (*urlv1.GetUrlResponse, error) {

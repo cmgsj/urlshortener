@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"time"
 
+	"github.com/cmgsj/go-env/env"
 	urlv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/url/v1"
 	"github.com/cmgsj/urlshortener/pkg/websvc"
 	_ "github.com/cmgsj/urlshortener/pkg/websvc/docs"
@@ -16,14 +16,15 @@ import (
 
 func main() {
 	var (
-		logger             = zap.Must(zap.NewDevelopment())
-		apiSvcPort         = os.Getenv("WEB_SVC_PORT")
-		apiSvcUrl          = os.Getenv("WEB_SVC_URL")
-		apiSvcCacheTimeout = os.Getenv("WEB_SVC_CACHE_TIMEOUT")
-		redisAddr          = os.Getenv("REDIS_URL")
-		redisPassword      = os.Getenv("REDIS_PASSWORD")
-		redisDb            = os.Getenv("REDIS_DB")
-		urlSvcAddr         = os.Getenv("URL_SVC_ADDR")
+		logger = zap.Must(zap.NewDevelopment())
+		// TODO:  change to env.GetDefault()
+		apiSvcPort         = env.MustGet("WEB_SVC_PORT")
+		apiSvcUrl          = env.MustGet("WEB_SVC_URL")
+		apiSvcCacheTimeout = env.MustGet("WEB_SVC_CACHE_TIMEOUT")
+		redisAddr          = env.MustGet("REDIS_URL")
+		redisPassword      = env.MustGet("REDIS_PASSWORD")
+		redisDb            = env.MustGet("REDIS_DB")
+		urlSvcAddr         = env.MustGet("URL_SVC_ADDR")
 	)
 
 	urlConn, err := grpc.Dial(urlSvcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
