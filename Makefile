@@ -3,18 +3,26 @@ default:
 
 minikube: 
 	minikube start --driver=docker
-	make docker_build
-	kubectl apply -f k8s
-	minikube service web-service --url
 
-docker_build: build
+kube: docker_build
+	kubectl apply -f k8s
+	kubens urlshortener
+
+kube_port_forward:
+	kubectl port-forward service/web-service 8080:8080
+
+kube_delete:
+	kubens default
+	kubectl delete -f k8s
+
+docker_build: gen
 	eval $$(minikube -p minikube docker-env)
 	docker build -t cmg/web-svc -f cmd/websvc/Dockerfile .
 	docker build -t cmg/url-svc -f cmd/urlsvc/Dockerfile .
 
 build: gen
-	GOOS=linux go build -o bin ./cmd/websvc
-	CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOARCH=amd64 GOOS=linux CGO_ENABLED=1 go build -ldflags "-linkmode external -extldflags -static" -o bin ./cmd/urlsvc
+	go build -o bin ./cmd/websvc
+	go build -o bin ./cmd/urlsvc
 
 install_tools:
 	grep _ pkg/tools/tools.go | awk -F'"' '{print $$2}' | xargs -tI % go install %

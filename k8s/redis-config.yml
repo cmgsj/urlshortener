@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  namespace: urlshortener
   name: redis-config
 data:
   redis-svc-url: redis-service:6379

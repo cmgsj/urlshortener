@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  namespace: urlshortener
   name: url-config
 data:
   url-svc-url: url-service:8080
