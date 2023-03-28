@@ -55,7 +55,7 @@ func main() {
 	svc.RegisterEndpoints()
 	svc.RegisterTrustedProxies()
 
-	svc.Logger.Info("starting", zap.String("service", "web-svc"), zap.String("port", apiSvcPort))
+	svc.Logger.Info("starting grpc server", zap.String("service", "web-svc"), zap.String("port", apiSvcPort))
 	svc.Logger.Info(fmt.Sprintf("swagger docs available at http://%s/docs/index.html", svc.Addr))
 
 	if err := svc.Router.Run(":" + apiSvcPort); err != nil {

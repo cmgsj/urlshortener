@@ -52,15 +52,15 @@ func main() {
 		svc.Logger.Fatal("failed to listen:", zap.Error(err))
 	}
 
-	go serveHTTP(logger, urlSvcHttpPort, urlSvcGrpcPort)
+	go runHTTPServer(logger, urlSvcHttpPort, urlSvcGrpcPort)
 
-	svc.Logger.Info("starting", zap.String("service", "url-svc"), zap.String("address", lis.Addr().String()))
+	svc.Logger.Info("starting grpc server", zap.String("service", "url-svc"), zap.String("address", lis.Addr().String()))
 	if err := grpcServer.Serve(lis); err != nil {
 		svc.Logger.Fatal("failed to serve:", zap.Error(err))
 	}
 }
 
-func serveHTTP(logger *zap.Logger, httpPort, grpcPort string) {
+func runHTTPServer(logger *zap.Logger, httpPort, grpcPort string) {
 	conn, err := grpc.Dial(":"+grpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("failed to dial grpc", zap.String("port", grpcPort), zap.Error(err))
@@ -76,12 +76,13 @@ func serveHTTP(logger *zap.Logger, httpPort, grpcPort string) {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", rmux)
+	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("./swagger-ui"))))
 	mux.Handle("/swagger-ui/swagger.json", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "pkg/gen/proto/url/v1/url.swagger.json")
 	}))
-	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("./swagger-ui"))))
 
+	logger.Info("starting http server", zap.String("service", "url-svc"), zap.String("port", httpPort))
 	if err = http.ListenAndServe(":"+httpPort, mux); err != nil {
-		logger.Fatal("failed to serve http", zap.String("port", grpcPort), zap.Error(err))
+		logger.Fatal("failed to serve http", zap.String("port", httpPort), zap.Error(err))
 	}
 }
