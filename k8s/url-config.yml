@@ -4,6 +4,6 @@ metadata:
   namespace: urlshortener
   name: url-config
 data:
-  url-svc-url: url-service:8080
-  # url-db-uri: db.sqlite
-  url-db-uri: ":memory:"
+  URL_SVC_PORT: "9090"
+  URL_SVC_HTTP_PORT: "8080"
+  URL_DB_URI: ":memory:"

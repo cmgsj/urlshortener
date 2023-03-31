@@ -16,8 +16,7 @@ import (
 
 func main() {
 	var (
-		logger = zap.Must(zap.NewDevelopment())
-		// TODO:  change to env.GetDefault()
+		logger             = zap.Must(zap.NewDevelopment())
 		apiSvcPort         = env.MustGet("WEB_SVC_PORT")
 		apiSvcUrl          = env.MustGet("WEB_SVC_URL")
 		apiSvcCacheTimeout = env.MustGet("WEB_SVC_CACHE_TIMEOUT")
@@ -55,7 +54,7 @@ func main() {
 	svc.RegisterEndpoints()
 	svc.RegisterTrustedProxies()
 
-	svc.Logger.Info("starting grpc server", zap.String("service", "web-svc"), zap.String("port", apiSvcPort))
+	svc.Logger.Info("starting http server", zap.String("service", "web-svc"), zap.String("port", apiSvcPort))
 	svc.Logger.Info(fmt.Sprintf("swagger docs available at http://%s/docs/index.html", svc.Addr))
 
 	if err := svc.Router.Run(":" + apiSvcPort); err != nil {

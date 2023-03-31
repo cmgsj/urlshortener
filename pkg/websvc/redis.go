@@ -3,7 +3,6 @@ package websvc
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
@@ -23,8 +22,7 @@ func (s *Service) InitRedisDB(redisAddr string, redisPassword string, redisDb in
 }
 
 func (s *Service) getFromCache(key string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	ctx := context.Background()
 	value, err := s.RedisDb.Get(ctx, key).Result()
 	if err != nil {
 		if !errors.Is(err, redis.Nil) {
@@ -36,8 +34,7 @@ func (s *Service) getFromCache(key string) (string, error) {
 }
 
 func (s *Service) putInCache(key string, value string) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	ctx := context.Background()
 	if err := s.RedisDb.Set(ctx, key, value, s.CacheTimeout).Err(); err != nil {
 		s.Logger.Error("failed to set cache", zap.Error(err))
 	}

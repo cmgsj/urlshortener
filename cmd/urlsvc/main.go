@@ -21,9 +21,9 @@ import (
 func main() {
 	var (
 		logger         = zap.Must(zap.NewDevelopment())
-		urlSvcGrpcPort = env.GetDefault("URL_SVC_PORT", "9090")
-		urlSvcHttpPort = env.GetDefault("URL_SVC_HTTP_PORT", "8080")
-		urlDbUri       = env.GetDefault("URL_DB_URI", ":memory:")
+		urlSvcGrpcPort = env.MustGet("URL_SVC_PORT")
+		urlSvcHttpPort = env.MustGet("URL_SVC_HTTP_PORT")
+		urlDbUri       = env.MustGet("URL_DB_URI")
 
 		opts = database.Options{
 			Driver:      "sqlite3",
@@ -54,16 +54,16 @@ func main() {
 
 	go runHTTPServer(logger, urlSvcHttpPort, urlSvcGrpcPort)
 
-	svc.Logger.Info("starting grpc server", zap.String("service", "url-svc"), zap.String("address", lis.Addr().String()))
+	svc.Logger.Info("starting grpc server", zap.String("service", "url-svc"), zap.String("port", urlSvcGrpcPort))
 	if err := grpcServer.Serve(lis); err != nil {
 		svc.Logger.Fatal("failed to serve:", zap.Error(err))
 	}
 }
 
-func runHTTPServer(logger *zap.Logger, httpPort, grpcPort string) {
-	conn, err := grpc.Dial(":"+grpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
+func runHTTPServer(logger *zap.Logger, urlSvcGrpcPort, urlSvcHttpPort string) {
+	conn, err := grpc.Dial(":"+urlSvcGrpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		logger.Fatal("failed to dial grpc", zap.String("port", grpcPort), zap.Error(err))
+		logger.Fatal("failed to dial grpc", zap.String("port", urlSvcGrpcPort), zap.Error(err))
 	}
 	defer conn.Close()
 
@@ -77,12 +77,10 @@ func runHTTPServer(logger *zap.Logger, httpPort, grpcPort string) {
 	mux := http.NewServeMux()
 	mux.Handle("/", rmux)
 	mux.Handle("/swagger-ui/", http.StripPrefix("/swagger-ui/", http.FileServer(http.Dir("./swagger-ui"))))
-	mux.Handle("/swagger-ui/swagger.json", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "pkg/gen/proto/url/v1/url.swagger.json")
-	}))
+	mux.Handle("/swagger-ui/swagger.json", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { http.ServeFile(w, r, "./swagger.json") }))
 
-	logger.Info("starting http server", zap.String("service", "url-svc"), zap.String("port", httpPort))
-	if err = http.ListenAndServe(":"+httpPort, mux); err != nil {
-		logger.Fatal("failed to serve http", zap.String("port", httpPort), zap.Error(err))
+	logger.Info("starting http server", zap.String("service", "url-svc"), zap.String("port", urlSvcHttpPort))
+	if err = http.ListenAndServe(":"+urlSvcHttpPort, mux); err != nil {
+		logger.Fatal("failed to serve http", zap.String("port", urlSvcHttpPort), zap.Error(err))
 	}
 }

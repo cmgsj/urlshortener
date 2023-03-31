@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
 	urlv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/url/v1"
 	"github.com/gin-gonic/gin"
@@ -83,8 +82,7 @@ func (s *Service) PostUrl(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	ctx := context.Background()
 	urlRes, err := s.UrlClient.CreateUrl(ctx, &urlv1.CreateUrlRequest{RedirectUrl: body.RedirectUrl})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
@@ -127,8 +125,7 @@ func (s *Service) getRedirectUrl(urlId string) (string, error) {
 	if redirectUrl, err := s.getFromCache(urlId); err == nil {
 		return redirectUrl, nil
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
+	ctx := context.Background()
 	urlRes, err := s.UrlClient.GetUrl(ctx, &urlv1.GetUrlRequest{UrlId: urlId})
 	if err != nil {
 		return "", err

@@ -28,39 +28,13 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "500m"
-          env:
-            - name: WEB_SVC_PORT
-              value: "8080"
-            - name: WEB_SVC_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: web-config
-                  key: web-svc-url
-            - name: WEB_SVC_CACHE_TIMEOUT
-              valueFrom:
-                configMapKeyRef:
-                  name: web-config
-                  key: web-svc-cache-timeout
-            - name: REDIS_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: redis-config
-                  key: redis-svc-url
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: redis-secret
-                  key: redis-password
-            - name: REDIS_DB
-              valueFrom:
-                configMapKeyRef:
-                  name: redis-config
-                  key: redis-db
-            - name: URL_SVC_ADDR
-              valueFrom:
-                configMapKeyRef:
-                  name: url-config
-                  key: url-svc-url
+          envFrom:
+            - configMapRef:
+                name: web-config
+            - configMapRef:
+                name: redis-config
+            - secretRef:
+                name: redis-secret
 
 ---
 apiVersion: v1
@@ -76,4 +50,4 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-      nodePort: 30000
+      nodePort: 30003

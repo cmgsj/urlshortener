@@ -32,11 +32,11 @@ spec:
           env:
             - name: MASTER
               value: "true"
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: redis-secret
-                  key: redis-password
+          envFrom:
+            - configMapRef:
+                name: redis-config
+            - secretRef:
+                name: redis-secret
           volumeMounts:
             - mountPath: /redis-master-data
               name: data
@@ -49,7 +49,7 @@ spec:
           configMap:
             name: redis-config
             items:
-              - key: redis-config
+              - key: REDIS_CONFIG
                 path: redis.conf
 
 ---
