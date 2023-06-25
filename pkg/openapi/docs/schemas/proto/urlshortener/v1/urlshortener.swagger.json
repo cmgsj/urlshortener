@@ -1,0 +1,261 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "proto/urlshortener/v1/urlshortener.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "URLShortener"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/url": {
+      "get": {
+        "operationId": "URLShortener_ListURLs",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListURLsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "URLShortener"
+        ]
+      },
+      "post": {
+        "operationId": "URLShortener_CreateURL",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateURLResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateURLRequest"
+            }
+          }
+        ],
+        "tags": [
+          "URLShortener"
+        ]
+      }
+    },
+    "/api/v1/url/{url.urlId}": {
+      "put": {
+        "operationId": "URLShortener_UpdateURL",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateURLResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "url.urlId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "object",
+                  "properties": {
+                    "redirectURL": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "URLShortener"
+        ]
+      }
+    },
+    "/api/v1/url/{urlId}": {
+      "get": {
+        "operationId": "URLShortener_GetURL",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetURLResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "urlId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "URLShortener"
+        ]
+      },
+      "delete": {
+        "operationId": "URLShortener_DeleteURL",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteURLResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "urlId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "URLShortener"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateURLRequest": {
+      "type": "object",
+      "properties": {
+        "redirectURL": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateURLResponse": {
+      "type": "object",
+      "properties": {
+        "urlId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1DeleteURLResponse": {
+      "type": "object"
+    },
+    "v1GetURLResponse": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "$ref": "#/definitions/v1URL"
+        }
+      }
+    },
+    "v1ListURLsResponse": {
+      "type": "object",
+      "properties": {
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1URL"
+          }
+        }
+      }
+    },
+    "v1URL": {
+      "type": "object",
+      "properties": {
+        "urlId": {
+          "type": "string"
+        },
+        "redirectURL": {
+          "type": "string"
+        }
+      }
+    },
+    "v1UpdateURLResponse": {
+      "type": "object"
+    }
+  }
+}
