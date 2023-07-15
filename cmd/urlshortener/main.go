@@ -48,7 +48,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", rmux)
-	mux.Handle("/r", svc.RedirectURL("/r"))
+	mux.Handle("/r/", http.StripPrefix("/r/", svc.RedirectURL()))
 	mux.Handle("/docs/", http.FileServer(http.FS(openapi.Docs())))
 
 	go func() {

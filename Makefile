@@ -19,5 +19,6 @@ clean:
 
 # minikube start --driver=docker
 # minikube addons enable ingress
-# minikube -n urlshortener service urlshortener --url
+# minikube addons enable ingress-dns
+# minikube -n urlshortener service urlshortener
 # minikube stop

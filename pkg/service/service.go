@@ -90,15 +90,15 @@ func (s *Service) DeleteURL(ctx context.Context, req *urlshortenerv1.DeleteURLRe
 	return &urlshortenerv1.DeleteURLResponse{}, nil
 }
 
-func (s *Service) RedirectURL(prefix string) http.Handler {
-	return http.StripPrefix(prefix, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (s *Service) RedirectURL() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		u, err := s.DB.GetUrl(r.Context(), strings.TrimPrefix(r.URL.Path, "/"))
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
 		http.Redirect(w, r, u.RedirectUrl, http.StatusMovedPermanently)
-	}))
+	})
 }
 
 func (s *Service) SeedDB(ctx context.Context) error {
