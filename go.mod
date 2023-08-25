@@ -1,10 +1,11 @@
 module github.com/cmgsj/urlshortener
 
-go 1.20
+go 1.21.0
 
 require (
 	github.com/bufbuild/buf v1.22.0
 	github.com/cmgsj/go-env v1.0.1
+	github.com/cmgsj/go-lib v0.0.4
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
 	github.com/kyleconroy/sqlc v1.18.0
 	github.com/mattn/go-sqlite3 v1.14.17

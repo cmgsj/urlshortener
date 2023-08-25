@@ -3,13 +3,12 @@ package main
 import (
 	"context"
 	"net"
-
 	"net/http"
 
 	"github.com/cmgsj/go-env/env"
+	"github.com/cmgsj/go-lib/openapi"
 	"github.com/cmgsj/urlshortener/pkg/database"
 	urlshortenerv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/urlshortener/v1"
-	"github.com/cmgsj/urlshortener/pkg/openapi"
 	"github.com/cmgsj/urlshortener/pkg/service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -49,7 +48,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/", rmux)
 	mux.Handle("/r/", http.StripPrefix("/r/", svc.RedirectURL()))
-	mux.Handle("/docs/", http.FileServer(http.FS(openapi.Docs())))
+	mux.Handle("/docs/", openapi.ServeDocs())
 
 	go func() {
 		hl, err := net.Listen("tcp", httpAddr)

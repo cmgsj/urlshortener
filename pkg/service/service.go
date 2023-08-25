@@ -22,6 +22,8 @@ var (
 	ErrInternal         = status.Error(codes.Internal, "internal error")
 
 	UrlIdLength = 8
+
+	ServiceName = urlshortenerv1.URLShortener_ServiceDesc.ServiceName
 )
 
 type Service struct {

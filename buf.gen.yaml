@@ -13,5 +13,3 @@ plugins:
       - paths=source_relative
   - name: openapiv2
     out: pkg/gen
-  - name: openapiv2
-    out: pkg/openapi/docs/schemas

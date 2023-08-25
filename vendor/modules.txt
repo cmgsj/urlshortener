@@ -219,6 +219,9 @@ github.com/bytecodealliance/wasmtime-go/v8/build/windows-x86_64
 # github.com/cmgsj/go-env v1.0.1
 ## explicit; go 1.20
 github.com/cmgsj/go-env/env
+# github.com/cmgsj/go-lib v0.0.4
+## explicit; go 1.21.0
+github.com/cmgsj/go-lib/openapi
 # github.com/containerd/stargz-snapshotter/estargz v0.14.3
 ## explicit; go 1.19
 github.com/containerd/stargz-snapshotter/estargz
