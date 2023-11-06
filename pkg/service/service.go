@@ -127,5 +127,8 @@ func generateUrlId(n int) (string, error) {
 
 func isValidUrl(s string) bool {
 	_, err := url.ParseRequestURI(s)
-	return err == nil
+	if err != nil {
+		return false
+	}
+	return true
 }
