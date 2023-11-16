@@ -6,7 +6,6 @@ import (
 	_ "embed"
 
 	sqlc "github.com/cmgsj/urlshortener/pkg/gen/sqlc/urls/v1"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 var _ DB = (*dbImpl)(nil)

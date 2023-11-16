@@ -8,8 +8,7 @@ build: gen
 
 gen:
 	sqlc generate -f sqlc.yaml
-	buf generate --exclude-path vendor
-	cp pkg/gen/proto/urlshortener/v1/urlshortener.swagger.json pkg/service
+	buf format -w && buf generate
 
 install_tools:
 	grep _ pkg/tools/tools.go | awk -F'"' '{print $$2}' | xargs -tI % go install %

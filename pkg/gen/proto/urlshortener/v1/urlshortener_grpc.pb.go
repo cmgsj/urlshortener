@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: proto/urlshortener/v1/urlshortener.proto
+// source: urlshortener/v1/urlshortener.proto
 
 package urlshortenerv1
 
@@ -253,5 +253,5 @@ var URLShortener_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/urlshortener/v1/urlshortener.proto",
+	Metadata: "urlshortener/v1/urlshortener.proto",
 }

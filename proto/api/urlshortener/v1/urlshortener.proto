@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package urlshortener.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "urlshortenerv1";
+
+service URLShortener {
+  rpc ListURLs(ListURLsRequest) returns (ListURLsResponse) {
+    option (google.api.http) = {get: "/api/v1/url"};
+  }
+  rpc GetURL(GetURLRequest) returns (GetURLResponse) {
+    option (google.api.http) = {get: "/api/v1/url/{urlId}"};
+  }
+  rpc CreateURL(CreateURLRequest) returns (CreateURLResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/url"
+      body: "*"
+    };
+  }
+  rpc UpdateURL(UpdateURLRequest) returns (UpdateURLResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/url/{url.urlId}"
+      body: "*"
+    };
+  }
+  rpc DeleteURL(DeleteURLRequest) returns (DeleteURLResponse) {
+    option (google.api.http) = {delete: "/api/v1/url/{urlId}"};
+  }
+}
+
+message URL {
+  string urlId = 1;
+  string redirectURL = 2;
+}
+
+message ListURLsRequest {}
+
+message ListURLsResponse {
+  repeated URL urls = 1;
+}
+
+message GetURLRequest {
+  string urlId = 1;
+}
+
+message GetURLResponse {
+  URL url = 1;
+}
+
+message CreateURLRequest {
+  string redirectURL = 1;
+}
+
+message CreateURLResponse {
+  string urlId = 1;
+}
+
+message UpdateURLRequest {
+  URL url = 1;
+}
+
+message UpdateURLResponse {}
+
+message DeleteURLRequest {
+  string urlId = 1;
+}
+
+message DeleteURLResponse {}

@@ -8,11 +8,14 @@ import (
 	"github.com/cmgsj/go-env/env"
 	"github.com/cmgsj/go-lib/openapi"
 	"github.com/cmgsj/urlshortener/pkg/database"
+	"github.com/cmgsj/urlshortener/pkg/docs"
 	urlshortenerv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/urlshortener/v1"
 	"github.com/cmgsj/urlshortener/pkg/service"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/health"
+	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -33,8 +36,12 @@ func main() {
 	err := svc.SeedDB(context.Background())
 	check(err)
 
+	hs := health.NewServer()
+	hs.SetServingStatus(service.ServiceName, healthv1.HealthCheckResponse_SERVING)
+
 	gs := grpc.NewServer()
 	reflection.Register(gs)
+	healthv1.RegisterHealthServer(gs, hs)
 	urlshortenerv1.RegisterURLShortenerServer(gs, svc)
 
 	rmux := runtime.NewServeMux()
@@ -48,7 +55,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/", rmux)
 	mux.Handle("/r/", http.StripPrefix("/r/", svc.RedirectURL()))
-	mux.Handle("/docs/", openapi.ServeDocs())
+	mux.Handle("/docs/", openapi.ServeDocs("/docs/", docs.OpenapiSchema()))
 
 	go func() {
 		hl, err := net.Listen("tcp", httpAddr)
