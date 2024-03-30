@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/cmgsj/vendor
+name: buf.build/cmgsj/urlshortener
 breaking:
   use:
     - FILE
