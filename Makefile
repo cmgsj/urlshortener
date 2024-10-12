@@ -19,7 +19,6 @@ test:
 
 .PHONY: docker
 docker:
-	@CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -ldflags "-s -w -linkmode=external -extldflags='-static'" -o bin/urlshortener ./cmd/urlshortener
 	@eval $$(minikube -p minikube docker-env) && docker build -t cmg/urlshortener:latest .
 
 # minikube start --driver=docker
