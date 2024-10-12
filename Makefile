@@ -25,6 +25,7 @@ docker:
 # minikube start --driver=docker
 # minikube addons enable ingress
 # minikube addons enable ingress-dns
+# kubectl delete -f k8s
 # kubectl apply -f k8s
 # minikube -n urlshortener service urlshortener
 # minikube stop

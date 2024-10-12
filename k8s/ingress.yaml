@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: short.url
+    - host: urlshortener
       http:
         paths:
           - path: "/"
