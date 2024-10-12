@@ -8,11 +8,12 @@ import (
 	"net/url"
 	"strings"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/cmgsj/urlshortener/pkg/database"
 	urlshortenerv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/urlshortener/v1"
 	urlsv1 "github.com/cmgsj/urlshortener/pkg/gen/sqlc/urls/v1"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var (
@@ -40,7 +41,7 @@ func (s *Service) ListURLs(ctx context.Context, req *urlshortenerv1.ListURLsRequ
 	for i, u := range urls {
 		urlsv1[i] = &urlshortenerv1.URL{
 			UrlId:       u.UrlID,
-			RedirectURL: u.RedirectUrl,
+			RedirectUrl: u.RedirectUrl,
 		}
 	}
 	return &urlshortenerv1.ListURLsResponse{Urls: urlsv1}, nil
@@ -51,7 +52,7 @@ func (s *Service) GetURL(ctx context.Context, req *urlshortenerv1.GetURLRequest)
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}
-	return &urlshortenerv1.GetURLResponse{Url: &urlshortenerv1.URL{UrlId: u.UrlID, RedirectURL: u.RedirectUrl}}, nil
+	return &urlshortenerv1.GetURLResponse{Url: &urlshortenerv1.URL{UrlId: u.UrlID, RedirectUrl: u.RedirectUrl}}, nil
 }
 
 func (s *Service) CreateURL(ctx context.Context, req *urlshortenerv1.CreateURLRequest) (*urlshortenerv1.CreateURLResponse, error) {
@@ -59,12 +60,12 @@ func (s *Service) CreateURL(ctx context.Context, req *urlshortenerv1.CreateURLRe
 	if err != nil {
 		return nil, ErrInternal
 	}
-	if !isValidUrl(req.GetRedirectURL()) {
+	if !isValidUrl(req.GetRedirectUrl()) {
 		return nil, ErrInvalidUrl
 	}
 	u, err := s.DB.CreateUrl(ctx, urlsv1.CreateUrlParams{
 		UrlID:       urlId,
-		RedirectUrl: req.GetRedirectURL(),
+		RedirectUrl: req.GetRedirectUrl(),
 	})
 	if err != nil {
 		return nil, ErrUrlAlreadyExists
@@ -73,12 +74,12 @@ func (s *Service) CreateURL(ctx context.Context, req *urlshortenerv1.CreateURLRe
 }
 
 func (s *Service) UpdateURL(ctx context.Context, req *urlshortenerv1.UpdateURLRequest) (*urlshortenerv1.UpdateURLResponse, error) {
-	if !isValidUrl(req.GetUrl().GetRedirectURL()) {
+	if !isValidUrl(req.GetUrl().GetRedirectUrl()) {
 		return nil, ErrInvalidUrl
 	}
 	if err := s.DB.UpdateUrl(ctx, urlsv1.UpdateUrlParams{
 		UrlID:       req.GetUrl().GetUrlId(),
-		RedirectUrl: req.GetUrl().GetRedirectURL(),
+		RedirectUrl: req.GetUrl().GetRedirectUrl(),
 	}); err != nil {
 		return nil, ErrUrlAlreadyExists
 	}
@@ -92,7 +93,7 @@ func (s *Service) DeleteURL(ctx context.Context, req *urlshortenerv1.DeleteURLRe
 	return &urlshortenerv1.DeleteURLResponse{}, nil
 }
 
-func (s *Service) RedirectURL() http.Handler {
+func (s *Service) RedirectUrl() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		u, err := s.DB.GetUrl(r.Context(), strings.TrimPrefix(r.URL.Path, "/"))
 		if err != nil {
@@ -127,8 +128,5 @@ func generateUrlId(n int) (string, error) {
 
 func isValidUrl(s string) bool {
 	_, err := url.ParseRequestURI(s)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }

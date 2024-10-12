@@ -60,14 +60,14 @@ func request_URLShortener_GetURL_0(ctx context.Context, marshaler runtime.Marsha
 		_   = err
 	)
 
-	val, ok = pathParams["urlId"]
+	val, ok = pathParams["url_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "urlId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "url_id")
 	}
 
 	protoReq.UrlId, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "urlId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "url_id", err)
 	}
 
 	msg, err := client.GetURL(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -86,14 +86,14 @@ func local_request_URLShortener_GetURL_0(ctx context.Context, marshaler runtime.
 		_   = err
 	)
 
-	val, ok = pathParams["urlId"]
+	val, ok = pathParams["url_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "urlId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "url_id")
 	}
 
 	protoReq.UrlId, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "urlId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "url_id", err)
 	}
 
 	msg, err := server.GetURL(ctx, &protoReq)
@@ -154,14 +154,14 @@ func request_URLShortener_UpdateURL_0(ctx context.Context, marshaler runtime.Mar
 		_   = err
 	)
 
-	val, ok = pathParams["url.urlId"]
+	val, ok = pathParams["url.url_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "url.urlId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "url.url_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "url.urlId", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "url.url_id", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "url.urlId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "url.url_id", err)
 	}
 
 	msg, err := client.UpdateURL(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -188,14 +188,14 @@ func local_request_URLShortener_UpdateURL_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["url.urlId"]
+	val, ok = pathParams["url.url_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "url.urlId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "url.url_id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "url.urlId", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "url.url_id", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "url.urlId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "url.url_id", err)
 	}
 
 	msg, err := server.UpdateURL(ctx, &protoReq)
@@ -214,14 +214,14 @@ func request_URLShortener_DeleteURL_0(ctx context.Context, marshaler runtime.Mar
 		_   = err
 	)
 
-	val, ok = pathParams["urlId"]
+	val, ok = pathParams["url_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "urlId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "url_id")
 	}
 
 	protoReq.UrlId, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "urlId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "url_id", err)
 	}
 
 	msg, err := client.DeleteURL(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -240,14 +240,14 @@ func local_request_URLShortener_DeleteURL_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["urlId"]
+	val, ok = pathParams["url_id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "urlId")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "url_id")
 	}
 
 	protoReq.UrlId, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "urlId", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "url_id", err)
 	}
 
 	msg, err := server.DeleteURL(ctx, &protoReq)
@@ -294,7 +294,7 @@ func RegisterURLShortenerHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/urlshortener.v1.URLShortener/GetURL", runtime.WithHTTPPathPattern("/api/v1/url/{urlId}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/urlshortener.v1.URLShortener/GetURL", runtime.WithHTTPPathPattern("/api/v1/url/{url_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -344,7 +344,7 @@ func RegisterURLShortenerHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/urlshortener.v1.URLShortener/UpdateURL", runtime.WithHTTPPathPattern("/api/v1/url/{url.urlId}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/urlshortener.v1.URLShortener/UpdateURL", runtime.WithHTTPPathPattern("/api/v1/url/{url.url_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -369,7 +369,7 @@ func RegisterURLShortenerHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/urlshortener.v1.URLShortener/DeleteURL", runtime.WithHTTPPathPattern("/api/v1/url/{urlId}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/urlshortener.v1.URLShortener/DeleteURL", runtime.WithHTTPPathPattern("/api/v1/url/{url_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -455,7 +455,7 @@ func RegisterURLShortenerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/urlshortener.v1.URLShortener/GetURL", runtime.WithHTTPPathPattern("/api/v1/url/{urlId}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/urlshortener.v1.URLShortener/GetURL", runtime.WithHTTPPathPattern("/api/v1/url/{url_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -499,7 +499,7 @@ func RegisterURLShortenerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/urlshortener.v1.URLShortener/UpdateURL", runtime.WithHTTPPathPattern("/api/v1/url/{url.urlId}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/urlshortener.v1.URLShortener/UpdateURL", runtime.WithHTTPPathPattern("/api/v1/url/{url.url_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -521,7 +521,7 @@ func RegisterURLShortenerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/urlshortener.v1.URLShortener/DeleteURL", runtime.WithHTTPPathPattern("/api/v1/url/{urlId}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/urlshortener.v1.URLShortener/DeleteURL", runtime.WithHTTPPathPattern("/api/v1/url/{url_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -543,13 +543,13 @@ func RegisterURLShortenerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 var (
 	pattern_URLShortener_ListURLs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "url"}, ""))
 
-	pattern_URLShortener_GetURL_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "url", "urlId"}, ""))
+	pattern_URLShortener_GetURL_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "url", "url_id"}, ""))
 
 	pattern_URLShortener_CreateURL_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "url"}, ""))
 
-	pattern_URLShortener_UpdateURL_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "url", "url.urlId"}, ""))
+	pattern_URLShortener_UpdateURL_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "url", "url.url_id"}, ""))
 
-	pattern_URLShortener_DeleteURL_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "url", "urlId"}, ""))
+	pattern_URLShortener_DeleteURL_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "url", "url_id"}, ""))
 )
 
 var (

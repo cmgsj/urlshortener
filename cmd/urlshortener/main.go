@@ -6,17 +6,18 @@ import (
 	"net/http"
 
 	"github.com/cmgsj/go-env/env"
-	"github.com/cmgsj/go-lib/openapi"
-	"github.com/cmgsj/urlshortener/pkg/database"
-	"github.com/cmgsj/urlshortener/pkg/docs"
-	urlshortenerv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/urlshortener/v1"
-	"github.com/cmgsj/urlshortener/pkg/service"
+	"github.com/cmgsj/go-lib/swagger"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health"
 	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+
+	"github.com/cmgsj/urlshortener/pkg/database"
+	"github.com/cmgsj/urlshortener/pkg/docs"
+	urlshortenerv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/urlshortener/v1"
+	"github.com/cmgsj/urlshortener/pkg/service"
 )
 
 func main() {
@@ -54,8 +55,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", rmux)
-	mux.Handle("/r/", http.StripPrefix("/r/", svc.RedirectURL()))
-	mux.Handle("/docs/", openapi.ServeDocs("/docs/", docs.OpenapiSchema()))
+	mux.Handle("/r/", http.StripPrefix("/r/", svc.RedirectUrl()))
+	mux.Handle("/docs/", swagger.Docs("/docs/", docs.SwaggerSchema()))
 
 	go func() {
 		hl, err := net.Listen("tcp", httpAddr)

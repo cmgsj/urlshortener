@@ -5,8 +5,9 @@ import (
 	"database/sql"
 	_ "embed"
 
-	sqlc "github.com/cmgsj/urlshortener/pkg/gen/sqlc/urls/v1"
 	_ "github.com/mattn/go-sqlite3"
+
+	sqlc "github.com/cmgsj/urlshortener/pkg/gen/sqlc/urls/v1"
 )
 
 var (

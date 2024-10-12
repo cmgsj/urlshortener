@@ -1,23 +1,30 @@
-all: build
+SHELL := /bin/bash
 
-docker_build: build
-	eval $$(minikube -p minikube docker-env) && docker build -t cmg/urlshortener:latest -f ./cmd/urlshortener/Dockerfile .
+.PHONY: default
+default: fmt gen
 
-build: gen
-	CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOARCH=amd64 GOOS=linux CGO_ENABLED=1 go build -mod=vendor -trimpath -ldflags "-linkmode external -extldflags -static" -o bin ./cmd/urlshortener
+.PHONY: fmt
+fmt:
+	@go fmt ./...
+	@goimports -w -local github.com/cmgsj/urlshortener $$(find . -type f -name "*.go" ! -path "./vendor/*")
 
+.PHONY: gen
 gen:
-	sqlc generate -f sqlc.yaml
-	buf format -w && buf generate
+	@sqlc generate --file sqlc.yaml
+	@buf format --write proto && buf generate --template proto/buf.gen.yaml proto
 
-install_tools:
-	grep _ pkg/tools/tools.go | awk -F'"' '{print $$2}' | xargs -tI % go install %
+.PHONY: test
+test:
+	@go test -v ./...
 
-clean:
-	rm -f bin/*
+.PHONY: docker
+docker:
+	@CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -ldflags "-s -w -linkmode=external -extldflags='-static'" -o bin/urlshortener ./cmd/urlshortener
+	@eval $$(minikube -p minikube docker-env) && docker build -t cmg/urlshortener:latest .
 
 # minikube start --driver=docker
 # minikube addons enable ingress
 # minikube addons enable ingress-dns
+# kubectl apply -f k8s
 # minikube -n urlshortener service urlshortener
 # minikube stop

@@ -11,7 +11,7 @@ service URLShortener {
     option (google.api.http) = {get: "/api/v1/url"};
   }
   rpc GetURL(GetURLRequest) returns (GetURLResponse) {
-    option (google.api.http) = {get: "/api/v1/url/{urlId}"};
+    option (google.api.http) = {get: "/api/v1/url/{url_id}"};
   }
   rpc CreateURL(CreateURLRequest) returns (CreateURLResponse) {
     option (google.api.http) = {
@@ -21,18 +21,18 @@ service URLShortener {
   }
   rpc UpdateURL(UpdateURLRequest) returns (UpdateURLResponse) {
     option (google.api.http) = {
-      put: "/api/v1/url/{url.urlId}"
+      put: "/api/v1/url/{url.url_id}"
       body: "*"
     };
   }
   rpc DeleteURL(DeleteURLRequest) returns (DeleteURLResponse) {
-    option (google.api.http) = {delete: "/api/v1/url/{urlId}"};
+    option (google.api.http) = {delete: "/api/v1/url/{url_id}"};
   }
 }
 
 message URL {
-  string urlId = 1;
-  string redirectURL = 2;
+  string url_id = 1;
+  string redirect_url = 2;
 }
 
 message ListURLsRequest {}
@@ -42,7 +42,7 @@ message ListURLsResponse {
 }
 
 message GetURLRequest {
-  string urlId = 1;
+  string url_id = 1;
 }
 
 message GetURLResponse {
@@ -50,11 +50,11 @@ message GetURLResponse {
 }
 
 message CreateURLRequest {
-  string redirectURL = 1;
+  string redirect_url = 1;
 }
 
 message CreateURLResponse {
-  string urlId = 1;
+  string url_id = 1;
 }
 
 message UpdateURLRequest {
@@ -64,7 +64,7 @@ message UpdateURLRequest {
 message UpdateURLResponse {}
 
 message DeleteURLRequest {
-  string urlId = 1;
+  string url_id = 1;
 }
 
 message DeleteURLResponse {}

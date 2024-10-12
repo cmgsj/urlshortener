@@ -102,7 +102,7 @@
                 "url": {
                   "type": "object",
                   "properties": {
-                    "redirectURL": {
+                    "redirectUrl": {
                       "type": "string"
                     }
                   }
@@ -207,7 +207,7 @@
     "v1CreateURLRequest": {
       "type": "object",
       "properties": {
-        "redirectURL": {
+        "redirectUrl": {
           "type": "string"
         }
       }
@@ -249,7 +249,7 @@
         "urlId": {
           "type": "string"
         },
-        "redirectURL": {
+        "redirectUrl": {
           "type": "string"
         }
       }
