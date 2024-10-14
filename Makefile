@@ -12,10 +12,11 @@ fmt:
 		goimports -w -local $(MODULE) "$${file}"; \
 	done
 
-.PHONY: gen
 gen:
-	@sqlc generate
+	@rm -rf pkg/gen
+	@rm -rf pkg/docs/docs.swagger.json
 	@buf format --write && buf generate
+	@sqlc generate
 
 .PHONY: test
 test:
