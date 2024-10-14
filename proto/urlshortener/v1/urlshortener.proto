@@ -3,20 +3,72 @@ syntax = "proto3";
 package urlshortener.v1;
 
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "urlshortenerv1";
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "URLShortener Service API"
+    version: "1.0"
+  }
+  schemes: HTTP
+  schemes: HTTPS
+  consumes: "application/json"
+  produces: "application/json"
+  tags: {
+    name: "urlshortener.v1"
+    description: "URLShortener Service API"
+  }
+  security_definitions: {
+    security: {
+      key: "APIKeyAuth"
+      value: {
+        type: TYPE_API_KEY
+        in: IN_HEADER
+        name: "X-API-Key"
+      }
+    }
+  }
+  security: {
+    security_requirement: {key: "APIKeyAuth"}
+  }
+};
 
-service URLShortener {
+service URLShortenerService {
   rpc ListURLs(ListURLsRequest) returns (ListURLsResponse) {
     option (google.api.http) = {get: "/api/v1/url"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "List URLs"
+      operation_id: "list_urls"
+      tags: "urlshortener.v1"
+      security: {
+        security_requirement: {key: "APIKeyAuth"}
+      }
+    };
   }
   rpc GetURL(GetURLRequest) returns (GetURLResponse) {
     option (google.api.http) = {get: "/api/v1/url/{url_id}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get URL"
+      operation_id: "get_url"
+      tags: "urlshortener.v1"
+      security: {
+        security_requirement: {key: "APIKeyAuth"}
+      }
+    };
   }
   rpc CreateURL(CreateURLRequest) returns (CreateURLResponse) {
     option (google.api.http) = {
       post: "/api/v1/url"
       body: "*"
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create URL"
+      operation_id: "create_url"
+      tags: "urlshortener.v1"
+      security: {
+        security_requirement: {key: "APIKeyAuth"}
+      }
     };
   }
   rpc UpdateURL(UpdateURLRequest) returns (UpdateURLResponse) {
@@ -24,9 +76,25 @@ service URLShortener {
       put: "/api/v1/url/{url.url_id}"
       body: "*"
     };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Update URL"
+      operation_id: "update_url"
+      tags: "urlshortener.v1"
+      security: {
+        security_requirement: {key: "APIKeyAuth"}
+      }
+    };
   }
   rpc DeleteURL(DeleteURLRequest) returns (DeleteURLResponse) {
     option (google.api.http) = {delete: "/api/v1/url/{url_id}"};
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Delete URL"
+      operation_id: "delete_url"
+      tags: "urlshortener.v1"
+      security: {
+        security_requirement: {key: "APIKeyAuth"}
+      }
+    };
   }
 }
 

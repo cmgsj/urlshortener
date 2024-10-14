@@ -1,17 +1,21 @@
 SHELL := /bin/bash
 
+MODULE := $$(go list -m)
+
 .PHONY: default
 default: fmt gen
 
 .PHONY: fmt
 fmt:
-	@go fmt ./...
-	@goimports -w -local github.com/cmgsj/urlshortener $$(find . -type f -name "*.go" ! -path "./vendor/*")
+	@find . -type f -name "*.go" ! -path "./pkg/gen/*" ! -path "./vendor/*" | while read -r file; do \
+		go fmt "$${file}" 2>&1 | grep -v "is a program, not an importable package"; \
+		goimports -w -local $(MODULE) "$${file}"; \
+	done
 
 .PHONY: gen
 gen:
-	@sqlc generate --file sqlc.yaml
-	@buf format --write proto && buf generate --template proto/buf.gen.yaml proto
+	@sqlc generate
+	@buf format --write && buf generate
 
 .PHONY: test
 test:
