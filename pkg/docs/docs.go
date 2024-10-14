@@ -5,7 +5,7 @@ import (
 
 	"github.com/cmgsj/go-lib/swagger"
 
-	"github.com/cmgsj/urlshortener/pkg/service"
+	urlshortenerv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/urlshortener/v1"
 )
 
 //go:embed docs.swagger.json
@@ -13,7 +13,7 @@ var swaggerDocs []byte
 
 func SwaggerSchema() swagger.Schema {
 	return swagger.Schema{
-		Name:    service.ServiceName,
+		Name:    urlshortenerv1.URLShortenerService_ServiceDesc.ServiceName,
 		Content: swaggerDocs,
 	}
 }
