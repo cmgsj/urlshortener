@@ -1,4 +1,4 @@
-package database
+package sql
 
 import (
 	"context"
@@ -7,15 +7,15 @@ import (
 )
 
 var (
-	//go:embed sql/schema.sql
-	ddl string
+	//go:embed schema.sql
+	schema string
 )
 
-func DDL() string {
-	return ddl
+func Schema() string {
+	return schema
 }
 
 func Migrate(ctx context.Context, db *sql.DB) error {
-	_, err := db.ExecContext(ctx, ddl)
+	_, err := db.ExecContext(ctx, schema)
 	return err
 }

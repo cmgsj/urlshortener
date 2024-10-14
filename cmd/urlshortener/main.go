@@ -23,10 +23,10 @@ import (
 	reflectionv1 "google.golang.org/grpc/reflection/grpc_reflection_v1"
 	reflectionv1alpha "google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
 
-	"github.com/cmgsj/urlshortener/pkg/database"
 	"github.com/cmgsj/urlshortener/pkg/docs"
 	urlshortenerv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/urlshortener/v1"
 	urlshortenerserver "github.com/cmgsj/urlshortener/pkg/urlshortener/server"
+	urlshortenersql "github.com/cmgsj/urlshortener/sql"
 )
 
 func main() {
@@ -59,7 +59,7 @@ func run() error {
 		return err
 	}
 
-	err = database.Migrate(ctx, db)
+	err = urlshortenersql.Migrate(ctx, db)
 	if err != nil {
 		return err
 	}

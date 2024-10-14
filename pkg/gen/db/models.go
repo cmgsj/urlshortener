@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.27.0
 
-package sqlc
+package db
 
 type Url struct {
 	UrlID       string `db:"url_id" json:"url_id"`
