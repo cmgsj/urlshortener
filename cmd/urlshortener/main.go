@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"net"
@@ -11,6 +12,9 @@ import (
 
 	"github.com/cmgsj/go-lib/swagger"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/health"
@@ -18,9 +22,6 @@ import (
 	"google.golang.org/grpc/reflection"
 	reflectionv1 "google.golang.org/grpc/reflection/grpc_reflection_v1"
 	reflectionv1alpha "google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
-
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 
 	"github.com/cmgsj/urlshortener/pkg/database"
 	"github.com/cmgsj/urlshortener/pkg/docs"
@@ -53,15 +54,22 @@ func run() error {
 	grpcAddress := viper.GetString("grpc-address")
 	httpAddress := viper.GetString("http-address")
 
-	db := database.Must(database.New(database.Options{
-		Driver:      "sqlite3",
-		ConnString:  ":memory:",
-		AutoMigrate: true,
-	}))
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		return err
+	}
 
-	urlshortenerServer := urlshortenerserver.NewServer(db)
+	err = database.Migrate(ctx, db)
+	if err != nil {
+		return err
+	}
 
-	err := urlshortenerServer.SeedDB(ctx)
+	urlshortenerServer, err := urlshortenerserver.NewServer(ctx, db)
+	if err != nil {
+		return err
+	}
+
+	err = urlshortenerServer.SeedDB(ctx)
 	if err != nil {
 		return err
 	}

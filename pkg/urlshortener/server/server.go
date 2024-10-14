@@ -3,29 +3,34 @@ package server
 import (
 	"context"
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/cmgsj/urlshortener/pkg/database"
 	urlshortenerv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/urlshortener/v1"
-	urlsv1 "github.com/cmgsj/urlshortener/pkg/gen/sqlc/urls/v1"
+	"github.com/cmgsj/urlshortener/pkg/gen/sqlc"
 )
 
 type Server struct {
 	urlshortenerv1.UnimplementedURLShortenerServiceServer
-	db database.DB
+	q *sqlc.Queries
 }
 
-func NewServer(db database.DB) *Server {
-	return &Server{
-		db: db,
+func NewServer(ctx context.Context, db *sql.DB) (*Server, error) {
+	q, err := sqlc.Prepare(ctx, db)
+	if err != nil {
+		return nil, err
 	}
+
+	return &Server{
+		q: q,
+	}, nil
 }
 
 func (s *Server) ListURLs(ctx context.Context, req *urlshortenerv1.ListURLsRequest) (*urlshortenerv1.ListURLsResponse, error) {
-	urlList, err := s.db.ListUrls(ctx)
+	urlList, err := s.q.ListUrls(ctx)
 	if err != nil {
 		return nil, ErrInternal
 	}
@@ -45,7 +50,9 @@ func (s *Server) ListURLs(ctx context.Context, req *urlshortenerv1.ListURLsReque
 }
 
 func (s *Server) GetURL(ctx context.Context, req *urlshortenerv1.GetURLRequest) (*urlshortenerv1.GetURLResponse, error) {
-	u, err := s.db.GetUrl(ctx, req.GetUrlId())
+	u, err := s.q.GetUrl(ctx, sqlc.GetUrlParams{
+		UrlID: req.GetUrlId(),
+	})
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}
@@ -68,7 +75,7 @@ func (s *Server) CreateURL(ctx context.Context, req *urlshortenerv1.CreateURLReq
 		return nil, ErrInvalidUrl
 	}
 
-	u, err := s.db.CreateUrl(ctx, urlsv1.CreateUrlParams{
+	u, err := s.q.CreateUrl(ctx, sqlc.CreateUrlParams{
 		UrlID:       urlId,
 		RedirectUrl: req.GetRedirectUrl(),
 	})
@@ -86,7 +93,7 @@ func (s *Server) UpdateURL(ctx context.Context, req *urlshortenerv1.UpdateURLReq
 		return nil, ErrInvalidUrl
 	}
 
-	err := s.db.UpdateUrl(ctx, urlsv1.UpdateUrlParams{
+	err := s.q.UpdateUrl(ctx, sqlc.UpdateUrlParams{
 		UrlID:       req.GetUrl().GetUrlId(),
 		RedirectUrl: req.GetUrl().GetRedirectUrl(),
 	})
@@ -98,7 +105,9 @@ func (s *Server) UpdateURL(ctx context.Context, req *urlshortenerv1.UpdateURLReq
 }
 
 func (s *Server) DeleteURL(ctx context.Context, req *urlshortenerv1.DeleteURLRequest) (*urlshortenerv1.DeleteURLResponse, error) {
-	err := s.db.DeleteUrl(ctx, req.GetUrlId())
+	err := s.q.DeleteUrl(ctx, sqlc.DeleteUrlParams{
+		UrlID: req.GetUrlId(),
+	})
 	if err != nil {
 		return nil, ErrUrlNotFound
 	}
@@ -108,7 +117,9 @@ func (s *Server) DeleteURL(ctx context.Context, req *urlshortenerv1.DeleteURLReq
 
 func (s *Server) RedirectUrl() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		u, err := s.db.GetUrl(r.Context(), strings.TrimPrefix(r.URL.Path, "/"))
+		u, err := s.q.GetUrl(r.Context(), sqlc.GetUrlParams{
+			UrlID: strings.TrimPrefix(r.URL.Path, "/"),
+		})
 		if err != nil {
 			http.NotFound(w, r)
 			return
@@ -119,14 +130,14 @@ func (s *Server) RedirectUrl() http.Handler {
 }
 
 func (s *Server) SeedDB(ctx context.Context) error {
-	params := []urlsv1.CreateUrlParams{
+	params := []sqlc.CreateUrlParams{
 		{UrlID: "google", RedirectUrl: "https://www.google.com"},
 		{UrlID: "youtube", RedirectUrl: "https://www.youtube.com"},
 		{UrlID: "apple", RedirectUrl: "https://www.apple.com"},
 	}
 
 	for _, param := range params {
-		_, err := s.db.CreateUrl(ctx, param)
+		_, err := s.q.CreateUrl(ctx, param)
 		if err != nil {
 			return err
 		}
