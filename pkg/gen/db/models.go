@@ -5,6 +5,6 @@
 package db
 
 type Url struct {
-	UrlID       string `db:"url_id" json:"url_id"`
-	RedirectUrl string `db:"redirect_url" json:"redirect_url"`
+	UrlID       string `json:"url_id"`
+	RedirectUrl string `json:"redirect_url"`
 }

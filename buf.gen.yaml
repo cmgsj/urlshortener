@@ -22,9 +22,7 @@ plugins:
       - paths=source_relative
       - generate_unbound_methods=false
   - name: openapiv2
-    out: pkg/docs
+    out: swagger/dist
     opt:
       - generate_unbound_methods=false
-      - allow_merge=true
-      - merge_file_name=docs
     strategy: all

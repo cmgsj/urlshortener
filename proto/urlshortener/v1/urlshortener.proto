@@ -16,8 +16,8 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   consumes: "application/json"
   produces: "application/json"
   tags: {
-    name: "urlshortener.v1"
-    description: "URLShortener Service API"
+    name: "URLShortenerService"
+    description: "URLShortener Service"
   }
   security_definitions: {
     security: {
@@ -40,7 +40,7 @@ service URLShortenerService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "List URLs"
       operation_id: "list_urls"
-      tags: "urlshortener.v1"
+      tags: "URLShortenerService"
       security: {
         security_requirement: {key: "APIKeyAuth"}
       }
@@ -51,7 +51,7 @@ service URLShortenerService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Get URL"
       operation_id: "get_url"
-      tags: "urlshortener.v1"
+      tags: "URLShortenerService"
       security: {
         security_requirement: {key: "APIKeyAuth"}
       }
@@ -65,7 +65,7 @@ service URLShortenerService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Create URL"
       operation_id: "create_url"
-      tags: "urlshortener.v1"
+      tags: "URLShortenerService"
       security: {
         security_requirement: {key: "APIKeyAuth"}
       }
@@ -79,7 +79,7 @@ service URLShortenerService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Update URL"
       operation_id: "update_url"
-      tags: "urlshortener.v1"
+      tags: "URLShortenerService"
       security: {
         security_requirement: {key: "APIKeyAuth"}
       }
@@ -90,7 +90,7 @@ service URLShortenerService {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       summary: "Delete URL"
       operation_id: "delete_url"
-      tags: "urlshortener.v1"
+      tags: "URLShortenerService"
       security: {
         security_requirement: {key: "APIKeyAuth"}
       }

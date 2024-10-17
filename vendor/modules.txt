@@ -296,9 +296,6 @@ github.com/bufbuild/protovalidate-go/internal/evaluator
 github.com/bufbuild/protovalidate-go/internal/expression
 github.com/bufbuild/protovalidate-go/internal/extensions
 github.com/bufbuild/protovalidate-go/resolver
-# github.com/cmgsj/go-lib v0.6.0
-## explicit; go 1.22.0
-github.com/cmgsj/go-lib/swagger
 # github.com/containerd/cgroups/v3 v3.0.3
 ## explicit; go 1.18
 github.com/containerd/cgroups/v3/cgroup1/stats

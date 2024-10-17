@@ -6,11 +6,8 @@
   },
   "tags": [
     {
-      "name": "urlshortener.v1",
-      "description": "URLShortener Service API"
-    },
-    {
-      "name": "URLShortenerService"
+      "name": "URLShortenerService",
+      "description": "URLShortener Service"
     }
   ],
   "schemes": [
@@ -43,7 +40,7 @@
           }
         },
         "tags": [
-          "urlshortener.v1"
+          "URLShortenerService"
         ],
         "security": [
           {
@@ -79,7 +76,7 @@
           }
         ],
         "tags": [
-          "urlshortener.v1"
+          "URLShortenerService"
         ],
         "security": [
           {
@@ -123,7 +120,7 @@
           }
         ],
         "tags": [
-          "urlshortener.v1"
+          "URLShortenerService"
         ],
         "security": [
           {
@@ -159,7 +156,7 @@
           }
         ],
         "tags": [
-          "urlshortener.v1"
+          "URLShortenerService"
         ],
         "security": [
           {
@@ -193,7 +190,7 @@
           }
         ],
         "tags": [
-          "urlshortener.v1"
+          "URLShortenerService"
         ],
         "security": [
           {

@@ -4,7 +4,6 @@ go 1.23.0
 
 require (
 	github.com/bufbuild/buf v1.45.0
-	github.com/cmgsj/go-lib v0.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/spf13/pflag v1.0.5

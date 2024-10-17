@@ -24,19 +24,19 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
-	if q.createUrlStmt, err = db.PrepareContext(ctx, CreateUrl); err != nil {
+	if q.createUrlStmt, err = db.PrepareContext(ctx, createUrl); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUrl: %w", err)
 	}
-	if q.deleteUrlStmt, err = db.PrepareContext(ctx, DeleteUrl); err != nil {
+	if q.deleteUrlStmt, err = db.PrepareContext(ctx, deleteUrl); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUrl: %w", err)
 	}
-	if q.getUrlStmt, err = db.PrepareContext(ctx, GetUrl); err != nil {
+	if q.getUrlStmt, err = db.PrepareContext(ctx, getUrl); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUrl: %w", err)
 	}
-	if q.listUrlsStmt, err = db.PrepareContext(ctx, ListUrls); err != nil {
+	if q.listUrlsStmt, err = db.PrepareContext(ctx, listUrls); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUrls: %w", err)
 	}
-	if q.updateUrlStmt, err = db.PrepareContext(ctx, UpdateUrl); err != nil {
+	if q.updateUrlStmt, err = db.PrepareContext(ctx, updateUrl); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUrl: %w", err)
 	}
 	return &q, nil

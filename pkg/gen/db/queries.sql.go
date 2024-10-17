@@ -9,56 +9,56 @@ import (
 	"context"
 )
 
-const CreateUrl = `-- name: CreateUrl :one
+const createUrl = `-- name: CreateUrl :one
 INSERT INTO urls (url_id, redirect_url) VALUES (?, ?) RETURNING url_id, redirect_url
 `
 
 type CreateUrlParams struct {
-	UrlID       string `db:"url_id" json:"url_id"`
-	RedirectUrl string `db:"redirect_url" json:"redirect_url"`
+	UrlID       string `json:"url_id"`
+	RedirectUrl string `json:"redirect_url"`
 }
 
 func (q *Queries) CreateUrl(ctx context.Context, arg CreateUrlParams) (Url, error) {
-	row := q.queryRow(ctx, q.createUrlStmt, CreateUrl, arg.UrlID, arg.RedirectUrl)
+	row := q.queryRow(ctx, q.createUrlStmt, createUrl, arg.UrlID, arg.RedirectUrl)
 	var i Url
 	err := row.Scan(&i.UrlID, &i.RedirectUrl)
 	return i, err
 }
 
-const DeleteUrl = `-- name: DeleteUrl :exec
+const deleteUrl = `-- name: DeleteUrl :exec
 DELETE FROM urls WHERE url_id = ?
 `
 
 type DeleteUrlParams struct {
-	UrlID string `db:"url_id" json:"url_id"`
+	UrlID string `json:"url_id"`
 }
 
 func (q *Queries) DeleteUrl(ctx context.Context, arg DeleteUrlParams) error {
-	_, err := q.exec(ctx, q.deleteUrlStmt, DeleteUrl, arg.UrlID)
+	_, err := q.exec(ctx, q.deleteUrlStmt, deleteUrl, arg.UrlID)
 	return err
 }
 
-const GetUrl = `-- name: GetUrl :one
+const getUrl = `-- name: GetUrl :one
 SELECT url_id, redirect_url FROM urls WHERE url_id = ? LIMIT 1
 `
 
 type GetUrlParams struct {
-	UrlID string `db:"url_id" json:"url_id"`
+	UrlID string `json:"url_id"`
 }
 
 func (q *Queries) GetUrl(ctx context.Context, arg GetUrlParams) (Url, error) {
-	row := q.queryRow(ctx, q.getUrlStmt, GetUrl, arg.UrlID)
+	row := q.queryRow(ctx, q.getUrlStmt, getUrl, arg.UrlID)
 	var i Url
 	err := row.Scan(&i.UrlID, &i.RedirectUrl)
 	return i, err
 }
 
-const ListUrls = `-- name: ListUrls :many
+const listUrls = `-- name: ListUrls :many
 SELECT url_id, redirect_url FROM urls
 `
 
 func (q *Queries) ListUrls(ctx context.Context) ([]Url, error) {
-	rows, err := q.query(ctx, q.listUrlsStmt, ListUrls)
+	rows, err := q.query(ctx, q.listUrlsStmt, listUrls)
 	if err != nil {
 		return nil, err
 	}
@@ -80,16 +80,16 @@ func (q *Queries) ListUrls(ctx context.Context) ([]Url, error) {
 	return items, nil
 }
 
-const UpdateUrl = `-- name: UpdateUrl :exec
+const updateUrl = `-- name: UpdateUrl :exec
 UPDATE urls SET redirect_url = ? WHERE url_id = ?
 `
 
 type UpdateUrlParams struct {
-	RedirectUrl string `db:"redirect_url" json:"redirect_url"`
-	UrlID       string `db:"url_id" json:"url_id"`
+	RedirectUrl string `json:"redirect_url"`
+	UrlID       string `json:"url_id"`
 }
 
 func (q *Queries) UpdateUrl(ctx context.Context, arg UpdateUrlParams) error {
-	_, err := q.exec(ctx, q.updateUrlStmt, UpdateUrl, arg.RedirectUrl, arg.UrlID)
+	_, err := q.exec(ctx, q.updateUrlStmt, updateUrl, arg.RedirectUrl, arg.UrlID)
 	return err
 }

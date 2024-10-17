@@ -10,7 +10,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cmgsj/go-lib/swagger"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/pflag"
@@ -23,10 +22,10 @@ import (
 	reflectionv1 "google.golang.org/grpc/reflection/grpc_reflection_v1"
 	reflectionv1alpha "google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
 
-	"github.com/cmgsj/urlshortener/pkg/docs"
 	urlshortenerv1 "github.com/cmgsj/urlshortener/pkg/gen/proto/urlshortener/v1"
 	urlshortenerserver "github.com/cmgsj/urlshortener/pkg/urlshortener/server"
 	urlshortenersql "github.com/cmgsj/urlshortener/sql"
+	urlshortenerswagger "github.com/cmgsj/urlshortener/swagger"
 )
 
 func main() {
@@ -100,7 +99,7 @@ func run() error {
 
 	mux.Handle("/", rmux)
 	mux.Handle("/r/", http.StripPrefix("/r/", urlshortenerServer.RedirectUrl()))
-	mux.Handle("/docs/", swagger.Docs("/docs/", docs.SwaggerSchema()))
+	mux.Handle("/docs/", http.StripPrefix("/docs", urlshortenerswagger.Handler()))
 
 	httpServer := &http.Server{
 		Handler: mux,
