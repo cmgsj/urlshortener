@@ -39,7 +39,7 @@ func (s *Server) ListURLs(ctx context.Context, req *urlshortenerv1.ListURLsReque
 
 	for i, u := range urlList {
 		urls[i] = &urlshortenerv1.URL{
-			UrlId:       u.UrlID,
+			UrlId:       u.UrlId,
 			RedirectUrl: u.RedirectUrl,
 		}
 	}
@@ -51,7 +51,7 @@ func (s *Server) ListURLs(ctx context.Context, req *urlshortenerv1.ListURLsReque
 
 func (s *Server) GetURL(ctx context.Context, req *urlshortenerv1.GetURLRequest) (*urlshortenerv1.GetURLResponse, error) {
 	u, err := s.q.GetUrl(ctx, db.GetUrlParams{
-		UrlID: req.GetUrlId(),
+		UrlId: req.GetUrlId(),
 	})
 	if err != nil {
 		return nil, ErrUrlNotFound
@@ -59,7 +59,7 @@ func (s *Server) GetURL(ctx context.Context, req *urlshortenerv1.GetURLRequest) 
 
 	return &urlshortenerv1.GetURLResponse{
 		Url: &urlshortenerv1.URL{
-			UrlId:       u.UrlID,
+			UrlId:       u.UrlId,
 			RedirectUrl: u.RedirectUrl,
 		},
 	}, nil
@@ -76,7 +76,7 @@ func (s *Server) CreateURL(ctx context.Context, req *urlshortenerv1.CreateURLReq
 	}
 
 	u, err := s.q.CreateUrl(ctx, db.CreateUrlParams{
-		UrlID:       urlId,
+		UrlId:       urlId,
 		RedirectUrl: req.GetRedirectUrl(),
 	})
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *Server) CreateURL(ctx context.Context, req *urlshortenerv1.CreateURLReq
 	}
 
 	return &urlshortenerv1.CreateURLResponse{
-		UrlId: u.UrlID,
+		UrlId: u.UrlId,
 	}, nil
 }
 
@@ -94,7 +94,7 @@ func (s *Server) UpdateURL(ctx context.Context, req *urlshortenerv1.UpdateURLReq
 	}
 
 	err := s.q.UpdateUrl(ctx, db.UpdateUrlParams{
-		UrlID:       req.GetUrl().GetUrlId(),
+		UrlId:       req.GetUrl().GetUrlId(),
 		RedirectUrl: req.GetUrl().GetRedirectUrl(),
 	})
 	if err != nil {
@@ -106,7 +106,7 @@ func (s *Server) UpdateURL(ctx context.Context, req *urlshortenerv1.UpdateURLReq
 
 func (s *Server) DeleteURL(ctx context.Context, req *urlshortenerv1.DeleteURLRequest) (*urlshortenerv1.DeleteURLResponse, error) {
 	err := s.q.DeleteUrl(ctx, db.DeleteUrlParams{
-		UrlID: req.GetUrlId(),
+		UrlId: req.GetUrlId(),
 	})
 	if err != nil {
 		return nil, ErrUrlNotFound
@@ -118,7 +118,7 @@ func (s *Server) DeleteURL(ctx context.Context, req *urlshortenerv1.DeleteURLReq
 func (s *Server) RedirectUrl() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		u, err := s.q.GetUrl(r.Context(), db.GetUrlParams{
-			UrlID: strings.TrimPrefix(r.URL.Path, "/"),
+			UrlId: strings.TrimPrefix(r.URL.Path, "/"),
 		})
 		if err != nil {
 			http.NotFound(w, r)
@@ -131,9 +131,9 @@ func (s *Server) RedirectUrl() http.Handler {
 
 func (s *Server) SeedDB(ctx context.Context) error {
 	params := []db.CreateUrlParams{
-		{UrlID: "google", RedirectUrl: "https://www.google.com"},
-		{UrlID: "youtube", RedirectUrl: "https://www.youtube.com"},
-		{UrlID: "apple", RedirectUrl: "https://www.apple.com"},
+		{UrlId: "google", RedirectUrl: "https://www.google.com"},
+		{UrlId: "youtube", RedirectUrl: "https://www.youtube.com"},
+		{UrlId: "apple", RedirectUrl: "https://www.apple.com"},
 	}
 
 	for _, param := range params {

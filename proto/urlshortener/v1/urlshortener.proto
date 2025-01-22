@@ -5,7 +5,7 @@ package urlshortener.v1;
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
-option go_package = "urlshortenerv1";
+option go_package = "urlshortener/v1";
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "URLShortener Service API"

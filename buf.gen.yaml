@@ -1,28 +1,30 @@
-version: v1
+version: v2
+clean: true
 managed:
   enabled: true
-  go_package_prefix:
-    default: github.com/cmgsj/urlshortener/proto
-    except:
-      - buf.build/googleapis/googleapis
-      - buf.build/grpc-ecosystem/grpc-gateway
+  disable:
+    - file_option: go_package
+      module: buf.build/googleapis/googleapis
+    - file_option: go_package
+      module: buf.build/grpc-ecosystem/grpc-gateway
+  override:
+    - file_option: go_package_prefix
+      value: github.com/cmgsj/urlshortener/proto
 plugins:
-  - name: go
+  - local: protoc-gen-go
     out: pkg/gen/proto
-    opt:
-      - paths=source_relative
-  - name: go-grpc
+    opt: paths=source_relative
+  - local: protoc-gen-go-grpc
     out: pkg/gen/proto
     opt:
       - paths=source_relative
       - require_unimplemented_servers=true
-  - name: grpc-gateway
+  - local: protoc-gen-grpc-gateway
     out: pkg/gen/proto
     opt:
       - paths=source_relative
       - generate_unbound_methods=false
-  - name: openapiv2
+  - local: protoc-gen-openapiv2
     out: swagger/dist
-    opt:
-      - generate_unbound_methods=false
+    opt: generate_unbound_methods=false
     strategy: all

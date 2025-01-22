@@ -4,25 +4,59 @@ MODULE := $$(go list -m)
 SWAGGER_UI_VERSION :=
 
 .PHONY: default
-default: fmt generate
+default: tidy fmt generate
+
+.PHONY: tools
+tools: tidy
+	@rm -f bin/*; \
+	go -C internal/tools list -e -f '{{range .Imports}}{{.}} {{end}}' tools.go | xargs go -C internal/tools install; \
+	npm install --save-dev sql-formatter
+
+.PHONY: update
+update:
+	@go list -m -f '{{if and (not .Main) (not .Indirect)}}{{.Path}}{{end}}' all | xargs go get; \
+	go -C internal/tools list -m -f '{{if and (not .Main) (not .Indirect)}}{{.Path}}{{end}}' all | xargs go -C internal/tools get; \
+	$(MAKE) tidy
+
+.PHONY: tidy
+tidy:
+	@go mod tidy; \
+	go -C internal/tools mod tidy
 
 .PHONY: fmt
-fmt:
-	@find . -type f -name "*.go" ! -path "./pkg/gen/*" ! -path "./vendor/*" | while read -r file; do \
-		go fmt "$${file}" 2>&1 | grep -v "is a program, not an importable package"; \
-		goimports -w -local $(MODULE) "$${file}"; \
+fmt: fmt/sql fmt/buf
+	@go fmt ./...; \
+	go -C internal/tools fmt ./... 2>&1 | grep -v 'is a program, not an importable package' || true; \
+	goimports -w -local $(MODULE) .; \
+	goimports -w -local $(MODULE) internal/tools; \
+	tagalign -fix -sort -order "json,yaml,validate" --strict ./... 2>&1 | grep -v 'proto' || true; \
+
+.PHONY: fmt/sql
+fmt/sql:
+	@find sql -type f -name '*.sql' | while read -r file; do \
+		npx sql-formatter --fix "$$file"; \
+		for macro in arg narg slice embed; do \
+			sed -i.bak "s/sqlc.$$macro (/sqlc.$$macro(/" "$$file" && rm -f "$$file.bak"; \
+		done; \
 	done
 
+.PHONY: fmt/buf
+fmt/buf:
+	@buf format --write .
+
 .PHONY: generate
-generate: generate/buf generate/swagger generate/sqlc
+generate: generate/sqlc generate/buf generate/swagger
+	@go generate ./...
+
+.PHONY: generate/sqlc
+generate/sqlc:
+	@rm -rf pkg/gen/db; \
+	sqlc generate
 
 .PHONY: generate/buf
 generate/buf:
-	@rm -rf pkg/gen; \
+	@rm -rf pkg/gen/proto; \
 	find swagger/dist -type f -name '*.swagger.json' -delete; \
-	buf format --write; \
-	buf lint; \
-	buf breaking --against "https://$(MODULE).git#branch=main"; \
 	buf generate
 
 .PHONY: generate/swagger
@@ -50,9 +84,14 @@ generate/swagger:
 	after="$$(tail -n +"$$(($${line} + 1))" swagger/dist/swagger-initializer.js)"; \
 	echo -e "$${before}\n$${urls}\n$${after}" >swagger/dist/swagger-initializer.js
 
-.PHONY: generate/sqlc
-generate/sqlc:
-	@sqlc generate
+.PHONY: lint
+lint:
+	@go vet ./...; \
+	golangci-lint run ./...; \
+	govulncheck ./...; \
+	sqlc vet; \
+	buf lint; \
+	buf breaking --against "https://$(MODULE).git#branch=main"
 
 .PHONY: test
 test:
